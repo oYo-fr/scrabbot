@@ -1,0 +1,68 @@
+"""
+Gestionnaire pour la commande /help.
+"""
+
+from .base import BaseHandler
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import ContextTypes
+
+
+class HelpHandler(BaseHandler):
+    """Gestionnaire pour la commande /help."""
+    
+    async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        """
+        Traite la commande /help.
+        
+        Args:
+            update: Mise à jour Telegram
+            context: Contexte de la mise à jour
+        """
+        help_message = """
+📚 *Commandes disponibles :*
+
+*🎮 Commandes de jeu :*
+• /newgame - Créer une nouvelle partie
+• /join <id> - Rejoindre une partie
+• /play <mot> <position> - Jouer un mot
+• /pass - Passer son tour
+• /exchange <lettres> - Échanger des lettres
+
+*📋 Commandes d'information :*
+• /start - Démarrer le bot
+• /help - Afficher cette aide
+• /rules - Voir les règles du jeu
+• /status - État de la partie actuelle
+• /stats - Vos statistiques
+
+*⚙️ Commandes de configuration :*
+• /language <fr/en> - Changer la langue
+• /difficulty <facile/moyen/difficile> - Niveau IA
+
+*💡 Exemples :*
+• `/newgame` - Créer une partie solo
+• `/play CHAT H8` - Placer "CHAT" en H8
+• `/exchange QZ` - Échanger Q et Z
+
+*Besoin d'aide ?* Contactez @support
+        """.strip()
+        
+        # Créer des boutons inline pour les actions rapides
+        keyboard = [
+            [
+                InlineKeyboardButton("🎮 Nouvelle partie", callback_data="newgame"),
+                InlineKeyboardButton("📚 Règles", callback_data="rules")
+            ],
+            [
+                InlineKeyboardButton("📊 Statistiques", callback_data="stats"),
+                InlineKeyboardButton("⚙️ Configuration", callback_data="settings")
+            ]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await self.send_message(
+            update=update,
+            text=help_message,
+            parse_mode="Markdown",
+            reply_markup=reply_markup
+        )

@@ -1,0 +1,11 @@
+---
+description: Infos tech
+globs:
+alwaysApply: false
+---
+
+Url du repository pour le projet : https://github.com/oYo-fr/scrabbot
+
+S'assurer de créer une branche pour chaque commit (sauf pour le tout premier).
+S'assurer que le projet build et que les tests passent, s'il y en a.
+S'assurer que le projet respecte le linter s'il est définit.
