@@ -1,0 +1,27 @@
+---
+description: Règles spécifiques au projet Scrabbot
+globs: ["**/*.py", "**/*.js", "**/*.ts"]
+alwaysApply: true
+---
+
+## Architecture du projet
+- **Bot Discord** : Implémentation d'un bot de jeu de Scrabble pour Discord
+- **Langage principal** : Python
+- **Framework** : discord.py pour l'intégration Discord
+
+## Conventions de nommage
+- **Variables et fonctions** : En français, snake_case (ex: `calculer_score`, `mot_valide`)
+- **Classes** : En français, PascalCase (ex: `JoueurScrabble`, `PlateauJeu`)
+- **Constantes** : En français, UPPER_CASE (ex: `POINTS_LETTRES`, `TAILLE_PLATEAU`)
+
+## Structure fonctionnelle
+- **Gestion des mots** : Validation, calcul de score, vérification dans le dictionnaire
+- **Plateau de jeu** : Représentation et manipulation du plateau 15x15
+- **Joueurs** : Gestion des tours, scores, lettres en main
+- **Interface Discord** : Commandes slash, affichage du plateau, interactions
+
+## Règles de développement spécifiques
+- Toujours valider les mots contre le dictionnaire officiel français
+- Respecter les multiplicateurs de score du plateau classique
+- Gérer les cas spéciaux : lettres joker, mots croisés, bonus premier mot
+- Implémenter les vérifications de placement (continuité, connexion aux mots existants)

@@ -169,7 +169,14 @@ cython_debug/
 # Godot-specific ignores
 .godot/
 *.translation
-export_presets.cfg
+
+# Godot export templates (caches locaux, à ne pas versionner)
+.home/.local/share/godot/export_templates/
+**/.local/share/godot/export_templates/
+.home.local/share/godot/export_templates/
+
+# Outils locaux téléchargés (Godot binaire local)
+.tools/godot/
 
 # Imported translations (automatically generated from CSV files)
 *.translation

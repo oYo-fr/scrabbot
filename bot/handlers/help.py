@@ -2,9 +2,10 @@
 Gestionnaire pour la commande /help.
 """
 
-from .base import BaseHandler
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
+
+from .base import BaseHandler
 
 
 class HelpHandler(BaseHandler):
@@ -51,18 +52,19 @@ class HelpHandler(BaseHandler):
         keyboard = [
             [
                 InlineKeyboardButton("🎮 Nouvelle partie", callback_data="newgame"),
-                InlineKeyboardButton("📚 Règles", callback_data="rules")
+                InlineKeyboardButton("📚 Règles", callback_data="rules"),
             ],
             [
                 InlineKeyboardButton("📊 Statistiques", callback_data="stats"),
-                InlineKeyboardButton("⚙️ Configuration", callback_data="settings")
-            ]
+                InlineKeyboardButton("⚙️ Configuration", callback_data="settings"),
+            ],
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
 
         await self.send_message(
             update=update,
+            context=context,
             text=help_message,
             parse_mode="Markdown",
-            reply_markup=reply_markup
+            reply_markup=reply_markup,
         )

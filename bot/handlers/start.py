@@ -2,9 +2,12 @@
 Gestionnaire pour la commande /start.
 """
 
-from .base import BaseHandler
-from telegram import Update
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, WebAppInfo
 from telegram.ext import ContextTypes
+
+from ..config import get_settings
+from ..utils.godot_launcher import launch_godot_project
+from .base import BaseHandler
 
 
 class StartHandler(BaseHandler):
@@ -38,8 +41,44 @@ Utilisez /help pour voir toutes les commandes disponibles.
 *Bon jeu !* 🎯
         """.strip()
 
+        # Lancer la scène Godot (jeu) côté local (desktop)
+        settings = get_settings()
+        launched = False
+        if settings.godot_executable_path:
+            launched = launch_godot_project(
+                executable_path=settings.godot_executable_path,
+                project_dir=settings.godot_project_path,
+            )
+
+        suffix = ""
+        reply_markup = None
+        if settings.godot_web_url:
+            # Ajoute des boutons pour ouvrir la Mini App (plein écran) et un fallback navigateur
+            reply_markup = InlineKeyboardMarkup(
+                [
+                    [
+                        InlineKeyboardButton(
+                            "🎮 Ouvrir en plein écran (Mini App)",
+                            web_app=WebAppInfo(url=settings.godot_web_url),
+                        )
+                    ],
+                    [
+                        InlineKeyboardButton(
+                            "🌐 Ouvrir dans le navigateur",
+                            url=settings.godot_web_url,
+                        )
+                    ],
+                ]
+            )
+            suffix = "\n\nAstuce: utilisez le bouton ‘Mini App’ pour le plein écran."
+        elif launched:
+            suffix = "\n\n🖥️ Lancement de l'interface Godot..."
+
         await self.send_message(
             update=update,
-            text=welcome_message,
-            parse_mode="Markdown"
+            context=context,
+            text=welcome_message
+            + (suffix or "\n\n⚠️ Godot n'a pas pu être lancé automatiquement."),
+            parse_mode="Markdown",
+            reply_markup=reply_markup,
         )

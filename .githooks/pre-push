@@ -1,0 +1,199 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+echo "[pre-push] Initialisation du hook..."
+
+# Bypass optionnel via variable d'environnement
+case "${SKIP_HOOK_CHECKS:-}" in
+    1|true|TRUE|yes|YES)
+        echo "[pre-push] SKIP_HOOK_CHECKS activé. Bypass du hook."
+        exit 0
+        ;;
+esac
+
+# Se placer à la racine du dépôt
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
+
+echo "[pre-push] Nettoyage des fichiers et dossiers temporaires..."
+
+# Fonctions utilitaires
+remove_dirs() {
+	local name="$1"
+	# Supprime tous les dossiers correspondant au motif partout dans le repo, en évitant d'entrer dans les node_modules supprimés ensuite
+	# Ignore les erreurs (fichiers verrouillés sous Windows)
+	find . -path "*/.git" -prune -o -type d -name "$name" -print0 | xargs -0 -I {} sh -c 'rm -rf "$1" || true' _ {}
+}
+
+remove_globs() {
+	local pattern="$1"
+	# Supprime fichiers correspondant au motif
+	find . -path "*/.git" -prune -o -type f -name "$pattern" -print0 | xargs -0 -I {} rm -f {}
+}
+
+# Dossiers Python / caches
+remove_dirs "__pycache__"
+remove_dirs ".pytest_cache"
+remove_dirs ".mypy_cache"
+remove_dirs ".ruff_cache"
+
+# Dossiers Node / sorties
+remove_dirs "node_modules"
+remove_dirs "dist"
+remove_dirs "build"
+remove_dirs ".cache"
+remove_dirs "coverage"
+remove_dirs "htmlcov"
+
+# Environnements virtuels: NE PAS supprimer .venv pour éviter les verrous Windows
+
+# Fichiers temporaires courants
+remove_globs "*.log"
+remove_globs "*.tmp"
+remove_globs "*.pyc"
+remove_globs "*.pyo"
+
+echo "[pre-push] Dépendances: réinstallation..."
+
+# Détection Python
+PYTHON_BIN=""
+if command -v python3 >/dev/null 2>&1; then
+	PYTHON_BIN="python3"
+elif command -v python >/dev/null 2>&1; then
+	PYTHON_BIN="python"
+fi
+
+USE_PYTHON=false
+if [[ -n "${PYTHON_BIN}" ]]; then
+	USE_PYTHON=true
+fi
+
+if $USE_PYTHON; then
+	# Crée un venv propre et installe les dépendances si un requirements existe
+	echo "[pre-push] Python: préparation de l'environnement virtuel et installation des dépendances..."
+	if [[ ! -d ".venv" ]]; then
+		"${PYTHON_BIN}" -m venv .venv
+	fi
+	# shellcheck source=/dev/null
+	if [[ -f ".venv/bin/activate" ]]; then
+		source .venv/bin/activate
+	elif [[ -f ".venv/Scripts/activate" ]]; then
+		source .venv/Scripts/activate
+	else
+		echo "[pre-push] Avertissement: script d'activation venv introuvable."
+	fi
+	python -m pip install --upgrade pip >/dev/null
+	if [[ -f "bot/requirements.txt" ]]; then
+		pip install -r bot/requirements.txt
+	else
+		echo "[pre-push] Avertissement: bot/requirements.txt introuvable, étape d'installation Python ignorée."
+	fi
+else
+	echo "[pre-push] Avertissement: Python introuvable, étapes Python ignorées."
+fi
+
+# Détection de projets Node et réinstallation
+if command -v npm >/dev/null 2>&1; then
+	echo "[pre-push] npm: réinstallation des dépendances (npm ci) pour chaque package.json détecté..."
+	# Cherche tous les package.json (en excluant node_modules)
+	mapfile -t PKG_JSONS < <(find . -path "*/node_modules" -prune -o -name package.json -print)
+	for pkg in "${PKG_JSONS[@]}"; do
+		dir="$(dirname "$pkg")"
+		echo "[pre-push] npm ci dans: $dir"
+		(
+			cd "$dir"
+			npm ci --no-audit --no-fund
+		)
+	done
+else
+	echo "[pre-push] Avertissement: npm introuvable, étapes npm ignorées."
+fi
+
+echo "[pre-push] Linting..."
+
+# Lint Python
+if $USE_PYTHON; then
+	if command -v flake8 >/dev/null 2>&1; then
+		echo "[pre-push] flake8"
+		flake8 .
+	fi
+	if command -v black >/dev/null 2>&1; then
+		echo "[pre-push] black --check"
+		black --check .
+	fi
+	if command -v isort >/dev/null 2>&1; then
+		echo "[pre-push] isort --check-only"
+		isort --check-only .
+	fi
+	if command -v mypy >/dev/null 2>&1; then
+		echo "[pre-push] mypy"
+		mypy . || true
+	fi
+fi
+
+# Lint npm si script présent
+if command -v npm >/dev/null 2>&1; then
+	for pkg in "${PKG_JSONS[@]:-}"; do
+		dir="$(dirname "$pkg")"
+		echo "[pre-push] vérification et exécution du script lint (si présent) dans: $dir"
+		(
+			cd "$dir"
+			npm run -s lint --if-present || true
+		)
+	done
+fi
+
+echo "[pre-push] Build..."
+
+# Build Python: compilation bytecode
+if $USE_PYTHON; then
+	echo "[pre-push] Python: compilation (compileall)"
+	python -m compileall -q .
+fi
+
+# Build npm si script présent
+if command -v npm >/dev/null 2>&1; then
+	for pkg in "${PKG_JSONS[@]:-}"; do
+		dir="$(dirname "$pkg")"
+		echo "[pre-push] exécution du script build (si présent) dans: $dir"
+		(
+			cd "$dir"
+			npm run -s build --if-present || true
+		)
+	done
+fi
+
+# Export Godot Web si projet godot présent
+if [[ -d "godot" && -f "scripts/export_godot.sh" ]]; then
+	echo "[pre-push] Godot: export web vers docs/miniapp/game/"
+	if bash scripts/export_godot.sh "Web" "godot" "../docs/miniapp/game/index.html" 2>/dev/null; then
+		echo "[pre-push] Export Godot web terminé avec succès"
+	else
+		echo "[pre-push] Avertissement: échec de l'export Godot web (ignoré)"
+	fi
+fi
+
+echo "[pre-push] Tests..."
+
+# Tests Python
+if $USE_PYTHON; then
+	if command -v pytest >/dev/null 2>&1; then
+		echo "[pre-push] pytest"
+		pytest -q
+	fi
+fi
+
+# Tests npm si script présent
+if command -v npm >/dev/null 2>&1; then
+	for pkg in "${PKG_JSONS[@]:-}"; do
+		dir="$(dirname "$pkg")"
+		echo "[pre-push] exécution du script test (si présent) dans: $dir"
+		(
+			cd "$dir"
+			npm test --silent --if-present || true
+		)
+	done
+fi
+
+echo "[pre-push] Tous les contrôles sont terminés avec succès. Autorisation du push."

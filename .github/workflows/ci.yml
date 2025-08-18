@@ -2,9 +2,23 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches:
+      - main
+      - develop
+      - 'oyo-*'
   pull_request:
-    branches: [ main, develop ]
+    branches:
+      - '**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+env:
+  TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+  API_SECRET_KEY: "test-secret-key"
 
 jobs:
   test:
@@ -31,7 +45,8 @@ jobs:
 
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
+        python -m pip install --upgrade pip setuptools wheel
+        pip install -U "cryptography>=43.0.1"
         pip install -r bot/requirements.txt
 
     - name: Run linting
@@ -44,15 +59,166 @@ jobs:
 
     - name: Run tests
       run: |
-        cd bot
-        pytest tests/ --cov=. --cov-report=xml --cov-report=html
+        PYTHONPATH=. python -m pytest tests/ --cov=bot --cov-report=xml --cov-report=html
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
-        file: ./bot/coverage.xml
+        file: ./coverage.xml
         flags: unittests
         name: codecov-umbrella
+
+  export-godot:
+    name: Export Godot (headless)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Godot 4.4 headless + export templates (GitHub Releases)
+      run: |
+        set -euo pipefail
+        sudo apt-get update && sudo apt-get install -y unzip curl
+        GODOT_VERSION=4.4
+        TAG="${GODOT_VERSION}-stable"
+        GODOT_TAG="${GODOT_VERSION}.stable"
+        BIN_URL="https://github.com/godotengine/godot/releases/download/${TAG}/Godot_v${TAG}_linux.x86_64.zip"
+        TPL_URL="https://github.com/godotengine/godot/releases/download/${TAG}/Godot_v${TAG}_export_templates.tpz"
+        echo "Downloading Godot from $BIN_URL"
+        curl --retry 5 --retry-delay 5 -L "$BIN_URL" -o godot.zip
+        sudo unzip -q godot.zip -d /usr/local/bin
+        sudo mv /usr/local/bin/Godot_v${TAG}_linux.x86_64 /usr/local/bin/godot4
+        sudo chmod +x /usr/local/bin/godot4
+        echo "Installing export templates from $TPL_URL"
+        curl --retry 5 --retry-delay 5 -L "$TPL_URL" -o templates.tpz
+        mkdir -p "$HOME/.local/share/godot/export_templates/${GODOT_TAG}"
+        
+        echo "=== Extracting only web templates ==="
+        # Extraire uniquement les templates web nécessaires depuis l'archive
+        unzip -j templates.tpz "templates/web_nothreads_debug.zip" "templates/web_nothreads_release.zip" -d "$HOME/.local/share/godot/export_templates/${GODOT_TAG}/"
+        
+        echo "=== Cleaning up archive ==="
+        rm -f templates.tpz
+        
+        echo "=== Templates extraction successful - files confirmed at: ==="
+        echo "$HOME/.local/share/godot/export_templates/${GODOT_TAG}/web_nothreads_debug.zip"
+        echo "$HOME/.local/share/godot/export_templates/${GODOT_TAG}/web_nothreads_release.zip"
+        
+        echo "=== Verifying web templates installation ==="
+        ls -la "$HOME/.local/share/godot/export_templates/${GODOT_TAG}/"
+        
+        echo "=== Checking required web templates ==="
+        cd "$HOME/.local/share/godot/export_templates/${GODOT_TAG}"
+        for file in web_nothreads_debug.zip web_nothreads_release.zip; do
+          if [ -f "$file" ]; then
+            echo "✅ $file: $(ls -lh $file)"
+          else
+            echo "❌ Missing: $file"
+            exit 1
+          fi
+        done
+
+    - name: Export project (Web)
+      run: |
+        set -e
+        echo "=== Debug Godot export ==="
+        pwd
+        ls -la godot/
+        echo "=== Checking Godot version ==="
+        /usr/local/bin/godot4 --version
+        
+        echo "=== Verifying export templates before export ==="
+        TEMPLATES_DIR="$HOME/.local/share/godot/export_templates/${GODOT_TAG}"
+        echo "Templates directory: $TEMPLATES_DIR"
+        ls -la "$TEMPLATES_DIR"
+        
+        echo "=== Checking required web templates specifically ==="
+        for file in web_nothreads_debug.zip web_nothreads_release.zip; do
+          if [ -f "$TEMPLATES_DIR/$file" ]; then
+            echo "✅ Found: $TEMPLATES_DIR/$file"
+            ls -la "$TEMPLATES_DIR/$file"
+            if [ -L "$TEMPLATES_DIR/$file" ]; then
+              echo "   -> Symlink target: $(readlink -f "$TEMPLATES_DIR/$file")"
+            fi
+          else
+            echo "❌ Missing: $TEMPLATES_DIR/$file"
+          fi
+        done
+        
+        echo "=== Checking export presets ==="
+        cat godot/export_presets.cfg | grep -A 10 -B 2 "Web"
+        
+        echo "=== Creating build directory ==="
+        mkdir -p build/web
+        ls -la build/
+        
+        echo "=== Setting up environment for Godot export ==="
+        export HOME="$HOME"
+        export XDG_DATA_HOME="$HOME/.local/share"
+        echo "HOME: $HOME"
+        echo "XDG_DATA_HOME: $XDG_DATA_HOME"
+        echo "Templates should be found at: $XDG_DATA_HOME/godot/export_templates/${GODOT_TAG}/"
+        
+        echo "=== Running Godot export with absolute path ==="
+        EXPORT_PATH="$(pwd)/build/web/index.html"
+        echo "Export path: $EXPORT_PATH"
+        
+        echo "=== Running Godot export with maximum verbosity ==="
+        /usr/local/bin/godot4 --headless --verbose --path godot --export-release "Web" "$EXPORT_PATH" 2>&1 || {
+          echo "=== Export failed, checking for common issues ==="
+          echo "Godot exit code: $?"
+          echo "=== Checking if Godot found project.godot ==="
+          ls -la godot/project.godot
+          echo "=== Checking export presets file ==="
+          ls -la godot/export_presets.cfg
+          echo "=== Re-checking templates one more time ==="
+          ls -la "$TEMPLATES_DIR"/web*
+          exit 1
+        }
+        
+        echo "=== Post-export check ==="
+        ls -la build/web/ || echo "Build directory empty or missing"
+        ls -la build/ || echo "Build directory missing"
+
+    - name: Upload web artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: scrabbot-web
+        path: build/web/
+
+  deploy-pages:
+    name: Deploy Web to GitHub Pages
+    needs: export-godot
+    runs-on: ubuntu-latest
+    concurrency:
+      group: pages
+      cancel-in-progress: true
+    steps:
+    - name: Configure Pages
+      uses: actions/configure-pages@v5
+      with:
+        enablement: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Download web artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: scrabbot-web
+        path: build/web
+
+    - name: Upload Pages artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: build/web
+
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
+      with:
+        preview: ${{ github.ref != 'refs/heads/main' }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
   build:
     needs: test
