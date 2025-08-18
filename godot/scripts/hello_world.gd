@@ -5,13 +5,13 @@ extends Control
 func _ready():
 	"""Appelé quand la scène est prête."""
 	print("🎲 Scrabbot - Hello World!")
-	
+
 	# Configurer le label principal
 	var label = $VBoxContainer/Label
 	if label:
 		label.text = "🎲 Bienvenue dans Scrabbot !"
 		label.add_theme_font_size_override("font_size", 48)
-	
+
 	# Configurer le bouton
 	var button = $VBoxContainer/Button
 	if button:

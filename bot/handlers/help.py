@@ -9,11 +9,11 @@ from telegram.ext import ContextTypes
 
 class HelpHandler(BaseHandler):
     """Gestionnaire pour la commande /help."""
-    
+
     async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         """
         Traite la commande /help.
-        
+
         Args:
             update: Mise à jour Telegram
             context: Contexte de la mise à jour
@@ -46,7 +46,7 @@ class HelpHandler(BaseHandler):
 
 *Besoin d'aide ?* Contactez @support
         """.strip()
-        
+
         # Créer des boutons inline pour les actions rapides
         keyboard = [
             [
@@ -59,7 +59,7 @@ class HelpHandler(BaseHandler):
             ]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
-        
+
         await self.send_message(
             update=update,
             text=help_message,

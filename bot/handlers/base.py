@@ -10,32 +10,32 @@ from telegram.ext import ContextTypes
 
 class BaseHandler(ABC):
     """Classe de base pour tous les gestionnaires de commandes."""
-    
+
     def __init__(self):
         """Initialise le gestionnaire."""
         self.name = self.__class__.__name__.replace("Handler", "").lower()
-    
+
     @abstractmethod
     async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         """
         Traite la commande.
-        
+
         Args:
             update: Mise à jour Telegram
             context: Contexte de la mise à jour
         """
         pass
-    
+
     async def send_message(
-        self, 
-        update: Update, 
-        text: str, 
+        self,
+        update: Update,
+        text: str,
         parse_mode: Optional[str] = None,
         reply_markup: Optional[Any] = None
     ) -> None:
         """
         Envoie un message.
-        
+
         Args:
             update: Mise à jour Telegram
             text: Texte du message
@@ -49,14 +49,14 @@ class BaseHandler(ABC):
                 parse_mode=parse_mode,
                 reply_markup=reply_markup
             )
-    
+
     def get_user_info(self, update: Update) -> Dict[str, Any]:
         """
         Récupère les informations de l'utilisateur.
-        
+
         Args:
             update: Mise à jour Telegram
-            
+
         Returns:
             Informations de l'utilisateur
         """
