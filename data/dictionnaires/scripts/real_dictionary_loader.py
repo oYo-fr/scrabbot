@@ -64,7 +64,7 @@ class RealDictionaryLoader:
             'ods_french': DictionarySource(
                 name="ODS8_French",
                 language="fr",
-                url="https://raw.githubusercontent.com/cmangin87/scrabble-bot/master/dictionaries/ods8.txt",
+                url="https://raw.githubusercontent.com/Thecoolsim/French-Scrabble-ODS8/main/ODS8_word_list.txt",
                 local_file="ods8_french.txt",
                 expected_words=400000,
                 description="Official French Scrabble Dictionary (ODS8)"
@@ -72,7 +72,7 @@ class RealDictionaryLoader:
             'sowpods_english': DictionarySource(
                 name="SOWPODS_English",
                 language="en",
-                url="https://raw.githubusercontent.com/redbo/scrabble/master/dictionary.txt",
+                url="https://raw.githubusercontent.com/benjamin-croker/scrabble-bot/master/scrabble_bot/data/sowpods.txt",
                 local_file="sowpods_english.txt", 
                 expected_words=267000,
                 description="International English Scrabble Dictionary (SOWPODS)"
@@ -80,7 +80,7 @@ class RealDictionaryLoader:
             'twl_english': DictionarySource(
                 name="TWL_English",
                 language="en",
-                url="https://raw.githubusercontent.com/jonbcard/scrabble-bot/master/src/dictionary.txt",
+                url="https://raw.githubusercontent.com/jeremylow/scrabble/master/dictionary.txt",
                 local_file="twl_english.txt",
                 expected_words=187000,
                 description="North American Tournament Word List (TWL)"
