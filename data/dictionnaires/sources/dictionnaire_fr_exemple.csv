@@ -1,0 +1,118 @@
+mot,definition,categorie_grammaticale,valide_scrabble,source
+CHAT,"Mammifère domestique félin de la famille des félidés",nom,true,ODS
+CHATS,"Pluriel de chat",nom,true,ODS
+CHIEN,"Mammifère domestique canin de la famille des canidés",nom,true,ODS
+CHIENS,"Pluriel de chien",nom,true,ODS
+MAISON,"Bâtiment d'habitation",nom,true,ODS
+MAISONS,"Pluriel de maison",nom,true,ODS
+JOUER,"Pratiquer un jeu ou s'amuser",verbe,true,ODS
+JOUE,"Troisième personne du singulier du verbe jouer",verbe,true,ODS
+JOUES,"Deuxième personne du singulier du verbe jouer",verbe,true,ODS
+JEUX,"Pluriel de jeu",nom,true,ODS
+JEU,"Activité ludique ou de divertissement",nom,true,ODS
+SCRABBLE,"Jeu de lettres où l'on forme des mots sur un plateau",nom,true,ODS
+LETTRE,"Caractère de l'alphabet",nom,true,ODS
+LETTRES,"Pluriel de lettre",nom,true,ODS
+MOT,"Unité linguistique composée de sons",nom,true,ODS
+MOTS,"Pluriel de mot",nom,true,ODS
+PLATEAU,"Surface plane horizontale",nom,true,ODS
+PLATEAUX,"Pluriel de plateau",nom,true,ODS
+POINT,"Marque ronde de petite dimension",nom,true,ODS
+POINTS,"Pluriel de point",nom,true,ODS
+SCORE,"Total des points obtenus",nom,true,ODS
+SCORES,"Pluriel de score",nom,true,ODS
+DICTIONNAIRE,"Recueil de mots d'une langue",nom,true,ODS
+DICTIONNAIRES,"Pluriel de dictionnaire",nom,true,ODS
+FRANCAIS,"Relatif à la France",adjectif,true,ODS
+LANGUE,"Système de communication verbale",nom,true,ODS
+LANGUES,"Pluriel de langue",nom,true,ODS
+VALIDE,"Qui est conforme aux règles",adjectif,true,ODS
+VALIDES,"Pluriel de valide",adjectif,true,ODS
+BASE,"Fondement ou support",nom,true,ODS
+BASES,"Pluriel de base",nom,true,ODS
+DONNEE,"Information ou élément factuel",nom,true,ODS
+DONNEES,"Pluriel de donnée",nom,true,ODS
+RECHERCHE,"Action de chercher avec méthode",nom,true,ODS
+RECHERCHES,"Pluriel de recherche",nom,true,ODS
+SERVEUR,"Ordinateur qui fournit des services",nom,true,ODS
+SERVEURS,"Pluriel de serveur",nom,true,ODS
+API,"Interface de programmation d'application",nom,true,Wiktionnaire
+TEST,"Épreuve ou examen",nom,true,ODS
+TESTS,"Pluriel de test",nom,true,ODS
+VALIDATION,"Action de valider ou confirmer",nom,true,ODS
+VALIDATIONS,"Pluriel de validation",nom,true,ODS
+PERFORMANCE,"Résultat obtenu dans l'exécution",nom,true,ODS
+PERFORMANCES,"Pluriel de performance",nom,true,ODS
+SQLITE,"Système de gestion de base de données",nom,true,Wiktionnaire
+CSV,"Format de fichier pour données tabulaires",nom,true,Wiktionnaire
+FICHIER,"Ensemble ordonné d'informations",nom,true,ODS
+FICHIERS,"Pluriel de fichier",nom,true,ODS
+SCRIPT,"Programme informatique automatisé",nom,true,Wiktionnaire
+SCRIPTS,"Pluriel de script",nom,true,Wiktionnaire
+PYTHON,"Langage de programmation",nom,true,Wiktionnaire
+CONVERSION,"Action de convertir ou transformer",nom,true,ODS
+CONVERSIONS,"Pluriel de conversion",nom,true,ODS
+INDEX,"Table alphabétique ou système d'indexation",nom,true,ODS
+OPTIMISATION,"Action d'optimiser ou améliorer",nom,true,ODS
+OPTIMISATIONS,"Pluriel d'optimisation",nom,true,ODS
+GODOT,"Moteur de jeu libre et open source",nom,true,Wiktionnaire
+MOTEUR,"Mécanisme producteur d'énergie",nom,true,ODS
+MOTEURS,"Pluriel de moteur",nom,true,ODS
+RAPIDE,"Qui se déplace à grande vitesse",adjectif,true,ODS
+RAPIDES,"Pluriel de rapide",adjectif,true,ODS
+EFFICACE,"Qui produit l'effet attendu",adjectif,true,ODS
+EFFICACES,"Pluriel d'efficace",adjectif,true,ODS
+INTELLIGENT,"Qui fait preuve d'intelligence",adjectif,true,ODS
+INTELLIGENTS,"Pluriel d'intelligent",adjectif,true,ODS
+BOT,"Programme informatique automatisé",nom,true,Wiktionnaire
+BOTS,"Pluriel de bot",nom,true,Wiktionnaire
+ALGO,"Abréviation d'algorithme",nom,true,Wiktionnaire
+ALGOS,"Pluriel d'algo",nom,true,Wiktionnaire
+ALGORITHME,"Suite d'opérations élémentaires",nom,true,ODS
+ALGORITHMES,"Pluriel d'algorithme",nom,true,ODS
+SYSTEM,"Terme anglais, non autorisé en français",nom,false,Wiktionnaire
+MULTILINGUE,"Qui concerne plusieurs langues",adjectif,true,ODS
+MULTILINGUES,"Pluriel de multilingue",adjectif,true,ODS
+STRUCTURE,"Organisation des parties d'un tout",nom,true,ODS
+STRUCTURES,"Pluriel de structure",nom,true,ODS
+IMPLEMENTATION,"Action de mettre en application",nom,true,ODS
+IMPLEMENTATIONS,"Pluriel d'implémentation",nom,true,ODS
+FONCTION,"Rôle joué par quelque chose",nom,true,ODS
+FONCTIONS,"Pluriel de fonction",nom,true,ODS
+CLASSE,"Catégorie d'objets ayant des propriétés communes",nom,true,ODS
+CLASSES,"Pluriel de classe",nom,true,ODS
+METHODE,"Manière de procéder",nom,true,ODS
+METHODES,"Pluriel de méthode",nom,true,ODS
+OBJET,"Chose matérielle ou conceptuelle",nom,true,ODS
+OBJETS,"Pluriel d'objet",nom,true,ODS
+MODULE,"Élément constitutif d'un ensemble",nom,true,ODS
+MODULES,"Pluriel de module",nom,true,ODS
+IMPORT,"Action d'importer",nom,true,ODS
+IMPORTS,"Pluriel d'import",nom,true,ODS
+EXPORT,"Action d'exporter",nom,true,ODS
+EXPORTS,"Pluriel d'export",nom,true,ODS
+CONFIGURATION,"Action de configurer",nom,true,ODS
+CONFIGURATIONS,"Pluriel de configuration",nom,true,ODS
+PARAMETRE,"Variable d'entrée d'une fonction",nom,true,ODS
+PARAMETRES,"Pluriel de paramètre",nom,true,ODS
+RESULT,"Terme anglais pour résultat",nom,false,Wiktionnaire
+RESULTAT,"Ce qui résulte de quelque chose",nom,true,ODS
+RESULTATS,"Pluriel de résultat",nom,true,ODS
+ERREUR,"Faute ou méprise",nom,true,ODS
+ERREURS,"Pluriel d'erreur",nom,true,ODS
+SUCCESS,"Terme anglais pour succès",nom,false,Wiktionnaire
+SUCCES,"Réussite ou bon résultat",nom,true,ODS
+LOGGING,"Terme anglais pour journalisation",nom,false,Wiktionnaire
+JOURNAL,"Registre où l'on note jour par jour",nom,true,ODS
+JOURNAUX,"Pluriel de journal",nom,true,ODS
+DEBUG,"Terme anglais pour débogage",nom,false,Wiktionnaire
+DEBOGAGE,"Action de déboguer un programme",nom,true,ODS
+INFO,"Abréviation d'information",nom,true,Wiktionnaire
+INFOS,"Pluriel d'info",nom,true,Wiktionnaire
+WARNING,"Terme anglais pour avertissement",nom,false,Wiktionnaire
+AVERTISSEMENT,"Action d'avertir",nom,true,ODS
+AVERTISSEMENTS,"Pluriel d'avertissement",nom,true,ODS
+CRITIQUE,"Qui présente du danger",adjectif,true,ODS
+CRITIQUES,"Pluriel de critique",adjectif,true,ODS
+STATISTIQUE,"Relative aux statistiques",adjectif,true,ODS
+STATISTIQUES,"Pluriel de statistique",nom,true,ODS
