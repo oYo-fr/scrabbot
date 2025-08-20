@@ -121,6 +121,19 @@ class ConvertisseurCSVSQLite:
         Args:
             cursor: Curseur de la base SQLite
         """
+        # Table des métadonnées
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS dictionnaires (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            code_langue CHAR(2) NOT NULL,
+            nom TEXT NOT NULL,
+            version TEXT NOT NULL,
+            date_creation DATETIME DEFAULT CURRENT_TIMESTAMP,
+            source TEXT NOT NULL,
+            UNIQUE(code_langue, version)
+        )
+        """)
+        
         # Table principale des mots anglais
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS mots_en (
@@ -393,11 +406,15 @@ class ConvertisseurCSVSQLite:
                 if lignes_valides:
                     self._inserer_batch(cursor, table_name, lignes_valides, langue)
             
-            # Optimisation finale
+            # Final optimization
             cursor.execute("ANALYZE")
-            cursor.execute("VACUUM")
             
             conn.commit()
+            conn.close()
+            
+            # VACUUM must be executed outside of a transaction
+            conn = sqlite3.connect(fichier_db)
+            conn.execute("VACUUM")
             conn.close()
             
             self.statistiques["fin"] = time.time()

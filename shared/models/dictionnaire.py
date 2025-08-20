@@ -164,15 +164,15 @@ class DictionaryService:
             # Query according to language
             if language == LanguageEnum.FRENCH:
                 query = """
-                SELECT word as word, definition, points, is_valid_scrabble, part_of_speech
-                FROM french_words 
-                WHERE word = ? AND is_valid_scrabble = 1
+                SELECT mot as word, definition, points, valide_scrabble as is_valid_scrabble, categorie_grammaticale as part_of_speech
+                FROM mots_fr 
+                WHERE mot = ? AND valide_scrabble = 1
                 """
             else:
                 query = """
-                SELECT word, definition, points, is_valid_scrabble, part_of_speech
-                FROM english_words 
-                WHERE word = ? AND is_valid_scrabble = 1
+                SELECT word, definition, points, scrabble_valid as is_valid_scrabble, part_of_speech
+                FROM mots_en 
+                WHERE word = ? AND scrabble_valid = 1
                 """
             
             cursor = conn.cursor()
@@ -246,21 +246,25 @@ class DictionaryService:
             conn = self._get_connection(language)
             
             # Dynamic query construction
-            conditions = ["is_valid_scrabble = 1"]
+            conditions = []
             params = []
             
             if language == LanguageEnum.FRENCH:
-                table = "french_words"
-                word_col = "word"
-                length_col = "length"
-                first_col = "first_letter"
-                last_col = "last_letter"
+                table = "mots_fr"
+                word_col = "mot"
+                length_col = "longueur"
+                first_col = "premiere_lettre"
+                last_col = "derniere_lettre"
+                valid_col = "valide_scrabble"
             else:
-                table = "english_words"
+                table = "mots_en"
                 word_col = "word"
                 length_col = "length"
                 first_col = "first_letter"
                 last_col = "last_letter"
+                valid_col = "scrabble_valid"
+            
+            conditions.append(f"{valid_col} = 1")
             
             if length:
                 conditions.append(f"{length_col} = ?")
@@ -289,20 +293,36 @@ class DictionaryService:
             # Convert to DictionaryWord objects
             words = []
             for row in results:
-                word = DictionaryWord(
-                    id=row["id"],
-                    word=row["word"],
-                    definition=row["definition"],
-                    part_of_speech=row["part_of_speech"],
-                    points=row["points"],
-                    is_valid_scrabble=bool(row["is_valid_scrabble"]),
-                    length=row["length"],
-                    first_letter=row["first_letter"],
-                    last_letter=row["last_letter"],
-                    language=language,
-                    source=row["source"],
-                    date_added=row["date_added"]
-                )
+                if language == LanguageEnum.FRENCH:
+                    word = DictionaryWord(
+                        id=row["id"],
+                        word=row["mot"],
+                        definition=row["definition"],
+                        part_of_speech=row["categorie_grammaticale"],
+                        points=row["points"],
+                        is_valid_scrabble=bool(row["valide_scrabble"]),
+                        length=row["longueur"],
+                        first_letter=row["premiere_lettre"],
+                        last_letter=row["derniere_lettre"],
+                        language=language,
+                        source=row["source"],
+                        date_added=row["date_ajout"]
+                    )
+                else:
+                    word = DictionaryWord(
+                        id=row["id"],
+                        word=row["word"],
+                        definition=row["definition"],
+                        part_of_speech=row["part_of_speech"],
+                        points=row["points"],
+                        is_valid_scrabble=bool(row["scrabble_valid"]),
+                        length=row["length"],
+                        first_letter=row["first_letter"],
+                        last_letter=row["last_letter"],
+                        language=language,
+                        source=row["source"],
+                        date_added=row["date_added"]
+                    )
                 words.append(word)
             
             return words
