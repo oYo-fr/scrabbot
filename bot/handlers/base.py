@@ -4,6 +4,7 @@ Classe de base pour les gestionnaires de commandes.
 
 from abc import ABC, abstractmethod
 from typing import Any, Dict, Optional
+
 from telegram import Update
 from telegram.ext import ContextTypes
 
@@ -29,9 +30,10 @@ class BaseHandler(ABC):
     async def send_message(
         self,
         update: Update,
+        context: ContextTypes.DEFAULT_TYPE,
         text: str,
         parse_mode: Optional[str] = None,
-        reply_markup: Optional[Any] = None
+        reply_markup: Optional[Any] = None,
     ) -> None:
         """
         Envoie un message.
@@ -47,7 +49,7 @@ class BaseHandler(ABC):
                 chat_id=update.effective_chat.id,
                 text=text,
                 parse_mode=parse_mode,
-                reply_markup=reply_markup
+                reply_markup=reply_markup,
             )
 
     def get_user_info(self, update: Update) -> Dict[str, Any]:
@@ -67,6 +69,6 @@ class BaseHandler(ABC):
                 "username": user.username,
                 "first_name": user.first_name,
                 "last_name": user.last_name,
-                "language_code": user.language_code
+                "language_code": user.language_code,
             }
         return {}

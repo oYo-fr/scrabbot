@@ -8,7 +8,7 @@ __version__ = "0.1.0"
 __author__ = "Yoann Diguet"
 __email__ = "yoann.diguet@example.com"
 
-from .config import settings
 from .bot import ScrabbotBot
+from .config import get_settings
 
-__all__ = ["ScrabbotBot", "settings"]
+__all__ = ["ScrabbotBot", "get_settings"]

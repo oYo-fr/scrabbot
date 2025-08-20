@@ -1,11 +1,29 @@
 ---
-description: Infos tech
-globs:
-alwaysApply: false
+description: Informations techniques et bonnes pratiques de développement
+alwaysApply: true
 ---
 
-Url du repository pour le projet : https://github.com/oYo-fr/scrabbot
+## Informations du projet
+- **Repository GitHub** : https://github.com/oYo-fr/scrabbot
+- **Workspace** : /workspaces/scrabbot
 
-S'assurer de créer une branche pour chaque commit (sauf pour le tout premier).
-S'assurer que le projet build et que les tests passent, s'il y en a.
-S'assurer que le projet respecte le linter s'il est définit.
+## Workflow de développement
+1. **Gestion des branches** : Si l'on est sur main, créer une nouvelle branche pour chaque fonctionnalité/correction (sauf pour le premier commit)
+2. **Tests et qualité** : 
+   - S'assurer que le projet build correctement
+   - Vérifier que tous les tests passent avant de commiter
+   - Respecter les règles du linter si configuré
+3. **Commits** : Utiliser des messages de commit clairs et descriptifs en français
+
+## Gestion des dépendances
+- **Installation de nouvelles dépendances** : À chaque fois qu'une nouvelle dépendance est installée pour le projet, elle doit être correctement configurée pour :
+  - Le devcontainer (mise à jour des fichiers de configuration appropriés)
+  - La CI/CD (mise à jour des workflows et fichiers de dépendances)
+- **Validation** : S'assurer que la dépendance fonctionne correctement dans les deux environnements
+- **Documentation** : Documenter la raison de l'ajout de la dépendance si elle n'est pas évidente
+
+## Bonnes pratiques
+- Toujours lire et comprendre le code existant avant de faire des modifications
+- Utiliser des noms de variables et fonctions en français pour ce projet
+- Documenter les fonctions complexes
+- Tester manuellement les changements critiques

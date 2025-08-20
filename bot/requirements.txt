@@ -3,7 +3,6 @@ python-telegram-bot==20.7
 python-dotenv==1.0.0
 
 # Base de données
-sqlite3
 sqlalchemy==2.0.23
 alembic==1.13.1
 
@@ -30,6 +29,7 @@ loguru==0.7.2
 
 # Utilitaires
 pydantic==2.5.0
+pydantic-settings==2.2.1
 python-multipart==0.0.6
 aiofiles==23.2.1
 
@@ -38,7 +38,7 @@ redis==5.0.1
 aioredis==2.0.1
 
 # Sécurité
-cryptography==41.0.8
+cryptography==43.0.1
 passlib==1.7.4
 
 # Monitoring

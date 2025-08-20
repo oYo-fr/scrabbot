@@ -1,0 +1,71 @@
+{
+  "name": "Scrabbot Dev",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "remoteUser": "vscode",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "charliermarsh.ruff",
+        "ms-azuretools.vscode-docker",
+        "github.vscode-github-actions",
+        "GitHub.copilot"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.testing.pytestEnabled": true,
+        "python.testing.pytestArgs": [
+          "-q",
+          "tests"
+        ],
+        "python.formatting.provider": "black",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.organizeImports": true
+        }
+      }
+    }
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {}
+  },
+  "mounts": [
+    "source=scrabbot-pip-cache,target=/home/vscode/.cache/pip,type=volume",
+    "source=scrabbot-godot-cache,target=/workspaces/scrabbot/.cache,type=volume",
+    "source=scrabbot-godot-home,target=/workspaces/scrabbot/.home,type=volume"
+  ],
+  "postCreateCommand": "bash .devcontainer/scripts/post_create.sh",
+  "postStartCommand": "bash .devcontainer/scripts/post_start.sh",
+  "forwardPorts": [
+    8000,
+    8080,
+    3000,
+    5000
+  ],
+  "portsAttributes": {
+    "8000": {
+      "label": "API Bot",
+      "onAutoForward": "notify"
+    },
+    "8080": {
+      "label": "Interface Web Godot",
+      "onAutoForward": "openBrowser"
+    },
+    "3000": {
+      "label": "Dev Server",
+      "onAutoForward": "notify"
+    },
+    "5000": {
+      "label": "Flask/Debug",
+      "onAutoForward": "notify"
+    }
+  },
+  "containerEnv": {
+    "PIP_DISABLE_PIP_VERSION_CHECK": "1",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PYTHONUNBUFFERED": "1"
+  }
+}
