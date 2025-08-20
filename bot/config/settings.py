@@ -51,10 +51,10 @@ class Settings(BaseSettings):
 
     # Configuration des dictionnaires
     dictionary_fr_path: str = Field(
-        "./data/dictionaries/french.db", description="Chemin du dictionnaire français"
+        "./data/dictionnaires/databases/french_extended.db", description="Chemin du dictionnaire français"
     )
     dictionary_en_path: str = Field(
-        "./data/dictionaries/english.db", description="Chemin du dictionnaire anglais"
+        "./data/dictionnaires/databases/english_extended.db", description="Chemin du dictionnaire anglais"
     )
 
     # Configuration des tests
