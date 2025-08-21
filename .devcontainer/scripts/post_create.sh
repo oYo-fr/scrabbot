@@ -16,6 +16,9 @@ if [ -f "/workspaces/scrabbot/bot/requirements.txt" ]; then
     python -m pip install -r /workspaces/scrabbot/bot/requirements.txt
 fi
 
+# Install SQLite3 for database management
+sudo apt update && sudo apt install -y sqlite3 || true
+
 # Ensure Git is configured minimally (useful inside containers)
 git config --global init.defaultBranch main || true
 git config --global pull.rebase false || true

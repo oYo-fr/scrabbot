@@ -32,6 +32,9 @@ pydantic==2.5.0
 pydantic-settings==2.2.1
 python-multipart==0.0.6
 aiofiles==23.2.1
+pandas==2.3.1  # Pour la manipulation des données de dictionnaires
+beautifulsoup4==4.12.2  # Pour parser le HTML du Wiktionnaire
+unidecode==1.4.0  # Pour la normalisation des mots (suppression des accents)
 
 # Cache et performance
 redis==5.0.1

@@ -12,7 +12,8 @@
         "charliermarsh.ruff",
         "ms-azuretools.vscode-docker",
         "github.vscode-github-actions",
-        "GitHub.copilot"
+        "GitHub.copilot",
+        "qwtel.sqlite-viewer"
       ],
       "settings": {
         "python.defaultInterpreterPath": "/usr/local/bin/python",

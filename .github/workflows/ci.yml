@@ -91,21 +91,21 @@ jobs:
         echo "Installing export templates from $TPL_URL"
         curl --retry 5 --retry-delay 5 -L "$TPL_URL" -o templates.tpz
         mkdir -p "$HOME/.local/share/godot/export_templates/${GODOT_TAG}"
-        
+
         echo "=== Extracting only web templates ==="
         # Extraire uniquement les templates web nécessaires depuis l'archive
         unzip -j templates.tpz "templates/web_nothreads_debug.zip" "templates/web_nothreads_release.zip" -d "$HOME/.local/share/godot/export_templates/${GODOT_TAG}/"
-        
+
         echo "=== Cleaning up archive ==="
         rm -f templates.tpz
-        
+
         echo "=== Templates extraction successful - files confirmed at: ==="
         echo "$HOME/.local/share/godot/export_templates/${GODOT_TAG}/web_nothreads_debug.zip"
         echo "$HOME/.local/share/godot/export_templates/${GODOT_TAG}/web_nothreads_release.zip"
-        
+
         echo "=== Verifying web templates installation ==="
         ls -la "$HOME/.local/share/godot/export_templates/${GODOT_TAG}/"
-        
+
         echo "=== Checking required web templates ==="
         cd "$HOME/.local/share/godot/export_templates/${GODOT_TAG}"
         for file in web_nothreads_debug.zip web_nothreads_release.zip; do
@@ -125,12 +125,12 @@ jobs:
         ls -la godot/
         echo "=== Checking Godot version ==="
         /usr/local/bin/godot4 --version
-        
+
         echo "=== Verifying export templates before export ==="
         TEMPLATES_DIR="$HOME/.local/share/godot/export_templates/${GODOT_TAG}"
         echo "Templates directory: $TEMPLATES_DIR"
         ls -la "$TEMPLATES_DIR"
-        
+
         echo "=== Checking required web templates specifically ==="
         for file in web_nothreads_debug.zip web_nothreads_release.zip; do
           if [ -f "$TEMPLATES_DIR/$file" ]; then
@@ -143,25 +143,25 @@ jobs:
             echo "❌ Missing: $TEMPLATES_DIR/$file"
           fi
         done
-        
+
         echo "=== Checking export presets ==="
         cat godot/export_presets.cfg | grep -A 10 -B 2 "Web"
-        
+
         echo "=== Creating build directory ==="
         mkdir -p build/web
         ls -la build/
-        
+
         echo "=== Setting up environment for Godot export ==="
         export HOME="$HOME"
         export XDG_DATA_HOME="$HOME/.local/share"
         echo "HOME: $HOME"
         echo "XDG_DATA_HOME: $XDG_DATA_HOME"
         echo "Templates should be found at: $XDG_DATA_HOME/godot/export_templates/${GODOT_TAG}/"
-        
+
         echo "=== Running Godot export with absolute path ==="
         EXPORT_PATH="$(pwd)/build/web/index.html"
         echo "Export path: $EXPORT_PATH"
-        
+
         echo "=== Running Godot export with maximum verbosity ==="
         /usr/local/bin/godot4 --headless --verbose --path godot --export-release "Web" "$EXPORT_PATH" 2>&1 || {
           echo "=== Export failed, checking for common issues ==="
@@ -174,7 +174,7 @@ jobs:
           ls -la "$TEMPLATES_DIR"/web*
           exit 1
         }
-        
+
         echo "=== Post-export check ==="
         ls -la build/web/ || echo "Build directory empty or missing"
         ls -la build/ || echo "Build directory missing"
