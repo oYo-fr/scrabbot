@@ -13,7 +13,7 @@ import logging
 import time
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Dict, List, Optional, Set
 
 logger = logging.getLogger(__name__)
 
@@ -339,7 +339,7 @@ class AdvancedSearchEngine:
         Returns:
             SearchResult with words of specified length
         """
-        start_time = time.time()
+        time.time()
         pattern = "?" * length  # Pattern with length wildcards
         result = self.pattern_search(pattern, language, max_results)
         result.algorithm_used = "length_search"

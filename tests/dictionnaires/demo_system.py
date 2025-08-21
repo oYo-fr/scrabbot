@@ -17,7 +17,6 @@ Usage:
 import os
 import subprocess
 import sys
-import threading
 import time
 from pathlib import Path
 
@@ -172,7 +171,7 @@ class DemoSystemeDictionnaires:
 
         for mot in mots_perf:
             debut = time.time()
-            resultat = self.service.valider_mot(mot, LangueEnum.FRANCAIS)
+            self.service.valider_mot(mot, LangueEnum.FRANCAIS)
             temps_ms = (time.time() - debut) * 1000
             temps_total.append(temps_ms)
 
@@ -367,9 +366,8 @@ def main():
 
     # Vérification des dépendances
     try:
-        import sqlite3
+        pass
 
-        import requests
     except ImportError as e:
         print(f"❌ Dépendance manquante : {e}")
         print("💡 Installer avec : pip install requests")

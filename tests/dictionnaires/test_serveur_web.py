@@ -2,12 +2,12 @@
 """
 Tests unitaires pour le serveur web - Système de dictionnaires Scrabbot.
 
-Ces tests vérifient que le serveur web et l'application Godot peuvent 
+Ces tests vérifient que le serveur web et l'application Godot peuvent
 bien accéder aux dictionnaires selon les spécifications du ticket OYO-7.
 
 Tests couverts :
 - Test d'accès basique SQLite
-- Test de validation de mots 
+- Test de validation de mots
 - Test de performance (< 50ms)
 - Test de caractères spéciaux
 - Test de connexion/fermeture SQLite
@@ -21,13 +21,13 @@ import tempfile
 import time
 import unittest
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 # Ajout du chemin pour importer les modules
 sys.path.append(str(Path(__file__).parent.parent.parent / "shared" / "models"))
 sys.path.append(str(Path(__file__).parent.parent.parent / "shared" / "api"))
 
-from dictionnaire import DictionnaireService, LangueEnum, MotDictionnaire, ResultatValidation
+from dictionnaire import DictionnaireService, LangueEnum, ResultatValidation
 from dictionnaire_service import app
 from fastapi.testclient import TestClient
 
@@ -163,7 +163,7 @@ class TestAccesSQLiteBasique(unittest.TestCase):
 
         cursor.executemany(
             """
-        INSERT INTO mots_fr (mot, definition, categorie_grammaticale, points, valide_scrabble, 
+        INSERT INTO mots_fr (mot, definition, categorie_grammaticale, points, valide_scrabble,
                            longueur, premiere_lettre, derniere_lettre, voyelles, consonnes, source)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
@@ -250,7 +250,7 @@ class TestAccesSQLiteBasique(unittest.TestCase):
 
         cursor.executemany(
             """
-        INSERT INTO mots_en (word, definition, part_of_speech, points, scrabble_valid, 
+        INSERT INTO mots_en (word, definition, part_of_speech, points, scrabble_valid,
                            length, first_letter, last_letter, vowels, consonants, source)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
@@ -392,7 +392,7 @@ class TestPerformance(unittest.TestCase):
 
         cursor.executemany(
             """
-        INSERT INTO mots_fr (mot, definition, categorie_grammaticale, points, valide_scrabble, 
+        INSERT INTO mots_fr (mot, definition, categorie_grammaticale, points, valide_scrabble,
                            longueur, premiere_lettre, derniere_lettre, voyelles, consonnes, source)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
@@ -452,7 +452,7 @@ class TestPerformance(unittest.TestCase):
 
         cursor.executemany(
             """
-        INSERT INTO mots_en (word, definition, part_of_speech, points, scrabble_valid, 
+        INSERT INTO mots_en (word, definition, part_of_speech, points, scrabble_valid,
                            length, first_letter, last_letter, vowels, consonants, source)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
@@ -633,7 +633,7 @@ class TestCaracteresSpeciaux(unittest.TestCase):
 
         cursor.executemany(
             """
-        INSERT INTO mots_fr (mot, definition, categorie_grammaticale, points, valide_scrabble, 
+        INSERT INTO mots_fr (mot, definition, categorie_grammaticale, points, valide_scrabble,
                            longueur, premiere_lettre, derniere_lettre, voyelles, consonnes, source)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
@@ -689,7 +689,7 @@ class TestCaracteresSpeciaux(unittest.TestCase):
 
         cursor.executemany(
             """
-        INSERT INTO mots_en (word, definition, part_of_speech, points, scrabble_valid, 
+        INSERT INTO mots_en (word, definition, part_of_speech, points, scrabble_valid,
                            length, first_letter, last_letter, vowels, consonants, source)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,

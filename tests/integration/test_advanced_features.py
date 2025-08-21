@@ -13,7 +13,6 @@ This module tests:
 import logging
 import sys
 import time
-from pathlib import Path
 
 # Add shared modules to path
 sys.path.append("/workspaces/scrabbot/shared")
@@ -23,7 +22,7 @@ from algorithms.trie_search import create_search_engine
 from algorithms.word_suggestions import create_suggestion_engine
 from analytics.dictionary_analytics import create_analytics_engine
 from cache.intelligent_cache import create_cache_manager
-from models.dictionnaire import DictionaryService, LanguageEnum
+from models.dictionnaire import DictionaryService
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")

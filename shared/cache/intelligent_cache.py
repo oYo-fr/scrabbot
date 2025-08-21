@@ -9,7 +9,7 @@ This module implements:
 - Performance metrics and optimization
 """
 
-import json
+
 import logging
 import threading
 import time

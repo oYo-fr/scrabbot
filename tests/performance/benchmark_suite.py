@@ -14,13 +14,12 @@ import gc
 import logging
 import random
 import statistics
-import string
 import sys
 import time
 import tracemalloc
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 # Add shared modules to path
 sys.path.append("/workspaces/scrabbot/shared")
@@ -306,7 +305,7 @@ class PerformanceBenchmark:
                     word = random.choice(word_list)
 
                     start_time = time.time()
-                    result = self.dictionary_service.validate_word(word, language)
+                    self.dictionary_service.validate_word(word, language)
                     response_time = (time.time() - start_time) * 1000
 
                     response_times.append(response_time)

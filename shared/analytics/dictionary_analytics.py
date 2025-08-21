@@ -17,7 +17,7 @@ import statistics
 import time
 from collections import Counter, defaultdict
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -119,7 +119,7 @@ class DictionaryAnalytics:
                 # Get all words with metadata
                 cursor.execute(
                     f"""
-                    SELECT {word_col}, points, longueur as length, 
+                    SELECT {word_col}, points, longueur as length,
                            premiere_lettre as first_letter, derniere_lettre as last_letter
                     FROM {table_name}
                 """
@@ -335,8 +335,8 @@ class DictionaryAnalytics:
                 # High-value short words (2-4 letters)
                 cursor.execute(
                     f"""
-                    SELECT {word_col}, points 
-                    FROM {table_name} 
+                    SELECT {word_col}, points
+                    FROM {table_name}
                     WHERE {length_col} BETWEEN 2 AND 4 AND points >= 6
                     ORDER BY points DESC, {length_col} ASC
                     LIMIT 25

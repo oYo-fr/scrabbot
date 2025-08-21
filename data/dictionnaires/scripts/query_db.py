@@ -7,7 +7,7 @@ import argparse
 import sqlite3
 import sys
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import List, Tuple
 
 
 class DictionaryQuery:

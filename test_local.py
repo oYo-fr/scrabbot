@@ -6,7 +6,7 @@ Simulateur local pour tester le bot Scrabbot sans token Telegram.
 import asyncio
 import logging
 from dataclasses import dataclass
-from typing import Any, Dict
+from typing import Any
 
 
 # Configuration pour simuler Telegram

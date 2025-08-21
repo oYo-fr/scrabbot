@@ -15,7 +15,7 @@ import time
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
 # Logging configuration
 logging.basicConfig(level=logging.INFO)
@@ -168,13 +168,13 @@ class DictionaryService:
             if language == LanguageEnum.FRENCH:
                 query = """
                 SELECT mot as word, definition, points, valide_scrabble as is_valid_scrabble, categorie_grammaticale as part_of_speech
-                FROM mots_fr 
+                FROM mots_fr
                 WHERE mot = ? AND valide_scrabble = 1
                 """
             else:
                 query = """
                 SELECT word, definition, points, scrabble_valid as is_valid_scrabble, part_of_speech
-                FROM mots_en 
+                FROM mots_en
                 WHERE word = ? AND scrabble_valid = 1
                 """
 

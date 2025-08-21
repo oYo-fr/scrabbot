@@ -25,7 +25,6 @@ class BaseHandler(ABC):
             update: Mise à jour Telegram
             context: Contexte de la mise à jour
         """
-        pass
 
     async def send_message(
         self,
