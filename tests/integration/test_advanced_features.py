@@ -500,14 +500,14 @@ def main():
     if "advanced_search" in results and "error" not in results["advanced_search"]:
         search_results = results["advanced_search"]
         print("\n🔍 ADVANCED SEARCH:")
-        prefix_count = search_results['prefix_search']['results_count']
-        prefix_time = search_results['prefix_search']['search_time_ms']
+        prefix_count = search_results["prefix_search"]["results_count"]
+        prefix_time = search_results["prefix_search"]["search_time_ms"]
         print(f"   Prefix search: {prefix_count} results in {prefix_time:.3f}ms")
-        pattern_count = search_results['pattern_search']['results_count']
-        pattern_time = search_results['pattern_search']['search_time_ms']
+        pattern_count = search_results["pattern_search"]["results_count"]
+        pattern_time = search_results["pattern_search"]["search_time_ms"]
         print(f"   Pattern search: {pattern_count} results in {pattern_time:.3f}ms")
-        anagram_count = search_results['anagram_search']['results_count']
-        anagram_time = search_results['anagram_search']['search_time_ms']
+        anagram_count = search_results["anagram_search"]["results_count"]
+        anagram_time = search_results["anagram_search"]["search_time_ms"]
         print(f"   Anagram search: {anagram_count} results in {anagram_time:.3f}ms")
 
     # Word Suggestions Results
