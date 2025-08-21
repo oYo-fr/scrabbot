@@ -33,9 +33,7 @@ def launch_godot_project(executable_path: Optional[str], project_dir: str) -> bo
         )
         return True
     except FileNotFoundError:
-        logger.error(
-            "Godot introuvable. Définissez GODOT_EXECUTABLE_PATH dans .env (ex: C:/Program Files/Godot/Godot_v4.4/godot4.exe)."
-        )
+        logger.error("Godot introuvable. Définissez GODOT_EXECUTABLE_PATH dans .env (ex: C:/Program Files/Godot/Godot_v4.4/godot4.exe).")
         return False
     except Exception as exc:
         logger.error(f"Échec du lancement Godot: {exc}")
@@ -65,9 +63,7 @@ def export_godot_project(
         subprocess.check_call(cmd)
         return True
     except FileNotFoundError:
-        logger.error(
-            "Godot introuvable. Définissez GODOT_EXECUTABLE_PATH dans .env (ex: C:/Program Files/Godot/Godot_v4.4/godot4.exe)."
-        )
+        logger.error("Godot introuvable. Définissez GODOT_EXECUTABLE_PATH dans .env (ex: C:/Program Files/Godot/Godot_v4.4/godot4.exe).")
         return False
     except subprocess.CalledProcessError as exc:
         logger.error(f"Échec export Godot (code {exc.returncode}).")

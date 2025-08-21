@@ -6,6 +6,7 @@ Checks the content of created SQLite databases
 import sqlite3
 from pathlib import Path
 
+
 def check_database(db_path, language):
     """Checks a database"""
     print(f"\n📊 === DATABASE {language.upper()} : {db_path.name} ===")
@@ -34,13 +35,15 @@ def check_database(db_path, language):
         print(f"📊 Average definitions/word: {nb_definitions/nb_words:.1f}")
 
         # Top 10 parts of speech
-        cursor.execute('''
+        cursor.execute(
+            """
             SELECT part_of_speech, COUNT(*) as nb
             FROM definitions
             GROUP BY part_of_speech
             ORDER BY nb DESC
             LIMIT 10
-        ''')
+        """
+        )
         top_categories = cursor.fetchall()
 
         print(f"\n📋 Top parts of speech:")
@@ -48,14 +51,16 @@ def check_database(db_path, language):
             print(f"  • {cat}: {nb:,}")
 
         # Sample words with their definitions
-        cursor.execute('''
+        cursor.execute(
+            """
             SELECT w.word_normalized, w.word_original, d.text, d.part_of_speech
             FROM words w
             JOIN definitions d ON w.id = d.word_id
             WHERE LENGTH(w.word_normalized) BETWEEN 5 AND 10
             ORDER BY RANDOM()
             LIMIT 10
-        ''')
+        """
+        )
         examples = cursor.fetchall()
 
         print(f"\n📝 Sample words:")
@@ -65,13 +70,15 @@ def check_database(db_path, language):
             print(f"    → {definition_short}")
 
         # Some statistics on word lengths
-        cursor.execute('''
+        cursor.execute(
+            """
             SELECT
                 MIN(LENGTH(word_normalized)) as min_len,
                 MAX(LENGTH(word_normalized)) as max_len,
                 AVG(LENGTH(word_normalized)) as avg_len
             FROM words
-        ''')
+        """
+        )
         len_stats = cursor.fetchone()
         print(f"\n📏 Word lengths:")
         print(f"  • Min: {len_stats[0]} characters")
@@ -83,6 +90,7 @@ def check_database(db_path, language):
 
     finally:
         conn.close()
+
 
 def main():
     """Main function"""
@@ -98,6 +106,7 @@ def main():
     check_database(en_db, "English")
 
     print(f"\n✅ Verification completed!")
+
 
 if __name__ == "__main__":
     main()

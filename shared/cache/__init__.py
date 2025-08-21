@@ -7,10 +7,10 @@ This package provides:
 - Performance optimization
 """
 
-from .intelligent_cache import IntelligentCache, DictionaryCacheManager, create_cache_manager
+from .intelligent_cache import DictionaryCacheManager, IntelligentCache, create_cache_manager
 
 __all__ = [
-    'IntelligentCache',
-    'DictionaryCacheManager',
-    'create_cache_manager'
+    "IntelligentCache",
+    "DictionaryCacheManager",
+    "create_cache_manager",
 ]

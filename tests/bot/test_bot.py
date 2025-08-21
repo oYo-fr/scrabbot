@@ -2,14 +2,15 @@
 Tests pour le bot Scrabbot.
 """
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock
-from telegram import Update, User, Chat
+
+import pytest
+from telegram import Chat, Update, User
 from telegram.ext import ContextTypes
 
 from bot.bot import ScrabbotBot
-from bot.handlers.start import StartHandler
 from bot.handlers.help import HelpHandler
+from bot.handlers.start import StartHandler
 
 
 class TestScrabbotBot:
@@ -20,15 +21,18 @@ class TestScrabbotBot:
         # Mock des settings pour éviter les erreurs de configuration
         with pytest.MonkeyPatch().context() as m:
             # Jeton factice conforme au format attendu par PTB (9 chiffres + ':' + 35 chars)
-            m.setenv("TELEGRAM_BOT_TOKEN", "123456789:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdef123")
+            m.setenv(
+                "TELEGRAM_BOT_TOKEN",
+                "123456789:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdef123",
+            )
             m.setenv("API_SECRET_KEY", "test_secret")
             # Désactive tout webhook pour les tests
             m.delenv("TELEGRAM_WEBHOOK_URL", raising=False)
 
             bot = ScrabbotBot()
             assert bot is not None
-            assert hasattr(bot, 'application')
-            assert hasattr(bot, 'handlers')
+            assert hasattr(bot, "application")
+            assert hasattr(bot, "handlers")
 
 
 class TestStartHandler:

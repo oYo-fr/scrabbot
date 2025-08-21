@@ -68,6 +68,9 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
 RUN git config --global core.pager cat \
     && git config --global init.defaultBranch main
 
+# Install Python dependencies for the project
+RUN pip3 install --user unidecode==1.4.0
+
 # Add Rust to PATH for the current session
 ENV PATH="/home/vscode/.cargo/bin:${PATH}"
 

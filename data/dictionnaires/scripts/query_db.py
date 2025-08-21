@@ -3,11 +3,12 @@
 Utility script to query dictionary SQLite databases
 """
 
+import argparse
 import sqlite3
 import sys
-import argparse
 from pathlib import Path
-from typing import List, Tuple, Optional
+from typing import List, Optional, Tuple
+
 
 class DictionaryQuery:
     def __init__(self, language: str):
@@ -28,13 +29,16 @@ class DictionaryQuery:
         conn = self.connect()
         cursor = conn.cursor()
 
-        cursor.execute('''
+        cursor.execute(
+            """
             SELECT w.word_normalized, w.word_original, d.text, d.part_of_speech
             FROM words w
             JOIN definitions d ON w.id = d.word_id
             WHERE w.word_normalized = ?
             ORDER BY d.part_of_speech
-        ''', (word_normalized,))
+        """,
+            (word_normalized,),
+        )
 
         results = cursor.fetchall()
         conn.close()
@@ -48,13 +52,16 @@ class DictionaryQuery:
         conn = self.connect()
         cursor = conn.cursor()
 
-        cursor.execute('''
+        cursor.execute(
+            """
             SELECT DISTINCT w.word_normalized, w.word_original
             FROM words w
             WHERE w.word_normalized LIKE ?
             ORDER BY w.word_normalized
             LIMIT ?
-        ''', (pattern_normalized, limit))
+        """,
+            (pattern_normalized, limit),
+        )
 
         results = cursor.fetchall()
         conn.close()
@@ -66,14 +73,17 @@ class DictionaryQuery:
         conn = self.connect()
         cursor = conn.cursor()
 
-        cursor.execute('''
+        cursor.execute(
+            """
             SELECT w.word_normalized, w.word_original, d.text, d.part_of_speech
             FROM words w
             JOIN definitions d ON w.id = d.word_id
             WHERE LENGTH(w.word_normalized) BETWEEN 4 AND 12
             ORDER BY RANDOM()
             LIMIT ?
-        ''', (count,))
+        """,
+            (count,),
+        )
 
         results = cursor.fetchall()
         conn.close()
@@ -94,49 +104,61 @@ class DictionaryQuery:
         nb_definitions = cursor.fetchone()[0]
 
         # Top categories
-        cursor.execute('''
+        cursor.execute(
+            """
             SELECT part_of_speech, COUNT(*) as nb
             FROM definitions
             GROUP BY part_of_speech
             ORDER BY nb DESC
             LIMIT 10
-        ''')
+        """
+        )
         top_categories = cursor.fetchall()
 
         # Lengths
-        cursor.execute('''
+        cursor.execute(
+            """
             SELECT
                 MIN(LENGTH(word_normalized)) as min_len,
                 MAX(LENGTH(word_normalized)) as max_len,
                 AVG(LENGTH(word_normalized)) as avg_len
             FROM words
-        ''')
+        """
+        )
         len_stats = cursor.fetchone()
 
         conn.close()
 
         return {
-            'nb_words': nb_words,
-            'nb_definitions': nb_definitions,
-            'top_categories': top_categories,
-            'len_stats': len_stats
+            "nb_words": nb_words,
+            "nb_definitions": nb_definitions,
+            "top_categories": top_categories,
+            "len_stats": len_stats,
         }
+
 
 def main():
     """Main function"""
     parser = argparse.ArgumentParser(description="Query dictionary databases")
-    parser.add_argument('--language', '-l', choices=['fr', 'en'], default='fr',
-                        help='Database language (default: fr)')
-    parser.add_argument('--word', '-w', type=str,
-                        help='Search for a specific word')
-    parser.add_argument('--pattern', '-p', type=str,
-                        help='Search with a pattern (ex: "CHAT*")')
-    parser.add_argument('--random', '-r', type=int, metavar='N', default=0,
-                        help='Show N random words')
-    parser.add_argument('--stats', '-s', action='store_true',
-                        help='Show database statistics')
-    parser.add_argument('--limit', type=int, default=20,
-                        help='Limit for results (default: 20)')
+    parser.add_argument(
+        "--language",
+        "-l",
+        choices=["fr", "en"],
+        default="fr",
+        help="Database language (default: fr)",
+    )
+    parser.add_argument("--word", "-w", type=str, help="Search for a specific word")
+    parser.add_argument("--pattern", "-p", type=str, help='Search with a pattern (ex: "CHAT*")')
+    parser.add_argument(
+        "--random",
+        "-r",
+        type=int,
+        metavar="N",
+        default=0,
+        help="Show N random words",
+    )
+    parser.add_argument("--stats", "-s", action="store_true", help="Show database statistics")
+    parser.add_argument("--limit", type=int, default=20, help="Limit for results (default: 20)")
 
     args = parser.parse_args()
 
@@ -151,10 +173,10 @@ def main():
             print(f"📊 Average definitions/word: {stats['nb_definitions']/stats['nb_words']:.1f}")
 
             print(f"\n📋 Top parts of speech:")
-            for cat, nb in stats['top_categories']:
+            for cat, nb in stats["top_categories"]:
                 print(f"  • {cat}: {nb:,}")
 
-            len_stats = stats['len_stats']
+            len_stats = stats["len_stats"]
             print(f"\n📏 Word lengths:")
             print(f"  • Min: {len_stats[0]} characters")
             print(f"  • Max: {len_stats[1]} characters")
@@ -174,7 +196,7 @@ def main():
                 print(f"❌ Word '{args.word}' not found in {args.language} database")
 
         elif args.pattern:
-            pattern = args.pattern.replace('*', '%').replace('?', '_')
+            pattern = args.pattern.replace("*", "%").replace("?", "_")
             results = db.search_pattern(pattern, args.limit)
             if results:
                 print(f"\n🔍 === WORDS MATCHING '{args.pattern}' ===")
@@ -198,6 +220,7 @@ def main():
     except Exception as e:
         print(f"❌ Error: {e}")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

@@ -13,14 +13,10 @@ class Settings(BaseSettings):
 
     # Configuration du bot Telegram
     telegram_bot_token: str = Field("dev-token", description="Token du bot Telegram")
-    telegram_webhook_url: Optional[str] = Field(
-        None, description="URL du webhook Telegram"
-    )
+    telegram_webhook_url: Optional[str] = Field(None, description="URL du webhook Telegram")
 
     # Configuration de la base de données
-    database_url: str = Field(
-        "sqlite:///./data/scrabbot.db", description="URL de la base de données"
-    )
+    database_url: str = Field("sqlite:///./data/scrabbot.db", description="URL de la base de données")
 
     # Configuration Redis (optionnel)
     redis_url: Optional[str] = Field(None, description="URL Redis")
@@ -31,15 +27,9 @@ class Settings(BaseSettings):
     api_secret_key: str = Field("dev-secret-key", description="Clé secrète de l'API")
 
     # Godot
-    godot_executable_path: Optional[str] = Field(
-        None, description="Chemin vers l'exécutable Godot"
-    )
-    godot_project_path: str = Field(
-        "./godot", description="Chemin vers le projet Godot"
-    )
-    godot_web_url: Optional[str] = Field(
-        None, description="URL de l'application web Godot"
-    )
+    godot_executable_path: Optional[str] = Field(None, description="Chemin vers l'exécutable Godot")
+    godot_project_path: str = Field("./godot", description="Chemin vers le projet Godot")
+    godot_web_url: Optional[str] = Field(None, description="URL de l'application web Godot")
 
     # Configuration des logs
     log_level: str = Field("INFO", description="Niveau de log")
@@ -51,20 +41,26 @@ class Settings(BaseSettings):
 
     # Configuration des dictionnaires
     dictionary_fr_path: str = Field(
-        "./data/dictionnaires/databases/french_extended.db", description="Chemin du dictionnaire français"
+        "./data/dictionnaires/databases/french_extended.db",
+        description="Chemin du dictionnaire français",
     )
     dictionary_en_path: str = Field(
-        "./data/dictionnaires/databases/english_extended.db", description="Chemin du dictionnaire anglais"
+        "./data/dictionnaires/databases/english_extended.db",
+        description="Chemin du dictionnaire anglais",
     )
 
     # Configuration des tests
     testing: bool = Field(False, description="Mode test")
     test_database_url: str = Field(
-        "sqlite:///./tests/test.db", description="URL de la base de données de test"
+        "sqlite:///./tests/test.db",
+        description="URL de la base de données de test",
     )
 
     model_config = ConfigDict(
-        env_file=".env", env_file_encoding="utf-8", case_sensitive=False, env_prefix=""
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        env_prefix="",
     )
 
     @property

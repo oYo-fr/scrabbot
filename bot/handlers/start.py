@@ -77,8 +77,7 @@ Utilisez /help pour voir toutes les commandes disponibles.
         await self.send_message(
             update=update,
             context=context,
-            text=welcome_message
-            + (suffix or "\n\n⚠️ Godot n'a pas pu être lancé automatiquement."),
+            text=welcome_message + (suffix or "\n\n⚠️ Godot n'a pas pu être lancé automatiquement."),
             parse_mode="Markdown",
             reply_markup=reply_markup,
         )
