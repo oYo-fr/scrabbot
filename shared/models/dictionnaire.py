@@ -417,3 +417,11 @@ def create_dictionary_service() -> DictionaryService:
         french_db_path=DictionaryConstants.DEFAULT_FRENCH_DB_PATH,
         english_db_path=DictionaryConstants.DEFAULT_ENGLISH_DB_PATH,
     )
+
+
+# Aliases français pour compatibilité avec les tests existants
+LangueEnum = LanguageEnum
+DictionnaireService = DictionaryService
+ResultatValidation = ValidationResult
+MotDictionnaire = DictionaryWord
+ConstantesDictionnaire = DictionaryConstants
