@@ -197,11 +197,11 @@ class PerformanceBenchmark:
                 operation_start = time.time()
 
                 if operation == "prefix_search":
-                    result = self.search_engine.prefix_search(query, language, max_results=50)
+                    self.search_engine.prefix_search(query, language, max_results=50)
                 elif operation == "pattern_search":
-                    result = self.search_engine.pattern_search(query, language, max_results=50)
+                    self.search_engine.pattern_search(query, language, max_results=50)
                 elif operation == "find_anagrams":
-                    result = self.search_engine.find_anagrams(query, language, max_results=50)
+                    self.search_engine.find_anagrams(query, language, max_results=50)
 
                 operation_time = (time.time() - operation_start) * 1000
                 times.append(operation_time)
@@ -536,14 +536,14 @@ def main():
 
     # Word validation results
     validation = results["benchmark_summary"]["word_validation"]
-    print(f"\n📝 WORD VALIDATION:")
+    print("\n📝 WORD VALIDATION:")
     print(f"   Average time: {validation['average_time_ms']:.3f}ms (target: <50ms)")
     print(f"   Operations/sec: {validation['operations_per_second']:.1f}")
     print(f"   Success rate: {validation['success_rate']:.1f}%")
 
     # Search operations results
     search = results["benchmark_summary"]["search_operations"]
-    print(f"\n🔍 SEARCH OPERATIONS:")
+    print("\n🔍 SEARCH OPERATIONS:")
     print(f"   Average time: {search['average_time_ms']:.3f}ms (target: <100ms)")
     print(f"   Operations/sec: {search['operations_per_second']:.1f}")
     print(f"   Success rate: {search['success_rate']:.1f}%")
@@ -551,7 +551,7 @@ def main():
     # Cache performance results
     cache = results["benchmark_summary"]["cache_performance"]
     cache_hit_rate = cache["additional_metrics"].get("cache_hit_rate", 0)
-    print(f"\n💾 CACHE PERFORMANCE:")
+    print("\n💾 CACHE PERFORMANCE:")
     print(f"   Average time: {cache['average_time_ms']:.3f}ms")
     print(f"   Cache hit rate: {cache_hit_rate:.1f}% (target: >80%)")
     print(f"   Operations/sec: {cache['operations_per_second']:.1f}")
@@ -566,7 +566,7 @@ def main():
 
     # Memory analysis
     memory = results["memory_analysis"]
-    print(f"\n🧠 MEMORY ANALYSIS:")
+    print("\n🧠 MEMORY ANALYSIS:")
     print(f"   Memory growth: {memory['memory_growth_mb']:.1f}MB (target: <100MB)")
     print(f"   Peak memory: {memory['peak_memory_mb']:.1f}MB")
     print(f"   Memory efficiency: {memory['memory_efficiency']:.1f}%")

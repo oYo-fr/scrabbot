@@ -112,7 +112,7 @@ class DictionaryService:
             "cache_requests": 0,
         }
 
-        logger.info(f"Dictionary service initialized")
+        logger.info("Dictionary service initialized")
         logger.info(f"  French DB: {self.french_db_path}")
         logger.info(f"  English DB: {self.english_db_path}")
 

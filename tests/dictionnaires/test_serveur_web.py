@@ -14,6 +14,7 @@ Tests couverts :
 - Test d'intégration API REST
 """
 
+import logging
 import os
 import sqlite3
 import sys

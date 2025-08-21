@@ -105,7 +105,7 @@ async def test_bot_commands():
     await help_handler.handle(help_update, context)
 
     print("\n✅ Tests terminés !")
-    print(f"🌐 Interface web disponible sur: http://localhost:8080")
+    print("🌐 Interface web disponible sur: http://localhost:8080")
 
 
 async def interactive_test():

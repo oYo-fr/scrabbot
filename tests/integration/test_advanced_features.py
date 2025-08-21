@@ -492,28 +492,28 @@ def main():
     results = test_suite.run_comprehensive_test()
 
     # Print summary
-    print(f"\n📋 TEST SUMMARY")
+    print("\n📋 TEST SUMMARY")
     print(f"   Duration: {results['test_metadata']['total_duration_seconds']}s")
     print(f"   Categories tested: {len([k for k in results.keys() if k != 'test_metadata'])}")
 
     # Advanced Search Results
     if "advanced_search" in results and "error" not in results["advanced_search"]:
         search_results = results["advanced_search"]
-        print(f"\n🔍 ADVANCED SEARCH:")
-        print(
-            f"   Prefix search: {search_results['prefix_search']['results_count']} results in {search_results['prefix_search']['search_time_ms']:.3f}ms"
-        )
-        print(
-            f"   Pattern search: {search_results['pattern_search']['results_count']} results in {search_results['pattern_search']['search_time_ms']:.3f}ms"
-        )
-        print(
-            f"   Anagram search: {search_results['anagram_search']['results_count']} results in {search_results['anagram_search']['search_time_ms']:.3f}ms"
-        )
+        print("\n🔍 ADVANCED SEARCH:")
+        prefix_count = search_results['prefix_search']['results_count']
+        prefix_time = search_results['prefix_search']['search_time_ms']
+        print(f"   Prefix search: {prefix_count} results in {prefix_time:.3f}ms")
+        pattern_count = search_results['pattern_search']['results_count']
+        pattern_time = search_results['pattern_search']['search_time_ms']
+        print(f"   Pattern search: {pattern_count} results in {pattern_time:.3f}ms")
+        anagram_count = search_results['anagram_search']['results_count']
+        anagram_time = search_results['anagram_search']['search_time_ms']
+        print(f"   Anagram search: {anagram_count} results in {anagram_time:.3f}ms")
 
     # Word Suggestions Results
     if "word_suggestions" in results and "error" not in results["word_suggestions"]:
         suggestion_results = results["word_suggestions"]
-        print(f"\n💡 WORD SUGGESTIONS:")
+        print("\n💡 WORD SUGGESTIONS:")
         print(f"   Spell correction: {suggestion_results['spell_correction']['suggestions_count']} suggestions")
         print(f"   Letter combinations: {suggestion_results['letter_suggestions']['suggestions_count']} words found")
         print(f"   Pattern matching: {suggestion_results['pattern_matching']['suggestions_count']} matches")
@@ -521,7 +521,7 @@ def main():
     # Cache Results
     if "intelligent_cache" in results and "error" not in results["intelligent_cache"]:
         cache_results = results["intelligent_cache"]
-        print(f"\n💾 INTELLIGENT CACHE:")
+        print("\n💾 INTELLIGENT CACHE:")
         print(f"   Cache hit rate: {cache_results['cache_statistics']['word_cache_hit_rate']:.1f}%")
         print(f"   Memory usage: {cache_results['cache_statistics']['total_memory_estimate']} entries")
         print(f"   Cache warming: {sum(cache_results['cache_warming'].values())} words warmed")
@@ -529,7 +529,7 @@ def main():
     # Analytics Results
     if "dictionary_analytics" in results and "error" not in results["dictionary_analytics"]:
         analytics_results = results["dictionary_analytics"]
-        print(f"\n📊 DICTIONARY ANALYTICS:")
+        print("\n📊 DICTIONARY ANALYTICS:")
         print(f"   French words: {analytics_results['language_statistics']['french_stats']['total_words']}")
         print(f"   English words: {analytics_results['language_statistics']['english_stats']['total_words']}")
         print(f"   Strategy insights: {analytics_results['strategy_guide']['high_value_words_count']} high-value words")
@@ -537,7 +537,7 @@ def main():
     # Strategy Results
     if "scrabble_strategy" in results and "error" not in results["scrabble_strategy"]:
         strategy_results = results["scrabble_strategy"]
-        print(f"\n🎯 SCRABBLE STRATEGY:")
+        print("\n🎯 SCRABBLE STRATEGY:")
         print(f"   Rack balance score: {strategy_results['rack_analysis']['balance_score']:.1f}/100")
         print(f"   Best plays found: {strategy_results['best_plays']['plays_found']}")
         print(f"   Strategy type: {strategy_results['strategy_recommendation']['strategy_type']}")
@@ -545,7 +545,7 @@ def main():
     # Performance Results
     if "performance_benchmarks" in results and "error" not in results["performance_benchmarks"]:
         perf_results = results["performance_benchmarks"]
-        print(f"\n⚡ PERFORMANCE BENCHMARKS:")
+        print("\n⚡ PERFORMANCE BENCHMARKS:")
         print(f"   Search avg: {perf_results['search_performance']['average_time_ms']:.3f}ms")
         print(f"   Cache avg: {perf_results['cache_performance']['average_time_ms']:.3f}ms")
         print(f"   Suggestions avg: {perf_results['suggestion_performance']['average_time_ms']:.3f}ms")
@@ -555,7 +555,7 @@ def main():
     if errors:
         print(f"\n❌ ERRORS IN: {', '.join(errors)}")
     else:
-        print(f"\n✅ ALL TESTS PASSED SUCCESSFULLY!")
+        print("\n✅ ALL TESTS PASSED SUCCESSFULLY!")
 
     print("\n" + "=" * 80)
     print("🚀 ADVANCED FEATURES FULLY OPERATIONAL!")

@@ -182,14 +182,14 @@ class DemoSystemeDictionnaires:
         temps_moyen = sum(temps_total) / len(temps_total)
         temps_max = max(temps_total)
 
-        print(f"  \n  📊 Statistiques de performance :")
+        print("  \n  📊 Statistiques de performance :")
         print(f"    • Temps moyen    : {temps_moyen:6.2f}ms")
         print(f"    • Temps maximum  : {temps_max:6.2f}ms")
-        print(f"    • Objectif       : < 50.00ms")
+        print("    • Objectif       : < 50.00ms")
         print(f"    • Conformité     : {'✅ CONFORME' if temps_moyen < 50 else '⚠️ NON CONFORME'}")
 
         # Test batch (10 mots)
-        print(f"  \n  🔄 Test batch (10 mots, objectif : < 200ms)")
+        print("  \n  🔄 Test batch (10 mots, objectif : < 200ms)")
         debut_batch = time.time()
         for i in range(10):
             self.service.valider_mot(f"MOT{i:02d}", LangueEnum.FRANCAIS)
@@ -201,7 +201,7 @@ class DemoSystemeDictionnaires:
 
         # Statistiques du service
         stats = self.service.obtenir_statistiques_performance()
-        print(f"  \n  📈 Statistiques du service :")
+        print("  \n  📈 Statistiques du service :")
         for cle, valeur in stats.items():
             print(f"    • {cle:20} : {valeur}")
 
@@ -334,7 +334,7 @@ class DemoSystemeDictionnaires:
         except Exception as e:
             print(f"    ❌ Recherche : Erreur - {e}")
 
-        print(f"  \n  📖 Documentation interactive disponible : http://127.0.0.1:8000/docs")
+        print("  \n  📖 Documentation interactive disponible : http://127.0.0.1:8000/docs")
 
     def arreter_serveur_api(self):
         """Arrête le serveur API."""
@@ -354,9 +354,9 @@ class DemoSystemeDictionnaires:
 
         self.arreter_serveur_api()
 
-        print(f"\n🧹 Nettoyage terminé")
+        print("\n🧹 Nettoyage terminé")
         print(f"  • Bases de démonstration conservées dans : {self.databases_dir}")
-        print(f"  • Logs disponibles pour analyse")
+        print("  • Logs disponibles pour analyse")
 
 
 def main():
