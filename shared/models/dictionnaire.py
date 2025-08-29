@@ -15,7 +15,7 @@ import time
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 # Logging configuration
 logging.basicConfig(level=logging.INFO)
@@ -105,7 +105,7 @@ class DictionaryService:
         """
         self.french_db_path = Path(french_db_path)
         self.english_db_path = Path(english_db_path)
-        self._connection_cache = {}
+        self._connection_cache: Dict[LanguageEnum, sqlite3.Connection] = {}
         self._performance_stats = {
             "total_requests": 0,
             "total_time_ms": 0.0,
@@ -252,7 +252,7 @@ class DictionaryService:
 
             # Dynamic query construction
             conditions = []
-            params = []
+            params: List[Any] = []
 
             if language == LanguageEnum.FRENCH:
                 table = "mots_fr"
