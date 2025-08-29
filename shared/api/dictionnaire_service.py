@@ -32,7 +32,7 @@ from pydantic import BaseModel, Field
 
 # Import dictionary service
 sys.path.append(str(PathLib(__file__).parent.parent / "models"))
-from dictionnaire import DictionaryConstants, DictionaryService, LanguageEnum, DictionaryWord, ValidationResult
+from dictionnaire import DictionaryConstants, DictionaryService, DictionaryWord, LanguageEnum, ValidationResult
 
 # Logging configuration
 logging.basicConfig(level=logging.INFO)
