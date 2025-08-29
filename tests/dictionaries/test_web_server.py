@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """
-Tests unitaires pour le serveur web - Système de dictionnaires Scrabbot.
+Unit tests for web server - Scrabbot dictionary system.
 
-Ces tests vérifient que le serveur web et l'application Godot peuvent
-bien accéder aux dictionnaires selon les spécifications du ticket OYO-7.
+These tests verify that the web server and Godot application can
+properly access dictionaries according to OYO-7 ticket specifications.
 
-Tests couverts :
-- Test d'accès basique SQLite
-- Test de validation de mots
-- Test de performance (< 50ms)
-- Test de caractères spéciaux
-- Test de connexion/fermeture SQLite
-- Test d'intégration API REST
+Tests covered:
+- Basic SQLite access test
+- Word validation test
+- Performance test (< 50ms)
+- Special characters test
+- SQLite connection/closure test
+- REST API integration test
 """
 
 import logging
@@ -24,48 +24,48 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-# Ajout du chemin pour importer les modules
+# Add path to import modules
 sys.path.append(str(Path(__file__).parent.parent.parent / "shared" / "models"))
 sys.path.append(str(Path(__file__).parent.parent.parent / "shared" / "api"))
 
-from dictionnaire import DictionaryService, LanguageEnum, ValidationResult
+from dictionary import DictionaryService, LanguageEnum, ValidationResult
 from dictionnaire_service import app
 from fastapi.testclient import TestClient
 
 
 class TestAccesSQLiteBasique(unittest.TestCase):
-    """Tests d'accès basique à la base SQLite."""
+    """Basic SQLite database access tests."""
 
     def setUp(self):
-        """Initialisation des tests."""
-        # Création de bases temporaires pour les tests
+        """Test initialization."""
+        # Create temporary databases for tests
         self.temp_dir = tempfile.mkdtemp()
         self.db_fr_path = os.path.join(self.temp_dir, "test_french.db")
         self.db_en_path = os.path.join(self.temp_dir, "test_english.db")
 
-        # Création des bases de test
+        # Create test databases
         self._creer_base_test_francaise()
         self._creer_base_test_anglaise()
 
-        # Service de test
+        # Test service
         self.service = DictionaryService(self.db_fr_path, self.db_en_path)
 
     def tearDown(self):
-        """Nettoyage après les tests."""
+        """Cleanup after tests."""
         self.service.close_connections()
 
-        # Suppression des fichiers temporaires
+        # Delete temporary files
         for file_path in [self.db_fr_path, self.db_en_path]:
             if os.path.exists(file_path):
                 os.unlink(file_path)
         os.rmdir(self.temp_dir)
 
     def _creer_base_test_francaise(self):
-        """Crée une base de test française."""
+        """Creates a French test database."""
         conn = sqlite3.connect(self.db_fr_path)
         cursor = conn.cursor()
 
-        # Table métadonnées
+        # Metadata table
         cursor.execute(
             """
         CREATE TABLE dictionnaires (
@@ -79,7 +79,7 @@ class TestAccesSQLiteBasique(unittest.TestCase):
         """
         )
 
-        # Table mots français
+        # French words table
         cursor.execute(
             """
         CREATE TABLE mots_fr (
@@ -100,13 +100,13 @@ class TestAccesSQLiteBasique(unittest.TestCase):
         """
         )
 
-        # Index
+        # Indexes
         cursor.execute("CREATE INDEX idx_mots_fr_mot ON mots_fr(mot)")
         cursor.execute("CREATE INDEX idx_mots_fr_longueur ON mots_fr(longueur)")
         cursor.execute("CREATE INDEX idx_mots_fr_premiere_lettre ON mots_fr(premiere_lettre)")
         cursor.execute("CREATE INDEX idx_mots_fr_valide_scrabble ON mots_fr(valide_scrabble)")
 
-        # Données de test
+        # Test data
         mots_test = [
             (
                 "CHAT",
@@ -175,11 +175,11 @@ class TestAccesSQLiteBasique(unittest.TestCase):
         conn.close()
 
     def _creer_base_test_anglaise(self):
-        """Crée une base de test anglaise."""
+        """Creates an English test database."""
         conn = sqlite3.connect(self.db_en_path)
         cursor = conn.cursor()
 
-        # Table mots anglais
+        # English words table
         cursor.execute(
             """
         CREATE TABLE mots_en (
@@ -200,13 +200,13 @@ class TestAccesSQLiteBasique(unittest.TestCase):
         """
         )
 
-        # Index
+        # Indexes
         cursor.execute("CREATE INDEX idx_mots_en_word ON mots_en(word)")
         cursor.execute("CREATE INDEX idx_mots_en_length ON mots_en(length)")
         cursor.execute("CREATE INDEX idx_mots_en_first_letter ON mots_en(first_letter)")
         cursor.execute("CREATE INDEX idx_mots_en_scrabble_valid ON mots_en(scrabble_valid)")
 
-        # Données de test
+        # Test data
         words_test = [
             (
                 "CAT",
@@ -262,29 +262,29 @@ class TestAccesSQLiteBasique(unittest.TestCase):
         conn.close()
 
     def test_acces_mot_quelconque_francais(self):
-        """Test d'accès basique : récupérer un mot quelconque depuis SQLite français."""
+        """Basic access test: retrieve any word from French SQLite."""
         resultat = self.service.validate_word("CHAT", LanguageEnum.FRENCH)
 
         self.assertIsNotNone(resultat)
-        self.assertEqual(resultat.mot, "CHAT")
+        self.assertEqual(resultat.word, "CHAT")
         self.assertTrue(resultat.is_valid)
         self.assertEqual(resultat.definition, "Mammifère domestique félin")
         self.assertEqual(resultat.points, 9)
         self.assertEqual(resultat.language, LanguageEnum.FRENCH)
 
     def test_acces_mot_quelconque_anglais(self):
-        """Test d'accès basique : récupérer un mot quelconque depuis SQLite anglais."""
+        """Basic access test: retrieve any word from English SQLite."""
         resultat = self.service.validate_word("CAT", LanguageEnum.ENGLISH)
 
         self.assertIsNotNone(resultat)
-        self.assertEqual(resultat.mot, "CAT")
+        self.assertEqual(resultat.word, "CAT")
         self.assertTrue(resultat.is_valid)
         self.assertEqual(resultat.definition, "Small domesticated carnivorous mammal")
         self.assertEqual(resultat.points, 5)
         self.assertEqual(resultat.language, LanguageEnum.ENGLISH)
 
     def test_validation_mot_valide_francais(self):
-        """Test de validation : mot valide retourne True."""
+        """Validation test: valid word returns True."""
         resultat = self.service.validate_word("CHIEN", LanguageEnum.FRENCH)
 
         self.assertTrue(resultat.is_valid)
@@ -292,7 +292,7 @@ class TestAccesSQLiteBasique(unittest.TestCase):
         self.assertGreater(resultat.points, 0)
 
     def test_validation_mot_invalide_francais(self):
-        """Test de validation : mot invalide retourne False."""
+        """Validation test: invalid word returns False."""
         resultat = self.service.validate_word("MOTINEXISTANT", LanguageEnum.FRENCH)
 
         self.assertFalse(resultat.is_valid)
@@ -300,7 +300,7 @@ class TestAccesSQLiteBasique(unittest.TestCase):
         self.assertIsNone(resultat.points)
 
     def test_validation_mot_valide_anglais(self):
-        """Test de validation : mot valide anglais retourne True."""
+        """Validation test: valid English word returns True."""
         resultat = self.service.validate_word("DOG", LanguageEnum.ENGLISH)
 
         self.assertTrue(resultat.is_valid)
@@ -308,7 +308,7 @@ class TestAccesSQLiteBasique(unittest.TestCase):
         self.assertGreater(resultat.points, 0)
 
     def test_validation_mot_invalide_anglais(self):
-        """Test de validation : mot invalide anglais retourne False."""
+        """Validation test: invalid English word returns False."""
         resultat = self.service.validate_word("NONEXISTENTWORD", LanguageEnum.ENGLISH)
 
         self.assertFalse(resultat.is_valid)
@@ -317,23 +317,23 @@ class TestAccesSQLiteBasique(unittest.TestCase):
 
 
 class TestPerformance(unittest.TestCase):
-    """Tests de performance selon les critères d'acceptation."""
+    """Performance tests according to acceptance criteria."""
 
     def setUp(self):
-        """Initialisation des tests de performance."""
-        # Utilisation des mêmes bases de test
+        """Performance test initialization."""
+        # Using same test databases
         self.temp_dir = tempfile.mkdtemp()
         self.db_fr_path = os.path.join(self.temp_dir, "test_french.db")
         self.db_en_path = os.path.join(self.temp_dir, "test_english.db")
 
-        # Création des bases avec plus de données pour tester les performances
+        # Create databases with more data to test performance
         self._creer_base_performance_francaise()
         self._creer_base_performance_anglaise()
 
         self.service = DictionaryService(self.db_fr_path, self.db_en_path)
 
     def tearDown(self):
-        """Nettoyage après les tests de performance."""
+        """Cleanup after performance tests."""
         self.service.close_connections()
 
         for file_path in [self.db_fr_path, self.db_en_path]:
@@ -342,11 +342,11 @@ class TestPerformance(unittest.TestCase):
         os.rmdir(self.temp_dir)
 
     def _creer_base_performance_francaise(self):
-        """Crée une base de test avec plus de données pour les performances."""
+        """Creates a test database with more data for performance."""
         conn = sqlite3.connect(self.db_fr_path)
         cursor = conn.cursor()
 
-        # Même schéma que précédemment
+        # Same schema as before
         cursor.execute(
             """
         CREATE TABLE mots_fr (
@@ -367,13 +367,13 @@ class TestPerformance(unittest.TestCase):
         """
         )
 
-        # Index critiques pour les performances
+        # Critical indexes for performance
         cursor.execute("CREATE INDEX idx_mots_fr_mot ON mots_fr(mot)")
         cursor.execute("CREATE INDEX idx_mots_fr_valide_scrabble ON mots_fr(valide_scrabble)")
 
-        # Données de test nombreuses
+        # Many test data entries
         mots_test = []
-        for i in range(1000):  # 1000 mots de test
+        for i in range(1000):  # 1000 test words
             mot = f"MOT{i:04d}"
             mots_test.append(
                 (
@@ -404,7 +404,7 @@ class TestPerformance(unittest.TestCase):
         conn.close()
 
     def _creer_base_performance_anglaise(self):
-        """Crée une base de test anglaise pour les performances."""
+        """Creates an English test database for performance."""
         conn = sqlite3.connect(self.db_en_path)
         cursor = conn.cursor()
 
@@ -431,7 +431,7 @@ class TestPerformance(unittest.TestCase):
         cursor.execute("CREATE INDEX idx_mots_en_word ON mots_en(word)")
         cursor.execute("CREATE INDEX idx_mots_en_scrabble_valid ON mots_en(scrabble_valid)")
 
-        # Données de test
+        # Test data
         words_test = []
         for i in range(1000):
             word = f"WORD{i:04d}"
@@ -464,8 +464,8 @@ class TestPerformance(unittest.TestCase):
         conn.close()
 
     def test_performance_recherche_inferieure_50ms(self):
-        """Test de performance : recherche d'un mot < 50ms."""
-        # Test sur plusieurs mots
+        """Performance test: word search < 50ms."""
+        # Test on multiple words
         mots_test = ["MOT0001", "MOT0500", "MOT0999"]
 
         for mot in mots_test:
@@ -476,13 +476,13 @@ class TestPerformance(unittest.TestCase):
             self.assertLess(
                 temps_ms,
                 50.0,
-                f"Recherche '{mot}' trop lente: {temps_ms:.1f}ms (objectif: < 50ms)",
+                f"Search '{mot}' too slow: {temps_ms:.1f}ms (target: < 50ms)",
             )
             self.assertTrue(resultat.is_valid)
             self.assertIsNotNone(resultat.search_time_ms)
 
     def test_performance_batch_validation(self):
-        """Test de performance : validation batch (10 mots) < 200ms."""
+        """Performance test: batch validation (10 words) < 200ms."""
         mots_test = [f"MOT{i:04d}" for i in range(0, 10)]
 
         debut = time.time()
@@ -493,30 +493,30 @@ class TestPerformance(unittest.TestCase):
         self.assertLess(
             temps_total_ms,
             200.0,
-            f"Validation batch trop lente: {temps_total_ms:.1f}ms (objectif: < 200ms)",
+            f"Batch validation too slow: {temps_total_ms:.1f}ms (target: < 200ms)",
         )
 
     def test_statistiques_performance(self):
-        """Test des statistiques de performance du service."""
-        # Effectuer quelques recherches
+        """Service performance statistics test."""
+        # Perform some searches
         for i in range(5):
             self.service.validate_word(f"MOT{i:04d}", LanguageEnum.FRENCH)
 
         stats = self.service.get_performance_statistics()
 
-        self.assertIn("requetes_totales", stats)
-        self.assertIn("temps_total_ms", stats)
-        self.assertIn("temps_moyen_ms", stats)
-        self.assertGreaterEqual(stats["requetes_totales"], 5)
-        self.assertGreater(stats["temps_total_ms"], 0)
-        self.assertLess(stats["temps_moyen_ms"], 50.0)
+        self.assertIn("total_requests", stats)
+        self.assertIn("total_time_ms", stats)
+        self.assertIn("average_time_ms", stats)
+        self.assertGreaterEqual(stats["total_requests"], 5)
+        self.assertGreater(stats["total_time_ms"], 0)
+        self.assertLess(stats["average_time_ms"], 50.0)
 
 
 class TestCaracteresSpeciaux(unittest.TestCase):
-    """Tests de gestion des caractères spéciaux."""
+    """Special characters handling tests."""
 
     def setUp(self):
-        """Initialisation des tests de caractères spéciaux."""
+        """Special characters test initialization."""
         self.temp_dir = tempfile.mkdtemp()
         self.db_fr_path = os.path.join(self.temp_dir, "test_french_accents.db")
         self.db_en_path = os.path.join(self.temp_dir, "test_english_simple.db")
@@ -527,7 +527,7 @@ class TestCaracteresSpeciaux(unittest.TestCase):
         self.service = DictionaryService(self.db_fr_path, self.db_en_path)
 
     def tearDown(self):
-        """Nettoyage après les tests de caractères spéciaux."""
+        """Cleanup after special characters tests."""
         self.service.close_connections()
 
         for file_path in [self.db_fr_path, self.db_en_path]:
@@ -536,7 +536,7 @@ class TestCaracteresSpeciaux(unittest.TestCase):
         os.rmdir(self.temp_dir)
 
     def _creer_base_accents_francaise(self):
-        """Crée une base avec des mots français accentués."""
+        """Creates a database with French accented words."""
         conn = sqlite3.connect(self.db_fr_path)
         cursor = conn.cursor()
 
@@ -563,7 +563,7 @@ class TestCaracteresSpeciaux(unittest.TestCase):
         cursor.execute("CREATE INDEX idx_mots_fr_mot ON mots_fr(mot)")
         cursor.execute("CREATE INDEX idx_mots_fr_valide_scrabble ON mots_fr(valide_scrabble)")
 
-        # Mots avec accents et caractères spéciaux français
+        # Words with accents and special French characters
         mots_accents = [
             (
                 "ÊTRE",
@@ -645,7 +645,7 @@ class TestCaracteresSpeciaux(unittest.TestCase):
         conn.close()
 
     def _creer_base_simple_anglaise(self):
-        """Crée une base anglaise simple (sans accents)."""
+        """Creates a simple English database (no accents)."""
         conn = sqlite3.connect(self.db_en_path)
         cursor = conn.cursor()
 
@@ -671,7 +671,7 @@ class TestCaracteresSpeciaux(unittest.TestCase):
 
         cursor.execute("CREATE INDEX idx_mots_en_word ON mots_en(word)")
 
-        # Mots anglais simples
+        # Simple English words
         words_simple = [
             (
                 "SIMPLE",
@@ -701,70 +701,70 @@ class TestCaracteresSpeciaux(unittest.TestCase):
         conn.close()
 
     def test_validation_accents_francais(self):
-        """Test de validation des mots français avec accents."""
+        """French words with accents validation test."""
         mots_accents = ["ÊTRE", "CŒUR", "NAÏF", "ÉLÈVE", "FRANÇAIS"]
 
         for mot in mots_accents:
             resultat = self.service.validate_word(mot, LanguageEnum.FRENCH)
-            self.assertTrue(resultat.is_valid, f"Mot accentué '{mot}' non validé")
+            self.assertTrue(resultat.is_valid, f"Accented word '{mot}' not validated")
             self.assertIsNotNone(resultat.definition)
 
     def test_normalisation_casse(self):
-        """Test de normalisation de la casse."""
-        # Test en minuscules
+        """Case normalization test."""
+        # Test in lowercase
         resultat_min = self.service.validate_word("être", LanguageEnum.FRENCH)
-        # Test en majuscules
+        # Test in uppercase
         resultat_maj = self.service.validate_word("ÊTRE", LanguageEnum.FRENCH)
 
-        self.assertTrue(resultat_min.valide)
-        self.assertTrue(resultat_maj.valide)
-        self.assertEqual(resultat_min.mot, resultat_maj.mot)
+        self.assertTrue(resultat_min.is_valid)
+        self.assertTrue(resultat_maj.is_valid)
+        self.assertEqual(resultat_min.word, resultat_maj.word)
 
 
 class TestConnexionSQLite(unittest.TestCase):
-    """Tests de gestion des connexions SQLite."""
+    """SQLite connection management tests."""
 
     def test_etablissement_connexion(self):
-        """Test d'établissement de connexion SQLite."""
+        """SQLite connection establishment test."""
         temp_dir = tempfile.mkdtemp()
         db_path = os.path.join(temp_dir, "test_connection.db")
 
-        # Création d'une base minimale
+        # Create minimal database
         conn = sqlite3.connect(db_path)
         conn.execute("CREATE TABLE test (id INTEGER)")
         conn.close()
 
         try:
-            # Test de connexion via le service
+            # Test connection through service
             service = DictionaryService(db_path, db_path)
             self.assertIsNotNone(service)
 
-            # Test de fermeture explicite
-            service.fermer_connexions()
+            # Test explicit closure
+            service.close_connections()
 
         finally:
             os.unlink(db_path)
             os.rmdir(temp_dir)
 
     def test_gestion_erreur_connexion(self):
-        """Test de gestion des erreurs de connexion."""
-        # Tentative de connexion à un fichier inexistant
+        """Connection error handling test."""
+        # Attempt connection to non-existent file
         with self.assertRaises(FileNotFoundError):
             service = DictionaryService("/inexistant/french.db", "/inexistant/english.db")
             service.validate_word("TEST", LanguageEnum.FRENCH)
 
 
 class TestAPIREST(unittest.TestCase):
-    """Tests d'intégration de l'API REST pour Godot."""
+    """REST API integration tests for Godot."""
 
     @classmethod
     def setUpClass(cls):
-        """Initialisation des tests API une seule fois."""
+        """API test initialization once only."""
         cls.client = TestClient(app)
 
     def test_endpoint_validation_francais(self):
-        """Test de l'endpoint de validation française."""
-        # Mock du service pour les tests
+        """French validation endpoint test."""
+        # Mock service for tests
         with patch("dictionnaire_service.get_service") as mock_service:
             mock_service.return_value.validate_word.return_value = ValidationResult(
                 word="TEST",
@@ -787,7 +787,7 @@ class TestAPIREST(unittest.TestCase):
             self.assertLess(data["temps_recherche_ms"], 50.0)
 
     def test_endpoint_validation_anglais(self):
-        """Test de l'endpoint de validation anglaise."""
+        """English validation endpoint test."""
         with patch("dictionnaire_service.get_service") as mock_service:
             mock_service.return_value.validate_word.return_value = ValidationResult(
                 word="TEST",
@@ -807,7 +807,7 @@ class TestAPIREST(unittest.TestCase):
             self.assertEqual(data["langue"], "en")
 
     def test_endpoint_definition_francaise(self):
-        """Test de l'endpoint de définition française."""
+        """French definition endpoint test."""
         with patch("dictionnaire_service.get_service") as mock_service:
             mock_service.return_value.get_definition.return_value = "Définition de test"
 
@@ -821,7 +821,7 @@ class TestAPIREST(unittest.TestCase):
             self.assertEqual(data["langue"], "fr")
 
     def test_endpoint_health_check(self):
-        """Test de l'endpoint de health check."""
+        """Health check endpoint test."""
         response = self.client.get("/api/v1/dictionnaire/health")
 
         self.assertEqual(response.status_code, 200)
@@ -832,25 +832,25 @@ class TestAPIREST(unittest.TestCase):
         self.assertIn("timestamp", data)
 
     def test_gestion_erreur_mot_trop_long(self):
-        """Test de gestion d'erreur pour mot trop long."""
-        mot_trop_long = "A" * 20  # Plus de 15 caractères
+        """Too long word error handling test."""
+        mot_trop_long = "A" * 20  # More than 15 characters
         response = self.client.get(f"/api/v1/dictionnaire/fr/valider/{mot_trop_long}")
 
         self.assertEqual(response.status_code, 422)  # Validation error
 
     def test_cors_headers(self):
-        """Test de la présence des headers CORS pour Godot."""
+        """CORS headers presence test for Godot."""
         response = self.client.get("/api/v1/dictionnaire/health")
 
-        # Vérification que les headers CORS sont présents (pour Godot)
+        # Verify CORS headers are present (for Godot)
         self.assertEqual(response.status_code, 200)
-        # Note: TestClient ne simule pas complètement les headers CORS
-        # En production, vérifier avec un vrai client HTTP
+        # Note: TestClient doesn't fully simulate CORS headers
+        # In production, verify with real HTTP client
 
 
 if __name__ == "__main__":
-    # Configuration du logging pour les tests
+    # Logging configuration for tests
     logging.basicConfig(level=logging.WARNING)
 
-    # Lancement des tests
+    # Run tests
     unittest.main(verbosity=2)

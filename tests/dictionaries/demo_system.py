@@ -23,11 +23,11 @@ from pathlib import Path
 # Ajout des chemins pour les imports
 sys.path.append(str(Path(__file__).parent.parent.parent / "shared" / "models"))
 sys.path.append(str(Path(__file__).parent.parent.parent / "shared" / "api"))
-sys.path.append(str(Path(__file__).parent.parent.parent / "data" / "dictionnaires" / "scripts"))
+sys.path.append(str(Path(__file__).parent.parent.parent / "data" / "dictionaries" / "scripts"))
 
 import requests
 from csv_to_sqlite import ConvertisseurCSVSQLite
-from dictionnaire import DictionaryService, LanguageEnum
+from dictionary import DictionaryService, LanguageEnum
 
 
 class DictionarySystemDemo:
