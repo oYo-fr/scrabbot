@@ -1,0 +1,64 @@
+---
+alwaysApply: true
+description: File naming conventions - all names must be in English
+---
+
+# File Naming Conventions
+
+## Mandatory Rule: English-Only File Names
+
+All file names, like code, comments, and documentation, MUST be in English.
+
+### File Naming Rules
+
+- **REQUIRED**: Use English names for all files
+- **REQUIRED**: Use snake_case for Python files
+- **REQUIRED**: Use kebab-case for documentation files
+- **FORBIDDEN**: French file names
+
+### Examples
+
+✅ **Correct file names:**
+```
+dictionary_service.py
+word_validator.py
+test_dictionary_api.py
+scrabble-rules.md
+api-documentation.md
+performance-tests.py
+```
+
+❌ **Forbidden file names:**
+```
+service_dictionnaire.py
+validateur_mot.py
+test_api_dictionnaire.py
+regles-scrabble.md
+documentation-api.md
+tests-performance.py
+```
+
+### Directory Names
+
+- **REQUIRED**: Use English directory names
+- **EXAMPLES**:
+  - `dictionary/` ✅
+  - `validation/` ✅
+  - `performance/` ✅
+  - `dictionnaire/` ❌
+
+### Migration Strategy
+
+When renaming existing French files:
+1. Update all imports that reference the old file name
+2. Update any references in configuration files
+3. Update documentation that mentions the file
+4. Ensure all tests still pass after renaming
+5. Update any CI/CD configurations that reference the files
+
+### Enforcement
+
+- This rule applies to ALL files in the project
+- No exceptions without explicit approval
+- All new files must follow these conventions
+- Existing French file names should be migrated progressively

@@ -1,0 +1,89 @@
+---
+alwaysApply: true
+description: Git quality standards - no bypassing of pre-commit hooks
+---
+
+# Git Quality Standards
+
+## Mandatory Rule: No Bypassing Pre-commit Hooks
+
+The use of `--no-verify` option when pushing code is **STRICTLY FORBIDDEN**. All errors must be fixed before pushing.
+
+### Forbidden Commands
+
+❌ **NEVER use these commands:**
+```bash
+git push --no-verify
+git commit --no-verify
+git push --force-with-lease --no-verify
+```
+
+### Required Process
+
+✅ **Always follow this process:**
+
+1. **Run checks locally before committing:**
+   ```bash
+   # Run linting
+   flake8 .
+   black --check .
+   isort --check-only .
+   mypy .
+   
+   # Run tests
+   pytest
+   ```
+
+2. **Fix all errors before committing:**
+   - Address linting errors
+   - Fix type checking issues
+   - Ensure all tests pass
+   - Resolve any pre-commit hook failures
+
+3. **Only push clean code:**
+   ```bash
+   git add .
+   git commit -m "Descriptive commit message"
+   git push  # Without --no-verify
+   ```
+
+### Why This Rule Exists
+
+- **Code Quality**: Ensures consistent code standards
+- **Team Collaboration**: Prevents broken code from entering the repository
+- **Continuous Integration**: Maintains a clean build pipeline
+- **Best Practices**: Follows industry standards for software development
+
+### When Pre-commit Hooks Fail
+
+If pre-commit hooks fail, you MUST:
+
+1. **Read the error messages carefully**
+2. **Fix the underlying issues** (don't bypass them)
+3. **Re-run the checks locally** to verify fixes
+4. **Commit only when all checks pass**
+
+### Common Fixes
+
+- **Linting errors**: Use `black .` and `isort .` to auto-fix formatting
+- **Type errors**: Add proper type annotations or fix type issues
+- **Test failures**: Fix the failing tests or update them if necessary
+- **Import errors**: Ensure all dependencies are properly installed
+
+### Emergency Exceptions
+
+In **extremely rare** emergency situations where bypassing is absolutely necessary:
+
+1. **Get explicit approval** from team lead
+2. **Document the reason** in the commit message
+3. **Create an immediate follow-up task** to fix the issues
+4. **Fix the issues within 24 hours**
+
+### Enforcement
+
+- This rule is **NON-NEGOTIABLE**
+- Code reviews will check for compliance
+- Any bypassed commits must be immediately fixed
+- Repeated violations will require additional training
+
+**Remember: Quality code is shipped code. Take the time to fix issues properly.**
