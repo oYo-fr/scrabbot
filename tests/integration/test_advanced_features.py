@@ -15,7 +15,7 @@ import sys
 import time
 
 # Add shared modules to path
-sys.path.append("/workspaces/scrabbot/shared")
+sys.path.append("/workspaces/Scrabbot/shared")
 
 from algorithms.scrabble_strategy import create_strategy_engine
 from algorithms.trie_search import create_search_engine
