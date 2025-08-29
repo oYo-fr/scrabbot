@@ -29,7 +29,7 @@ git push --force-with-lease --no-verify
    black --check .
    isort --check-only .
    mypy .
-   
+
    # Run tests
    pytest
    ```

@@ -40,6 +40,12 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && ln -sf python3 /usr/bin/python
 
+# Install Node.js and npm
+RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/* \
+    && npm install -g npm@latest
+
 # Install GitHub CLI from official repository
 RUN if ! command -v gh >/dev/null 2>&1; then \
     curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg; \
@@ -64,9 +70,12 @@ USER vscode
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
     && echo 'source $HOME/.cargo/env' >> ~/.bashrc
 
-# Configure Git to avoid pager blocking in terminal
+# Configure Git to avoid pager blocking in terminal and set identity
 RUN git config --global core.pager cat \
-    && git config --global init.defaultBranch main
+    && git config --global init.defaultBranch main \
+    && git config --global user.email "dev@scrabbot.local" \
+    && git config --global user.name "Scrabbot Dev" \
+    && git config --global --add safe.directory /workspaces/Scrabbot
 
 # Install Python dependencies for the project
 RUN pip3 install --user unidecode==1.4.0
