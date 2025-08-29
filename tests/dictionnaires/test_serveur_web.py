@@ -28,7 +28,7 @@ from unittest.mock import patch
 sys.path.append(str(Path(__file__).parent.parent.parent / "shared" / "models"))
 sys.path.append(str(Path(__file__).parent.parent.parent / "shared" / "api"))
 
-from dictionnaire import DictionnaireService, LangueEnum, ResultatValidation
+from dictionnaire import DictionaryService, LanguageEnum, ValidationResult
 from dictionnaire_service import app
 from fastapi.testclient import TestClient
 
@@ -48,11 +48,11 @@ class TestAccesSQLiteBasique(unittest.TestCase):
         self._creer_base_test_anglaise()
 
         # Service de test
-        self.service = DictionnaireService(self.db_fr_path, self.db_en_path)
+        self.service = DictionaryService(self.db_fr_path, self.db_en_path)
 
     def tearDown(self):
         """Nettoyage après les tests."""
-        self.service.fermer_connexions()
+        self.service.close_connections()
 
         # Suppression des fichiers temporaires
         for file_path in [self.db_fr_path, self.db_en_path]:
@@ -263,55 +263,55 @@ class TestAccesSQLiteBasique(unittest.TestCase):
 
     def test_acces_mot_quelconque_francais(self):
         """Test d'accès basique : récupérer un mot quelconque depuis SQLite français."""
-        resultat = self.service.valider_mot("CHAT", LangueEnum.FRANCAIS)
+        resultat = self.service.validate_word("CHAT", LanguageEnum.FRENCH)
 
         self.assertIsNotNone(resultat)
         self.assertEqual(resultat.mot, "CHAT")
-        self.assertTrue(resultat.valide)
+        self.assertTrue(resultat.is_valid)
         self.assertEqual(resultat.definition, "Mammifère domestique félin")
         self.assertEqual(resultat.points, 9)
-        self.assertEqual(resultat.langue, LangueEnum.FRANCAIS)
+        self.assertEqual(resultat.language, LanguageEnum.FRENCH)
 
     def test_acces_mot_quelconque_anglais(self):
         """Test d'accès basique : récupérer un mot quelconque depuis SQLite anglais."""
-        resultat = self.service.valider_mot("CAT", LangueEnum.ANGLAIS)
+        resultat = self.service.validate_word("CAT", LanguageEnum.ENGLISH)
 
         self.assertIsNotNone(resultat)
         self.assertEqual(resultat.mot, "CAT")
-        self.assertTrue(resultat.valide)
+        self.assertTrue(resultat.is_valid)
         self.assertEqual(resultat.definition, "Small domesticated carnivorous mammal")
         self.assertEqual(resultat.points, 5)
-        self.assertEqual(resultat.langue, LangueEnum.ANGLAIS)
+        self.assertEqual(resultat.language, LanguageEnum.ENGLISH)
 
     def test_validation_mot_valide_francais(self):
         """Test de validation : mot valide retourne True."""
-        resultat = self.service.valider_mot("CHIEN", LangueEnum.FRANCAIS)
+        resultat = self.service.validate_word("CHIEN", LanguageEnum.FRENCH)
 
-        self.assertTrue(resultat.valide)
+        self.assertTrue(resultat.is_valid)
         self.assertIsNotNone(resultat.definition)
         self.assertGreater(resultat.points, 0)
 
     def test_validation_mot_invalide_francais(self):
         """Test de validation : mot invalide retourne False."""
-        resultat = self.service.valider_mot("MOTINEXISTANT", LangueEnum.FRANCAIS)
+        resultat = self.service.validate_word("MOTINEXISTANT", LanguageEnum.FRENCH)
 
-        self.assertFalse(resultat.valide)
+        self.assertFalse(resultat.is_valid)
         self.assertIsNone(resultat.definition)
         self.assertIsNone(resultat.points)
 
     def test_validation_mot_valide_anglais(self):
         """Test de validation : mot valide anglais retourne True."""
-        resultat = self.service.valider_mot("DOG", LangueEnum.ANGLAIS)
+        resultat = self.service.validate_word("DOG", LanguageEnum.ENGLISH)
 
-        self.assertTrue(resultat.valide)
+        self.assertTrue(resultat.is_valid)
         self.assertIsNotNone(resultat.definition)
         self.assertGreater(resultat.points, 0)
 
     def test_validation_mot_invalide_anglais(self):
         """Test de validation : mot invalide anglais retourne False."""
-        resultat = self.service.valider_mot("NONEXISTENTWORD", LangueEnum.ANGLAIS)
+        resultat = self.service.validate_word("NONEXISTENTWORD", LanguageEnum.ENGLISH)
 
-        self.assertFalse(resultat.valide)
+        self.assertFalse(resultat.is_valid)
         self.assertIsNone(resultat.definition)
         self.assertIsNone(resultat.points)
 
@@ -330,11 +330,11 @@ class TestPerformance(unittest.TestCase):
         self._creer_base_performance_francaise()
         self._creer_base_performance_anglaise()
 
-        self.service = DictionnaireService(self.db_fr_path, self.db_en_path)
+        self.service = DictionaryService(self.db_fr_path, self.db_en_path)
 
     def tearDown(self):
         """Nettoyage après les tests de performance."""
-        self.service.fermer_connexions()
+        self.service.close_connections()
 
         for file_path in [self.db_fr_path, self.db_en_path]:
             if os.path.exists(file_path):
@@ -470,7 +470,7 @@ class TestPerformance(unittest.TestCase):
 
         for mot in mots_test:
             debut = time.time()
-            resultat = self.service.valider_mot(mot, LangueEnum.FRANCAIS)
+            resultat = self.service.validate_word(mot, LanguageEnum.FRENCH)
             temps_ms = (time.time() - debut) * 1000
 
             self.assertLess(
@@ -478,8 +478,8 @@ class TestPerformance(unittest.TestCase):
                 50.0,
                 f"Recherche '{mot}' trop lente: {temps_ms:.1f}ms (objectif: < 50ms)",
             )
-            self.assertTrue(resultat.valide)
-            self.assertIsNotNone(resultat.temps_recherche_ms)
+            self.assertTrue(resultat.is_valid)
+            self.assertIsNotNone(resultat.search_time_ms)
 
     def test_performance_batch_validation(self):
         """Test de performance : validation batch (10 mots) < 200ms."""
@@ -487,7 +487,7 @@ class TestPerformance(unittest.TestCase):
 
         debut = time.time()
         for mot in mots_test:
-            self.service.valider_mot(mot, LangueEnum.FRANCAIS)
+            self.service.validate_word(mot, LanguageEnum.FRENCH)
         temps_total_ms = (time.time() - debut) * 1000
 
         self.assertLess(
@@ -500,9 +500,9 @@ class TestPerformance(unittest.TestCase):
         """Test des statistiques de performance du service."""
         # Effectuer quelques recherches
         for i in range(5):
-            self.service.valider_mot(f"MOT{i:04d}", LangueEnum.FRANCAIS)
+            self.service.validate_word(f"MOT{i:04d}", LanguageEnum.FRENCH)
 
-        stats = self.service.obtenir_statistiques_performance()
+        stats = self.service.get_performance_statistics()
 
         self.assertIn("requetes_totales", stats)
         self.assertIn("temps_total_ms", stats)
@@ -524,11 +524,11 @@ class TestCaracteresSpeciaux(unittest.TestCase):
         self._creer_base_accents_francaise()
         self._creer_base_simple_anglaise()
 
-        self.service = DictionnaireService(self.db_fr_path, self.db_en_path)
+        self.service = DictionaryService(self.db_fr_path, self.db_en_path)
 
     def tearDown(self):
         """Nettoyage après les tests de caractères spéciaux."""
-        self.service.fermer_connexions()
+        self.service.close_connections()
 
         for file_path in [self.db_fr_path, self.db_en_path]:
             if os.path.exists(file_path):
@@ -705,16 +705,16 @@ class TestCaracteresSpeciaux(unittest.TestCase):
         mots_accents = ["ÊTRE", "CŒUR", "NAÏF", "ÉLÈVE", "FRANÇAIS"]
 
         for mot in mots_accents:
-            resultat = self.service.valider_mot(mot, LangueEnum.FRANCAIS)
-            self.assertTrue(resultat.valide, f"Mot accentué '{mot}' non validé")
+            resultat = self.service.validate_word(mot, LanguageEnum.FRENCH)
+            self.assertTrue(resultat.is_valid, f"Mot accentué '{mot}' non validé")
             self.assertIsNotNone(resultat.definition)
 
     def test_normalisation_casse(self):
         """Test de normalisation de la casse."""
         # Test en minuscules
-        resultat_min = self.service.valider_mot("être", LangueEnum.FRANCAIS)
+        resultat_min = self.service.validate_word("être", LanguageEnum.FRENCH)
         # Test en majuscules
-        resultat_maj = self.service.valider_mot("ÊTRE", LangueEnum.FRANCAIS)
+        resultat_maj = self.service.validate_word("ÊTRE", LanguageEnum.FRENCH)
 
         self.assertTrue(resultat_min.valide)
         self.assertTrue(resultat_maj.valide)
@@ -736,7 +736,7 @@ class TestConnexionSQLite(unittest.TestCase):
 
         try:
             # Test de connexion via le service
-            service = DictionnaireService(db_path, db_path)
+            service = DictionaryService(db_path, db_path)
             self.assertIsNotNone(service)
 
             # Test de fermeture explicite
@@ -750,8 +750,8 @@ class TestConnexionSQLite(unittest.TestCase):
         """Test de gestion des erreurs de connexion."""
         # Tentative de connexion à un fichier inexistant
         with self.assertRaises(FileNotFoundError):
-            service = DictionnaireService("/inexistant/french.db", "/inexistant/english.db")
-            service.valider_mot("TEST", LangueEnum.FRANCAIS)
+            service = DictionaryService("/inexistant/french.db", "/inexistant/english.db")
+            service.validate_word("TEST", LanguageEnum.FRENCH)
 
 
 class TestAPIREST(unittest.TestCase):
@@ -766,13 +766,13 @@ class TestAPIREST(unittest.TestCase):
         """Test de l'endpoint de validation française."""
         # Mock du service pour les tests
         with patch("dictionnaire_service.get_service") as mock_service:
-            mock_service.return_value.valider_mot.return_value = ResultatValidation(
-                mot="TEST",
-                valide=True,
+            mock_service.return_value.validate_word.return_value = ValidationResult(
+                word="TEST",
+                is_valid=True,
                 definition="Mot de test",
                 points=8,
-                langue=LangueEnum.FRANCAIS,
-                temps_recherche_ms=25.0,
+                language=LanguageEnum.FRENCH,
+                search_time_ms=25.0,
             )
 
             response = self.client.get("/api/v1/dictionnaire/fr/valider/TEST")
@@ -789,13 +789,13 @@ class TestAPIREST(unittest.TestCase):
     def test_endpoint_validation_anglais(self):
         """Test de l'endpoint de validation anglaise."""
         with patch("dictionnaire_service.get_service") as mock_service:
-            mock_service.return_value.valider_mot.return_value = ResultatValidation(
-                mot="TEST",
-                valide=True,
+            mock_service.return_value.validate_word.return_value = ValidationResult(
+                word="TEST",
+                is_valid=True,
                 definition="Test word",
                 points=8,
-                langue=LangueEnum.ANGLAIS,
-                temps_recherche_ms=30.0,
+                language=LanguageEnum.ENGLISH,
+                search_time_ms=30.0,
             )
 
             response = self.client.get("/api/v1/dictionnaire/en/valider/TEST")
@@ -809,7 +809,7 @@ class TestAPIREST(unittest.TestCase):
     def test_endpoint_definition_francaise(self):
         """Test de l'endpoint de définition française."""
         with patch("dictionnaire_service.get_service") as mock_service:
-            mock_service.return_value.obtenir_definition.return_value = "Définition de test"
+            mock_service.return_value.get_definition.return_value = "Définition de test"
 
             response = self.client.get("/api/v1/dictionnaire/fr/definition/TEST")
 

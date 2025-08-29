@@ -32,14 +32,14 @@ from pydantic import BaseModel, Field
 
 # Import dictionary service
 sys.path.append(str(PathLib(__file__).parent.parent / "models"))
-from dictionnaire import ConstantesDictionnaire, DictionnaireService, LangueEnum, MotDictionnaire, ResultatValidation
+from dictionnaire import DictionaryConstants, DictionaryService, LanguageEnum, DictionaryWord, ValidationResult
 
 # Logging configuration
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Global service instance
-dictionary_service: Optional[DictionnaireService] = None
+dictionary_service: Optional[DictionaryService] = None
 
 
 @asynccontextmanager
@@ -49,9 +49,9 @@ async def lifespan(app: FastAPI):
 
     # Initialization at startup
     try:
-        dictionary_service = DictionnaireService(
-            chemin_base_fr=ConstantesDictionnaire.CHEMIN_BASE_FR_DEFAUT,
-            chemin_base_en=ConstantesDictionnaire.CHEMIN_BASE_EN_DEFAUT,
+        dictionary_service = DictionaryService(
+            french_db_path=DictionaryConstants.DEFAULT_FRENCH_DB_PATH,
+            english_db_path=DictionaryConstants.DEFAULT_ENGLISH_DB_PATH,
         )
         logger.info("Dictionary service initialized")
         yield
@@ -61,7 +61,7 @@ async def lifespan(app: FastAPI):
     finally:
         # Cleanup at shutdown
         if dictionary_service:
-            dictionary_service.fermer_connexions()
+            dictionary_service.close_connections()
             logger.info("Connections closed")
 
 
@@ -164,7 +164,7 @@ class ReponseHealth(BaseModel):
 # ============================================================================
 
 
-def get_service() -> DictionnaireService:
+def get_service() -> DictionaryService:
     """Gets the dictionary service instance."""
     if dictionary_service is None:
         raise HTTPException(status_code=500, detail="Dictionary service not initialized")
@@ -172,32 +172,32 @@ def get_service() -> DictionnaireService:
 
 
 def convert_validation_result(
-    resultat: ResultatValidation,
+    resultat: ValidationResult,
 ) -> ReponseValidation:
     """Converts a ResultatValidation to ReponseValidation."""
     return ReponseValidation(
-        mot=resultat.mot,
-        valide=resultat.valide,
+        mot=resultat.word,
+        valide=resultat.is_valid,
         definition=resultat.definition,
         points=resultat.points,
-        langue=resultat.langue.value if resultat.langue else "unknown",
-        temps_recherche_ms=resultat.temps_recherche_ms,
+        langue=resultat.language.value if resultat.language else "unknown",
+        temps_recherche_ms=resultat.search_time_ms,
     )
 
 
-def convert_dictionary_word(mot: MotDictionnaire) -> MotComplet:
+def convert_dictionary_word(mot: DictionaryWord) -> MotComplet:
     """Converts a MotDictionnaire to MotComplet."""
     return MotComplet(
         id=mot.id,
-        mot=mot.mot,
+        mot=mot.word,
         definition=mot.definition,
-        categorie_grammaticale=mot.categorie_grammaticale,
+        categorie_grammaticale=mot.part_of_speech,
         points=mot.points,
-        valide_scrabble=mot.valide_scrabble,
-        longueur=mot.longueur,
-        premiere_lettre=mot.premiere_lettre,
-        derniere_lettre=mot.derniere_lettre,
-        langue=mot.langue.value,
+        valide_scrabble=mot.is_valid_scrabble,
+        longueur=mot.length,
+        premiere_lettre=mot.first_letter,
+        derniere_lettre=mot.last_letter,
+        langue=mot.language.value,
         source=mot.source,
     )
 
@@ -218,7 +218,7 @@ async def validate_french_word(mot: str = Path(..., description="Word to validat
     """Validates a French word."""
     try:
         service = get_service()
-        resultat = service.valider_mot(mot, LangueEnum.FRANCAIS)
+        resultat = service.validate_word(mot, LanguageEnum.FRENCH)
         return convert_validation_result(resultat)
     except Exception as e:
         logger.error(f"French word validation error '{mot}': {e}")
@@ -236,7 +236,7 @@ async def validate_english_word(word: str = Path(..., description="Word to valid
     """Validates an English word."""
     try:
         service = get_service()
-        resultat = service.valider_mot(word, LangueEnum.ANGLAIS)
+        resultat = service.validate_word(word, LanguageEnum.ENGLISH)
         return convert_validation_result(resultat)
     except Exception as e:
         logger.error(f"English word validation error '{word}': {e}")
@@ -259,7 +259,7 @@ async def get_french_definition(mot: str = Path(..., description="Word to get de
     """Gets the definition of a French word."""
     try:
         service = get_service()
-        definition = service.obtenir_definition(mot, LangueEnum.FRANCAIS)
+        definition = service.get_definition(mot, LanguageEnum.FRENCH)
         return ReponseDefinition(
             mot=mot.upper(),
             definition=definition,
@@ -282,7 +282,7 @@ async def get_english_definition(word: str = Path(..., description="Word to get 
     """Gets the definition of an English word."""
     try:
         service = get_service()
-        definition = service.obtenir_definition(word, LangueEnum.ANGLAIS)
+        definition = service.get_definition(word, LanguageEnum.ENGLISH)
         return ReponseDefinition(
             mot=word.upper(),
             definition=definition,
@@ -320,12 +320,12 @@ async def search_french_words(
         commence_par_norm = commence_par.upper() if commence_par else None
         finit_par_norm = finit_par.upper() if finit_par else None
 
-        mots = service.rechercher_mots_par_criteres(
-            langue=LangueEnum.FRANCAIS,
-            longueur=longueur,
-            commence_par=commence_par_norm,
-            finit_par=finit_par_norm,
-            limite=limite,
+        mots = service.search_words_by_criteria(
+            language=LanguageEnum.FRENCH,
+            length=longueur,
+            starts_with=commence_par_norm,
+            ends_with=finit_par_norm,
+            limit=limite,
         )
 
         mots_convertis = [convert_dictionary_word(mot) for mot in mots]
@@ -370,12 +370,12 @@ async def search_english_words(
         starts_with_norm = starts_with.upper() if starts_with else None
         ends_with_norm = ends_with.upper() if ends_with else None
 
-        mots = service.rechercher_mots_par_criteres(
-            langue=LangueEnum.ANGLAIS,
-            longueur=length,
-            commence_par=starts_with_norm,
-            finit_par=ends_with_norm,
-            limite=limit,
+        mots = service.search_words_by_criteria(
+            language=LanguageEnum.ENGLISH,
+            length=length,
+            starts_with=starts_with_norm,
+            ends_with=ends_with_norm,
+            limit=limit,
         )
 
         mots_convertis = [convert_dictionary_word(mot) for mot in mots]
@@ -415,12 +415,12 @@ async def get_statistics() -> ReponseStatistiques:
     """Gets service statistics."""
     try:
         service = get_service()
-        stats_perf = service.obtenir_statistiques_performance()
+        stats_perf = service.get_performance_statistics()
 
         # Check database availability
         bases_dispo = {
-            "francais": PathLib(ConstantesDictionnaire.CHEMIN_BASE_FR_DEFAUT).exists(),
-            "anglais": PathLib(ConstantesDictionnaire.CHEMIN_BASE_EN_DEFAUT).exists(),
+            "francais": PathLib(DictionaryConstants.DEFAULT_FRENCH_DB_PATH).exists(),
+            "anglais": PathLib(DictionaryConstants.DEFAULT_ENGLISH_DB_PATH).exists(),
         }
 
         return ReponseStatistiques(
@@ -446,8 +446,8 @@ async def health_check() -> ReponseHealth:
     try:
         # Database verification
         bases = {
-            "francais": PathLib(ConstantesDictionnaire.CHEMIN_BASE_FR_DEFAUT).exists(),
-            "anglais": PathLib(ConstantesDictionnaire.CHEMIN_BASE_EN_DEFAUT).exists(),
+            "francais": PathLib(DictionaryConstants.DEFAULT_FRENCH_DB_PATH).exists(),
+            "anglais": PathLib(DictionaryConstants.DEFAULT_ENGLISH_DB_PATH).exists(),
         }
 
         # Global status determination

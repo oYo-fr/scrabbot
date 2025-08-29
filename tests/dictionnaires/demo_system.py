@@ -27,7 +27,7 @@ sys.path.append(str(Path(__file__).parent.parent.parent / "data" / "dictionnaire
 
 import requests
 from csv_to_sqlite import ConvertisseurCSVSQLite
-from dictionnaire import DictionnaireService, LangueEnum
+from dictionnaire import DictionaryService, LanguageEnum
 
 
 class DictionarySystemDemo:
@@ -117,7 +117,7 @@ class DictionarySystemDemo:
             return
 
         print("  🔍 Initialisation du service de dictionnaires...")
-        self.service = DictionnaireService(self.db_fr_path, self.db_en_path)
+        self.service = DictionaryService(self.db_fr_path, self.db_en_path)
 
         # Tests français
         print("  \n  🇫🇷 Tests de validation française :")
@@ -130,12 +130,12 @@ class DictionarySystemDemo:
         ]
 
         for mot, attendu, description in mots_test_fr:
-            resultat = self.service.valider_mot(mot, LangueEnum.FRANCAIS)
-            statut = "✓" if resultat.valide == attendu else "✗"
-            temps = f"{resultat.temps_recherche_ms:.1f}ms" if resultat.temps_recherche_ms else "N/A"
+            resultat = self.service.validate_word(mot, LanguageEnum.FRENCH)
+            statut = "✓" if resultat.is_valid == attendu else "✗"
+            temps = f"{resultat.search_time_ms:.1f}ms" if resultat.search_time_ms else "N/A"
             print(f"    {statut} {mot:12} ({description}) - {temps}")
 
-            if resultat.valide and resultat.definition:
+            if resultat.is_valid and resultat.definition:
                 print(f"      💬 {resultat.definition[:60]}{'...' if len(resultat.definition) > 60 else ''}")
 
         # Tests anglais
@@ -149,12 +149,12 @@ class DictionarySystemDemo:
         ]
 
         for word, attendu, description in mots_test_en:
-            resultat = self.service.valider_mot(word, LangueEnum.ANGLAIS)
-            statut = "✓" if resultat.valide == attendu else "✗"
-            temps = f"{resultat.temps_recherche_ms:.1f}ms" if resultat.temps_recherche_ms else "N/A"
+            resultat = self.service.validate_word(word, LanguageEnum.ENGLISH)
+            statut = "✓" if resultat.is_valid == attendu else "✗"
+            temps = f"{resultat.search_time_ms:.1f}ms" if resultat.search_time_ms else "N/A"
             print(f"    {statut} {word:12} ({description}) - {temps}")
 
-            if resultat.valide and resultat.definition:
+            if resultat.is_valid and resultat.definition:
                 print(f"      💬 {resultat.definition[:60]}{'...' if len(resultat.definition) > 60 else ''}")
 
     def demo_performance(self):
@@ -171,7 +171,7 @@ class DictionarySystemDemo:
 
         for mot in mots_perf:
             debut = time.time()
-            self.service.valider_mot(mot, LangueEnum.FRANCAIS)
+            self.service.validate_word(mot, LanguageEnum.FRENCH)
             temps_ms = (time.time() - debut) * 1000
             temps_total.append(temps_ms)
 
@@ -192,7 +192,7 @@ class DictionarySystemDemo:
         print("  \n  🔄 Test batch (10 mots, objectif : < 200ms)")
         debut_batch = time.time()
         for i in range(10):
-            self.service.valider_mot(f"MOT{i:02d}", LangueEnum.FRANCAIS)
+            self.service.validate_word(f"MOT{i:02d}", LanguageEnum.FRENCH)
         temps_batch = (time.time() - debut_batch) * 1000
 
         statut_batch = "✅ CONFORME" if temps_batch < 200 else "⚠️ NON CONFORME"
@@ -286,8 +286,8 @@ class DictionarySystemDemo:
             if response.status_code == 200:
                 data = response.json()
                 print(f"    ✅ Validation FR : CHAT = {data.get('valide', False)}")
-                if data.get("temps_recherche_ms"):
-                    print(f"       Temps : {data['temps_recherche_ms']:.1f}ms")
+                if data.get("search_time_ms"):
+                    print(f"       Temps : {data['search_time_ms']:.1f}ms")
             else:
                 print(f"    ❌ Validation FR : {response.status_code}")
         except Exception as e:
