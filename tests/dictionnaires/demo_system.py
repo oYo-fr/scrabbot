@@ -30,8 +30,8 @@ from csv_to_sqlite import ConvertisseurCSVSQLite
 from dictionnaire import DictionnaireService, LangueEnum
 
 
-class DemoSystemeDictionnaires:
-    """Démonstration complète du système de dictionnaires."""
+class DictionarySystemDemo:
+    """Complete demonstration of the dictionary system."""
 
     def __init__(self):
         self.base_dir = Path(__file__).parent.parent.parent
@@ -39,7 +39,7 @@ class DemoSystemeDictionnaires:
         self.sources_dir = self.data_dir / "sources"
         self.databases_dir = self.data_dir / "databases"
 
-        # Création des répertoires si nécessaire
+        # Create directories if necessary
         self.databases_dir.mkdir(exist_ok=True)
 
         self.db_fr_path = str(self.databases_dir / "demo_french.db")
@@ -48,40 +48,40 @@ class DemoSystemeDictionnaires:
         self.service = None
         self.api_server_process = None
 
-    def executer_demo(self):
-        """Exécute la démonstration complète."""
+    def run_demo(self):
+        """Runs the complete demonstration."""
         print("=" * 60)
-        print("🎯 DÉMONSTRATION SYSTÈME DICTIONNAIRES MULTILINGUES")
+        print("🎯 MULTILINGUAL DICTIONARY SYSTEM DEMONSTRATION")
         print("   Ticket OYO-7 - Scrabbot")
         print("=" * 60)
 
         try:
-            # Étape 1 : Conversion CSV → SQLite
-            print("\n📊 ÉTAPE 1 : Conversion CSV → SQLite")
-            self.demo_conversion_csv()
+            # Step 1: CSV to SQLite conversion
+            print("\n📊 STEP 1: CSV to SQLite conversion")
+            self.demo_csv_conversion()
 
-            # Étape 2 : Tests de validation
-            print("\n✅ ÉTAPE 2 : Tests de validation des mots")
-            self.demo_validation_mots()
+            # Step 2: Validation tests
+            print("\n✅ STEP 2: Word validation tests")
+            self.demo_word_validation()
 
-            # Étape 3 : Tests de performance
-            print("\n⚡ ÉTAPE 3 : Tests de performance")
+            # Step 3: Performance tests
+            print("\n⚡ STEP 3: Performance tests")
             self.demo_performance()
 
-            # Étape 4 : Démonstration API REST
-            print("\n🌐 ÉTAPE 4 : Démonstration API REST pour Godot")
-            self.demo_api_rest()
+            # Step 4: REST API demonstration
+            print("\n🌐 STEP 4: REST API demonstration for Godot")
+            self.demo_rest_api()
 
-            print("\n🎉 DÉMONSTRATION TERMINÉE AVEC SUCCÈS !")
+            print("\n🎉 DEMONSTRATION COMPLETED SUCCESSFULLY!")
 
         except Exception as e:
-            print(f"\n❌ ERREUR LORS DE LA DÉMONSTRATION : {e}")
+            print(f"\n❌ ERROR DURING DEMONSTRATION: {e}")
         finally:
             self.nettoyer()
 
-    def demo_conversion_csv(self):
-        """Démontre la conversion CSV → SQLite."""
-        print("  📝 Conversion des fichiers CSV d'exemple...")
+    def demo_csv_conversion(self):
+        """Demonstrates CSV to SQLite conversion."""
+        print("  📝 Converting example CSV files...")
 
         convertisseur = ConvertisseurCSVSQLite()
 
@@ -110,10 +110,10 @@ class DemoSystemeDictionnaires:
             taille_en = Path(self.db_en_path).stat().st_size / 1024
             print(f"  📁 Base anglaise créée : {taille_en:.1f} KB")
 
-    def demo_validation_mots(self):
-        """Démontre la validation des mots."""
+    def demo_word_validation(self):
+        """Demonstrates word validation."""
         if not Path(self.db_fr_path).exists() or not Path(self.db_en_path).exists():
-            print("  ❌ Bases de données non disponibles pour la validation")
+            print("  ❌ Databases not available for validation")
             return
 
         print("  🔍 Initialisation du service de dictionnaires...")
@@ -158,9 +158,9 @@ class DemoSystemeDictionnaires:
                 print(f"      💬 {resultat.definition[:60]}{'...' if len(resultat.definition) > 60 else ''}")
 
     def demo_performance(self):
-        """Démontre les performances du système."""
+        """Demonstrates system performance."""
         if not self.service:
-            print("  ❌ Service de dictionnaires non initialisé")
+            print("  ❌ Dictionary service not initialized")
             return
 
         print("  ⏱️  Tests de performance (objectif : < 50ms par recherche)")
@@ -205,9 +205,9 @@ class DemoSystemeDictionnaires:
         for cle, valeur in stats.items():
             print(f"    • {cle:20} : {valeur}")
 
-    def demo_api_rest(self):
-        """Démontre l'API REST pour Godot."""
-        print("  🚀 Lancement du serveur API REST...")
+    def demo_rest_api(self):
+        """Demonstrates the REST API for Godot."""
+        print("  🚀 Starting REST API server...")
 
         # Démarrage du serveur en arrière-plan
         try:
@@ -360,22 +360,22 @@ class DemoSystemeDictionnaires:
 
 
 def main():
-    """Point d'entrée principal."""
-    print("🎮 Démonstration Système Dictionnaires Multilingues - Scrabbot")
-    print("   Développé pour le ticket Linear OYO-7")
+    """Main entry point."""
+    print("🎮 Multilingual Dictionary System Demonstration - Scrabbot")
+    print("   Developed for Linear ticket OYO-7")
 
-    # Vérification des dépendances
+    # Dependency verification
     try:
         pass
 
     except ImportError as e:
-        print(f"❌ Dépendance manquante : {e}")
-        print("💡 Installer avec : pip install requests")
+        print(f"❌ Missing dependency: {e}")
+        print("💡 Install with: pip install requests")
         return 1
 
-    # Lancement de la démonstration
-    demo = DemoSystemeDictionnaires()
-    demo.executer_demo()
+    # Launch demonstration
+    demo = DictionarySystemDemo()
+    demo.run_demo()
 
     return 0
 

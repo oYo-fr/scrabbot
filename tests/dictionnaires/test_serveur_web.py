@@ -765,7 +765,7 @@ class TestAPIREST(unittest.TestCase):
     def test_endpoint_validation_francais(self):
         """Test de l'endpoint de validation française."""
         # Mock du service pour les tests
-        with patch("dictionnaire_service.obtenir_service") as mock_service:
+        with patch("dictionnaire_service.get_service") as mock_service:
             mock_service.return_value.valider_mot.return_value = ResultatValidation(
                 mot="TEST",
                 valide=True,
@@ -788,7 +788,7 @@ class TestAPIREST(unittest.TestCase):
 
     def test_endpoint_validation_anglais(self):
         """Test de l'endpoint de validation anglaise."""
-        with patch("dictionnaire_service.obtenir_service") as mock_service:
+        with patch("dictionnaire_service.get_service") as mock_service:
             mock_service.return_value.valider_mot.return_value = ResultatValidation(
                 mot="TEST",
                 valide=True,
@@ -808,7 +808,7 @@ class TestAPIREST(unittest.TestCase):
 
     def test_endpoint_definition_francaise(self):
         """Test de l'endpoint de définition française."""
-        with patch("dictionnaire_service.obtenir_service") as mock_service:
+        with patch("dictionnaire_service.get_service") as mock_service:
             mock_service.return_value.obtenir_definition.return_value = "Définition de test"
 
             response = self.client.get("/api/v1/dictionnaire/fr/definition/TEST")

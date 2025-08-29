@@ -1,0 +1,44 @@
+---
+alwaysApply: true
+description: Language conventions for code and conversations
+---
+
+# Language Conventions
+
+## Code and Files
+All code, comments, documentation, variable names, function names, class names, file contents, and any text written in files MUST be in English. This includes:
+
+- Variable and function names
+- Class names and interfaces
+- Comments and inline documentation
+- README files and documentation
+- Configuration files
+- Test names and descriptions
+- Error messages and logs
+- Database schemas and table names
+- API endpoint names and responses
+
+## Conversations
+All conversations with users should be conducted in French, but the code itself remains in English.
+
+## Examples
+
+✅ **Correct (English code):**
+```python
+def calculate_word_score(word: str, multipliers: dict) -> int:
+    """Calculate the score for a word in Scrabble."""
+    total_score = 0
+    # Calculate letter scores
+    return total_score
+```
+
+❌ **Incorrect (French code):**
+```python
+def calculer_score_mot(mot: str, multiplicateurs: dict) -> int:
+    """Calculer le score d'un mot au Scrabble."""
+    score_total = 0
+    # Calculer les scores des lettres
+    return score_total
+```
+
+This rule ensures consistency across the codebase while maintaining French communication with users.
