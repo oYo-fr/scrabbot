@@ -11,10 +11,20 @@ source /workspaces/scrabbot/.venv/bin/activate || true
 python -m ensurepip --upgrade || true
 python -m pip install --upgrade pip setuptools wheel
 
+# Install Rust for the vscode user
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
+    && echo 'source $HOME/.cargo/env' >> ~/.bashrc \
+    && source ~/.cargo/env \
+    && cargo install wrkflw
+
 # Install project Python dependencies
 if [ -f "/workspaces/scrabbot/bot/requirements.txt" ]; then
     python -m pip install -r /workspaces/scrabbot/bot/requirements.txt
 fi
+
+# Install Python dependencies for the project
+cp bot/requirements.txt /tmp/requirements.txt
+pip3 install --user -r /tmp/requirements.txt
 
 # Install SQLite3 for database management
 sudo apt update && sudo apt install -y sqlite3 || true

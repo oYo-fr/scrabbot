@@ -66,22 +66,12 @@ RUN groupadd --gid 1000 vscode \
 
 USER vscode
 
-# Install Rust for the vscode user
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
-    && echo 'source $HOME/.cargo/env' >> ~/.bashrc \
-    && source ~/.cargo/env \
-    && cargo install wrkflw
-
 # Configure Git to avoid pager blocking in terminal and set identity
 RUN git config --global core.pager cat \
     && git config --global init.defaultBranch main \
     && git config --global user.email "dev@scrabbot.local" \
     && git config --global user.name "Scrabbot Dev" \
     && git config --global --add safe.directory /workspaces/Scrabbot
-
-# Install Python dependencies for the project
-COPY bot/requirements.txt /tmp/requirements.txt
-RUN pip3 install --user -r /tmp/requirements.txt
 
 # Add Rust to PATH for the current session
 ENV PATH="/home/vscode/.cargo/bin:${PATH}"
