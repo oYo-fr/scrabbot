@@ -9,16 +9,17 @@ This module implements:
 - Word suggestion system
 """
 
-import logging
 import sys
+from pathlib import Path
+
+# Import configuration loader - must be done before other local imports
+sys.path.append(str(Path(__file__).parent.parent / "models"))
+
+import logging
 import time
 from collections import defaultdict
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
-
-# Import configuration loader
-sys.path.append(str(Path(__file__).parent.parent / "models"))
 
 from shared.models.language_config import LanguageConfig, get_language_config
 
