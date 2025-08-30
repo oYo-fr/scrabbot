@@ -13,7 +13,8 @@
         "ms-azuretools.vscode-docker",
         "github.vscode-github-actions",
         "GitHub.copilot",
-        "qwtel.sqlite-viewer"
+        "qwtel.sqlite-viewer",
+        "ms-vscode.makefile-tools"
       ],
       "settings": {
         "python.defaultInterpreterPath": "/usr/local/bin/python",
