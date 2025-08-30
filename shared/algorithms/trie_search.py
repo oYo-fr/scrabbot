@@ -10,10 +10,17 @@ This module implements:
 """
 
 import logging
+
+# Import configuration loader
+import sys
 import time
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Set
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Set
+
+sys.path.append(str(Path(__file__).parent.parent / "models"))
+from language_config import LanguageConfig, get_language_config
 
 logger = logging.getLogger(__name__)
 
@@ -51,30 +58,33 @@ class AdvancedSearchEngine:
     """
 
     def __init__(self):
-        self.french_trie = TrieNode()
-        self.english_trie = TrieNode()
-        self._letter_frequency: Dict[str, Dict[str, int]] = {
-            "fr": defaultdict(int),
-            "en": defaultdict(int),
-        }
-        self._anagram_index: Dict[str, Dict[str, List[str]]] = {
-            "fr": defaultdict(list),
-            "en": defaultdict(list),
-        }
+        self._tries: Dict[str, TrieNode] = {}
+        self._language_configs: Dict[str, LanguageConfig] = {}
+        self._letter_frequency: Dict[str, Dict[str, int]] = defaultdict(lambda: defaultdict(int))
+        self._anagram_index: Dict[str, Dict[str, List[str]]] = defaultdict(lambda: defaultdict(list))
         self._loaded_languages: Set[str] = set()
 
         logger.info("Advanced search engine initialized")
 
-    def load_dictionary_into_trie(self, words_data: List[Dict], language: str):
+    def load_dictionary_into_trie(self, words_data: List[Dict], language_code: str):
         """
         Load dictionary data into the appropriate Trie structure.
 
         Args:
             words_data: List of word dictionaries with metadata
-            language: Language code ('fr' or 'en')
+            language_code: Language code (e.g., 'fr', 'en', 'es')
         """
         start_time = time.time()
-        trie = self.french_trie if language == "fr" else self.english_trie
+
+        # Load language configuration
+        if language_code not in self._language_configs:
+            self._language_configs[language_code] = get_language_config(language_code)
+
+        # Initialize trie for this language if not exists
+        if language_code not in self._tries:
+            self._tries[language_code] = TrieNode()
+
+        trie = self._tries[language_code]
         word_count = 0
 
         for word_data in words_data:
@@ -90,7 +100,7 @@ class AdvancedSearchEngine:
                 current = current.children[letter]
 
                 # Update letter frequency
-                self._letter_frequency[language][letter] += 1
+                self._letter_frequency[language_code][letter] += 1
 
             # Mark end of word and store metadata
             current.is_end_word = True
@@ -100,22 +110,23 @@ class AdvancedSearchEngine:
 
             # Build anagram index
             sorted_letters = "".join(sorted(word))
-            self._anagram_index[language][sorted_letters].append(word)
+            self._anagram_index[language_code][sorted_letters].append(word)
 
             word_count += 1
 
-        self._loaded_languages.add(language)
+        self._loaded_languages.add(language_code)
         elapsed_time = (time.time() - start_time) * 1000
 
-        logger.info(f"Loaded {word_count} {language} words into Trie in {elapsed_time:.1f}ms")
+        config = self._language_configs[language_code]
+        logger.info(f"Loaded {word_count} {config.language_name} words into Trie in {elapsed_time:.1f}ms")
 
-    def prefix_search(self, prefix: str, language: str, max_results: int = 100) -> SearchResult:
+    def prefix_search(self, prefix: str, language_code: str, max_results: int = 100) -> SearchResult:
         """
         Find all words starting with the given prefix.
 
         Args:
             prefix: Prefix to search for
-            language: Language code ('fr' or 'en')
+            language_code: Language code (e.g., 'fr', 'en', 'es')
             max_results: Maximum number of results to return
 
         Returns:
@@ -123,7 +134,16 @@ class AdvancedSearchEngine:
         """
         start_time = time.time()
         prefix = prefix.upper()
-        trie = self.french_trie if language == "fr" else self.english_trie
+
+        if language_code not in self._tries:
+            return SearchResult(
+                words=[],
+                search_time_ms=(time.time() - start_time) * 1000,
+                total_matches=0,
+                algorithm_used="trie_prefix_search",
+            )
+
+        trie = self._tries[language_code]
 
         # Navigate to prefix node
         current = trie
@@ -162,7 +182,7 @@ class AdvancedSearchEngine:
         for child in node.children.values():
             self._collect_words(child, words, max_results)
 
-    def pattern_search(self, pattern: str, language: str, max_results: int = 100) -> SearchResult:
+    def pattern_search(self, pattern: str, language_code: str, max_results: int = 100) -> SearchResult:
         """
         Find words matching a pattern with wildcards.
 
@@ -173,7 +193,7 @@ class AdvancedSearchEngine:
 
         Args:
             pattern: Pattern to match (e.g., "C?T", "S*E")
-            language: Language code
+            language_code: Language code (e.g., 'fr', 'en', 'es')
             max_results: Maximum results
 
         Returns:
@@ -181,7 +201,16 @@ class AdvancedSearchEngine:
         """
         start_time = time.time()
         pattern = pattern.upper()
-        trie = self.french_trie if language == "fr" else self.english_trie
+
+        if language_code not in self._tries:
+            return SearchResult(
+                words=[],
+                search_time_ms=(time.time() - start_time) * 1000,
+                total_matches=0,
+                algorithm_used="pattern_matching",
+            )
+
+        trie = self._tries[language_code]
 
         words = []
         self._pattern_search_recursive(trie, pattern, 0, "", words, max_results)
@@ -259,13 +288,13 @@ class AdvancedSearchEngine:
                     max_results,
                 )
 
-    def find_anagrams(self, letters: str, language: str, max_results: int = 100) -> SearchResult:
+    def find_anagrams(self, letters: str, language_code: str, max_results: int = 100) -> SearchResult:
         """
         Find all anagrams (and sub-anagrams) from the given letters.
 
         Args:
             letters: Available letters (e.g., "SCRABBLE")
-            language: Language code
+            language_code: Language code (e.g., 'fr', 'en', 'es')
             max_results: Maximum results
 
         Returns:
@@ -282,7 +311,7 @@ class AdvancedSearchEngine:
         words = []
 
         # Check all anagram combinations
-        for sorted_word, word_list in self._anagram_index[language].items():
+        for sorted_word, word_list in self._anagram_index[language_code].items():
             if self._can_form_word(sorted_word, letter_count):
                 words.extend(word_list)
                 if len(words) >= max_results:
@@ -310,61 +339,63 @@ class AdvancedSearchEngine:
 
         return True
 
-    def suggest_words(self, partial_word: str, language: str, max_suggestions: int = 10) -> SearchResult:
+    def suggest_words(self, partial_word: str, language_code: str, max_suggestions: int = 10) -> SearchResult:
         """
         Suggest word completions for a partial word.
 
         Args:
             partial_word: Partially typed word
-            language: Language code
+            language_code: Language code (e.g., 'fr', 'en', 'es')
             max_suggestions: Maximum suggestions
 
         Returns:
             SearchResult with suggested completions
         """
         # Use prefix search for suggestions
-        result = self.prefix_search(partial_word, language, max_suggestions)
+        result = self.prefix_search(partial_word, language_code, max_suggestions)
         result.algorithm_used = "word_suggestion"
         return result
 
-    def find_words_by_length(self, length: int, language: str, max_results: int = 100) -> SearchResult:
+    def find_words_by_length(self, length: int, language_code: str, max_results: int = 100) -> SearchResult:
         """
         Find all words of a specific length.
 
         Args:
             length: Word length
-            language: Language code
+            language_code: Language code (e.g., 'fr', 'en', 'es')
             max_results: Maximum results
 
         Returns:
             SearchResult with words of specified length
         """
-        time.time()
         pattern = "?" * length  # Pattern with length wildcards
-        result = self.pattern_search(pattern, language, max_results)
+        result = self.pattern_search(pattern, language_code, max_results)
         result.algorithm_used = "length_search"
         return result
 
-    def get_search_statistics(self, language: str) -> Dict[str, any]:
+    def get_search_statistics(self, language_code: str) -> Dict[str, Any]:
         """
         Get statistics about the search engine for a language.
 
         Args:
-            language: Language code
+            language_code: Language code (e.g., 'fr', 'en', 'es')
 
         Returns:
             Dictionary with statistics
         """
-        if language not in self._loaded_languages:
-            return {"error": f"Language {language} not loaded"}
+        if language_code not in self._loaded_languages:
+            return {"error": f"Language {language_code} not loaded"}
 
-        trie = self.french_trie if language == "fr" else self.english_trie
+        trie = self._tries[language_code]
+        config = self._language_configs[language_code]
+
         stats = {
-            "language": language,
+            "language_code": language_code,
+            "language_name": config.language_name,
             "total_words": self._count_words(trie),
-            "letter_frequency": dict(self._letter_frequency[language]),
-            "anagram_groups": len(self._anagram_index[language]),
-            "memory_loaded": language in self._loaded_languages,
+            "letter_frequency": dict(self._letter_frequency[language_code]),
+            "anagram_groups": len(self._anagram_index[language_code]),
+            "memory_loaded": language_code in self._loaded_languages,
         }
 
         return stats

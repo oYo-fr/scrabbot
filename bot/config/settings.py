@@ -40,13 +40,9 @@ class Settings(BaseSettings):
     debug: bool = Field(True, description="Debug mode")
 
     # Dictionaries configuration
-    dictionary_fr_path: str = Field(
-        "./data/dictionaries/databases/french_extended.db",
-        description="French dictionary path",
-    )
-    dictionary_en_path: str = Field(
-        "./data/dictionaries/databases/english_extended.db",
-        description="English dictionary path",
+    dictionaries_base_path: str = Field(
+        "./data/dictionaries/databases",
+        description="Base path for dictionary databases",
     )
 
     # Testing configuration

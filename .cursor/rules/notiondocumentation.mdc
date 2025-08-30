@@ -1,17 +1,17 @@
 ---
-description: Documentation Notion et règles métier
+description: Notion documentation and business rules
 globs: ["**/*.py", "**/*.js", "**/*.ts", "**/*.md"]
 alwaysApply: false
 ---
 
-## Documentation principale
-**Documentation complète du projet Scrabbot** : https://www.notion.so/yoanndiguet/Scrabbot-2535567a9a9c805b9fe8d65998296874
+## Main Documentation
+**Complete Scrabbot project documentation**: https://www.notion.so/yoanndiguet/Scrabbot-2535567a9a9c805b9fe8d65998296874
 
-## Règles métier
-**Règles officielles du Scrabble** : https://www.notion.so/yoanndiguet/Scrabble-R-gles-du-jeu-2535567a9a9c80ab9195daff3a3e556d
+## Business Rules
+**Official Scrabble rules**: https://www.notion.so/yoanndiguet/Scrabble-R-gles-du-jeu-2535567a9a9c80ab9195daff3a3e556d
 
-## Consignes d'utilisation
-- Consulter la documentation Notion avant d'implémenter des fonctionnalités liées au jeu
-- Se référer aux règles officielles pour toute logique de validation du jeu
-- Vérifier la cohérence avec les spécifications fonctionnelles dans Notion
-- En cas de doute sur les règles métier, toujours privilégier la documentation Notion
+## Usage Guidelines
+- Consult Notion documentation before implementing game-related features
+- Refer to official rules for any game validation logic
+- Verify consistency with functional specifications in Notion
+- When in doubt about business rules, always prioritize Notion documentation

@@ -1,29 +1,29 @@
 ---
-description: Informations techniques et bonnes pratiques de développement
+description: Technical information and development best practices
 alwaysApply: true
 ---
 
-## Informations du projet
-- **Repository GitHub** : https://github.com/oYo-fr/scrabbot
-- **Workspace** : /workspaces/scrabbot
+## Project Information
+- **GitHub Repository**: https://github.com/oYo-fr/scrabbot
+- **Workspace**: /workspaces/scrabbot
 
-## Workflow de développement
-1. **Gestion des branches** : Si l'on est sur main, créer une nouvelle branche pour chaque fonctionnalité/correction (sauf pour le premier commit)
-2. **Tests et qualité** : 
-   - S'assurer que le projet build correctement
-   - Vérifier que tous les tests passent avant de commiter
-   - Respecter les règles du linter si configuré
-3. **Commits** : Utiliser des messages de commit clairs et descriptifs en français
+## Development Workflow
+1. **Branch Management**: If on main, create a new branch for each feature/fix (except for the first commit)
+2. **Testing and Quality**:
+   - Ensure the project builds correctly
+   - Verify all tests pass before committing
+   - Follow linter rules if configured
+3. **Commits**: Use clear and descriptive commit messages in English
 
-## Gestion des dépendances
-- **Installation de nouvelles dépendances** : À chaque fois qu'une nouvelle dépendance est installée pour le projet, elle doit être correctement configurée pour :
-  - Le devcontainer (mise à jour des fichiers de configuration appropriés)
-  - La CI/CD (mise à jour des workflows et fichiers de dépendances)
-- **Validation** : S'assurer que la dépendance fonctionne correctement dans les deux environnements
-- **Documentation** : Documenter la raison de l'ajout de la dépendance si elle n'est pas évidente
+## Dependency Management
+- **Installing New Dependencies**: Every time a new dependency is installed for the project, it must be properly configured for:
+  - The devcontainer (update appropriate configuration files)
+  - CI/CD (update workflows and dependency files)
+- **Validation**: Ensure the dependency works correctly in both environments
+- **Documentation**: Document the reason for adding the dependency if not obvious
 
-## Bonnes pratiques
-- Toujours lire et comprendre le code existant avant de faire des modifications
-- Utiliser des noms de variables et fonctions en français pour ce projet
-- Documenter les fonctions complexes
-- Tester manuellement les changements critiques
+## Best Practices
+- Always read and understand existing code before making modifications
+- Use English names for variables and functions in this project
+- Document complex functions
+- Manually test critical changes

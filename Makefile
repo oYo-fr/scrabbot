@@ -1,4 +1,4 @@
-# Utilitaires d'automatisation pour Scrabbot
+# Automation utilities for Scrabbot
 
 VENV=.venv
 PY_BIN=$(VENV)/bin/python
@@ -10,15 +10,15 @@ ISORT=$(VENV)/bin/isort
 
 .PHONY: help
 help:
-	@echo "Cibles disponibles :"
-	@echo "  setup           - Crée la venv et installe les dépendances Python"
-	@echo "  test            - Lance la suite de tests (pytest)"
+	@echo "Available targets:"
+	@echo "  setup           - Create venv and install Python dependencies"
+	@echo "  test            - Run test suite (pytest)"
 	@echo "  lint            - Linting (flake8)"
-	@echo "  format          - Formattage (isort + black)"
+	@echo "  format          - Formatting (isort + black)"
 	@echo "  export-linux    - Export Godot preset 'Linux/X11'"
 	@echo "  export-windows  - Export Godot preset 'Windows Desktop'"
 	@echo "  export-web      - Export Godot preset 'Web'"
-	@echo "  build-all       - Exporte toutes les plateformes"
+	@echo "  build-all       - Export all platforms"
 
 .PHONY: setup
 setup:
@@ -55,5 +55,3 @@ export-web:
 
 .PHONY: build-all
 build-all: export-linux export-windows export-web
-
-

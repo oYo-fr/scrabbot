@@ -1,0 +1,113 @@
+---
+alwaysApply: true
+description: Enforce English-only commit messages and content
+---
+
+# English-Only Git Commit Policy
+
+## Mandatory Rule: All Git Commits Must Be in English
+
+All git commit messages, titles, descriptions, and any content within commits MUST be written in English only.
+
+### Commit Message Requirements
+
+**✅ Required Format:**
+```bash
+git commit -m "Add user authentication system"
+git commit -m "Fix database connection timeout issue"
+git commit -m "Update API documentation for dictionary endpoints"
+git commit -m "Refactor dictionary service for better performance"
+```
+
+**❌ Forbidden (French commits):**
+```bash
+git commit -m "Ajout du système d'authentification"
+git commit -m "Correction du timeout de connexion BDD"
+git commit -m "Mise à jour de la documentation API"
+git commit -m "Refactorisation du service dictionnaire"
+```
+
+### Commit Content Rules
+
+**All content in commits must be English:**
+- Commit titles
+- Commit descriptions
+- Inline comments added in the commit
+- Documentation changes
+- Variable/function names being added
+- Error messages
+- Log messages
+
+### Examples
+
+**✅ Correct English commits:**
+```bash
+# Feature commits
+git commit -m "feat: implement multilingual dictionary system"
+git commit -m "feat: add REST API endpoints for Godot integration"
+
+# Fix commits
+git commit -m "fix: resolve database connection timeout issues"
+git commit -m "fix: correct word validation logic for special characters"
+
+# Documentation commits
+git commit -m "docs: update API documentation with new endpoints"
+git commit -m "docs: add installation guide for development environment"
+
+# Refactoring commits
+git commit -m "refactor: rename French variables to English equivalents"
+git commit -m "refactor: improve dictionary service performance"
+```
+
+**❌ Forbidden French commits:**
+```bash
+git commit -m "feat: implémentation du système de dictionnaires multilingues"
+git commit -m "fix: correction des timeouts de connexion"
+git commit -m "docs: mise à jour de la documentation API"
+git commit -m "refactor: renommage des variables françaises"
+```
+
+### Multi-line Commit Messages
+
+For detailed commits, both title and body must be in English:
+
+**✅ Correct:**
+```bash
+git commit -m "feat: implement word validation system
+
+- Add DictionaryService class with validation methods
+- Support French and English word validation
+- Include performance metrics and caching
+- Add comprehensive unit tests
+
+Resolves: OYO-7"
+```
+
+**❌ Forbidden:**
+```bash
+git commit -m "feat: implémentation du système de validation
+
+- Add DictionaryService class with validation methods
+- Support French and English validation
+- Include performance metrics and caching
+- Add comprehensive unit tests
+
+Resolves: OYO-7"
+```
+
+### Rationale
+
+- **Consistency**: Maintains English-only codebase policy
+- **Collaboration**: Enables international team collaboration
+- **Standards**: Follows industry best practices
+- **Tooling**: Compatible with automated tools and CI/CD
+- **History**: Ensures clear, searchable git history
+
+### Enforcement
+
+- All commits are subject to review for language compliance
+- Commit messages should be clear, descriptive, and professional
+- Use conventional commit prefixes when appropriate (feat:, fix:, docs:, etc.)
+- This policy applies to all contributors regardless of native language
+
+**Remember: Code is international, commits should be too.**

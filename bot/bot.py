@@ -1,5 +1,5 @@
 """
-Bot principal de Scrabbot.
+Main Scrabbot bot.
 """
 
 import logging
@@ -44,7 +44,7 @@ class ScrabbotBot:
         # Callbacks for inline buttons
         self.application.add_handler(CallbackQueryHandler(self._handle_callback))
 
-        # Gestionnaire d'erreurs
+        # Error handler
         self.application.add_error_handler(self._handle_error)
 
     async def _handle_start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -114,7 +114,7 @@ class ScrabbotBot:
             try:
                 await context.bot.send_message(
                     chat_id=update.effective_chat.id,
-                    text="❌ Une erreur s'est produite. Veuillez réessayer.",
+                    text="❌ An error occurred. Please try again.",
                 )
             except Exception:
                 # Avoid error loop if sending fails
@@ -122,7 +122,7 @@ class ScrabbotBot:
 
     def start_polling(self) -> None:
         """Start bot in polling mode (blocking)."""
-        self.logger.info("Démarrage du bot Scrabbot (polling)...")
+        self.logger.info("Starting Scrabbot bot (polling)...")
         # Blocking and non-async method in PTB 20+
         self.application.run_polling()
 
@@ -130,9 +130,9 @@ class ScrabbotBot:
         """Start bot in webhook mode (blocking)."""
         settings = get_settings()
         if not settings.telegram_webhook_url:
-            raise ValueError("TELEGRAM_WEBHOOK_URL doit être configuré pour le mode webhook")
+            raise ValueError("TELEGRAM_WEBHOOK_URL must be configured for webhook mode")
 
-        self.logger.info("Démarrage du bot Scrabbot (webhook)...")
+        self.logger.info("Starting Scrabbot bot (webhook)...")
         # Blocking and non-async method in PTB 20+
         self.application.run_webhook(
             listen="0.0.0.0",
@@ -151,7 +151,7 @@ def main() -> None:
         else:
             bot.start_polling()
     except KeyboardInterrupt:
-        logging.info("Arrêt demandé par l'utilisateur.")
+        logging.info("Stop requested by user.")
     except Exception as e:
         logging.error(f"Error starting bot: {e}")
 

@@ -2,13 +2,13 @@
 """
 Demonstration script for Scrabbot multilingual dictionaries system.
 
-Ce script démontre le fonctionnement complet du système développé pour le ticket OYO-7.
+This script demonstrates the complete operation of the system developed for ticket OYO-7.
 
-Il effectue :
-1. Conversion des CSV d'exemple en bases SQLite
-2. Tests de validation de mots
-3. Tests de performance
-4. Démonstration de l'API REST
+It performs:
+1. Conversion of example CSV files to SQLite databases
+2. Word validation tests
+3. Performance tests
+4. REST API demonstration
 
 Usage:
     python demo_system.py
@@ -77,38 +77,38 @@ class DictionarySystemDemo:
         except Exception as e:
             print(f"\n❌ ERROR DURING DEMONSTRATION: {e}")
         finally:
-            self.nettoyer()
+            self.cleanup()
 
     def demo_csv_conversion(self):
         """Demonstrates CSV to SQLite conversion."""
         print("  📝 Converting example CSV files...")
 
-        convertisseur = CSVToSQLiteConverter()
+        converter = CSVToSQLiteConverter()
 
         # French conversion
         csv_fr = str(self.sources_dir / "dictionnaire_fr_exemple.csv")
         if Path(csv_fr).exists():
-            succes_fr = convertisseur.convert_csv_to_sqlite(csv_fr, self.db_fr_path, "fr", "demo-1.0")
-            print(f"  ✅ Conversion française : {'✓' if succes_fr else '✗'}")
+            success_fr = converter.convert_csv_to_sqlite(csv_fr, self.db_fr_path, "fr", "demo-1.0")
+            print(f"  ✅ French conversion: {'✓' if success_fr else '✗'}")
         else:
-            print(f"  ⚠️  Fichier CSV français introuvable : {csv_fr}")
+            print(f"  ⚠️  French CSV file not found: {csv_fr}")
 
-        # Conversion anglaise
+        # English conversion
         csv_en = str(self.sources_dir / "dictionnaire_en_exemple.csv")
         if Path(csv_en).exists():
-            succes_en = convertisseur.convert_csv_to_sqlite(csv_en, self.db_en_path, "en", "demo-1.0")
-            print(f"  ✅ Conversion anglaise : {'✓' if succes_en else '✗'}")
+            success_en = converter.convert_csv_to_sqlite(csv_en, self.db_en_path, "en", "demo-1.0")
+            print(f"  ✅ English conversion: {'✓' if success_en else '✗'}")
         else:
-            print(f"  ⚠️  Fichier CSV anglais introuvable : {csv_en}")
+            print(f"  ⚠️  English CSV file not found: {csv_en}")
 
         # Verify created databases
         if Path(self.db_fr_path).exists():
-            taille_fr = Path(self.db_fr_path).stat().st_size / 1024
-            print(f"  📁 Base française créée : {taille_fr:.1f} KB")
+            size_fr = Path(self.db_fr_path).stat().st_size / 1024
+            print(f"  📁 French database created: {size_fr:.1f} KB")
 
         if Path(self.db_en_path).exists():
-            taille_en = Path(self.db_en_path).stat().st_size / 1024
-            print(f"  📁 Base anglaise créée : {taille_en:.1f} KB")
+            size_en = Path(self.db_en_path).stat().st_size / 1024
+            print(f"  📁 English database created: {size_en:.1f} KB")
 
     def demo_word_validation(self):
         """Demonstrates word validation."""
@@ -120,27 +120,27 @@ class DictionarySystemDemo:
         self.service = DictionaryService(self.db_fr_path, self.db_en_path)
 
         # French tests
-        print("  \n  🇫🇷 Tests de validation française :")
-        mots_test_fr = [
-            ("CHAT", True, "Mot simple"),
-            ("SCRABBLE", True, "Nom du jeu"),
-            ("INEXISTANT", False, "Mot inexistant"),
-            ("ÊTRE", True, "Mot avec accent"),
-            ("API", True, "Acronyme moderne"),
+        print("  \n  🇫🇷 French validation tests:")
+        test_words_fr = [
+            ("CHAT", True, "Simple word"),
+            ("SCRABBLE", True, "Game name"),
+            ("NONEXISTENT", False, "Non-existent word"),
+            ("ÊTRE", True, "Word with accent"),
+            ("API", True, "Modern acronym"),
         ]
 
-        for mot, attendu, description in mots_test_fr:
-            resultat = self.service.validate_word(mot, LanguageEnum.FRENCH)
-            statut = "✓" if resultat.is_valid == attendu else "✗"
-            temps = f"{resultat.search_time_ms:.1f}ms" if resultat.search_time_ms else "N/A"
-            print(f"    {statut} {mot:12} ({description}) - {temps}")
+        for word, expected, description in test_words_fr:
+            result = self.service.validate_word(word, LanguageEnum.FRENCH)
+            status = "✓" if result.is_valid == expected else "✗"
+            time_ms = f"{result.search_time_ms:.1f}ms" if result.search_time_ms else "N/A"
+            print(f"    {status} {word:12} ({description}) - {time_ms}")
 
-            if resultat.is_valid and resultat.definition:
-                print(f"      💬 {resultat.definition[:60]}{'...' if len(resultat.definition) > 60 else ''}")
+            if result.is_valid and result.definition:
+                print(f"      💬 {result.definition[:60]}{'...' if len(result.definition) > 60 else ''}")
 
-        # Tests anglais
-        print("  \n  🇬🇧 Tests de validation anglaise :")
-        mots_test_en = [
+        # English tests
+        print("  \n  🇬🇧 English validation tests:")
+        test_words_en = [
             ("CAT", True, "Simple word"),
             ("SCRABBLE", True, "Game name"),
             ("NONEXISTENT", False, "Non-existent word"),
@@ -148,14 +148,14 @@ class DictionarySystemDemo:
             ("ENGINE", True, "Technical term"),
         ]
 
-        for word, attendu, description in mots_test_en:
-            resultat = self.service.validate_word(word, LanguageEnum.ENGLISH)
-            statut = "✓" if resultat.is_valid == attendu else "✗"
-            temps = f"{resultat.search_time_ms:.1f}ms" if resultat.search_time_ms else "N/A"
-            print(f"    {statut} {word:12} ({description}) - {temps}")
+        for word, expected, description in test_words_en:
+            result = self.service.validate_word(word, LanguageEnum.ENGLISH)
+            status = "✓" if result.is_valid == expected else "✗"
+            time_ms = f"{result.search_time_ms:.1f}ms" if result.search_time_ms else "N/A"
+            print(f"    {status} {word:12} ({description}) - {time_ms}")
 
-            if resultat.is_valid and resultat.definition:
-                print(f"      💬 {resultat.definition[:60]}{'...' if len(resultat.definition) > 60 else ''}")
+            if result.is_valid and result.definition:
+                print(f"      💬 {result.definition[:60]}{'...' if len(result.definition) > 60 else ''}")
 
     def demo_performance(self):
         """Demonstrates system performance."""
@@ -163,47 +163,47 @@ class DictionarySystemDemo:
             print("  ❌ Dictionary service not initialized")
             return
 
-        print("  ⏱️  Tests de performance (objectif : < 50ms par recherche)")
+        print("  ⏱️  Performance tests (target: < 50ms per search)")
 
         # Individual performance test
-        mots_perf = ["CHAT", "DOG", "SCRABBLE", "API", "PERFORMANCE"]
-        temps_total = []
+        perf_words = ["CHAT", "DOG", "SCRABBLE", "API", "PERFORMANCE"]
+        total_times = []
 
-        for mot in mots_perf:
-            debut = time.time()
-            self.service.validate_word(mot, LanguageEnum.FRENCH)
-            temps_ms = (time.time() - debut) * 1000
-            temps_total.append(temps_ms)
+        for word in perf_words:
+            start = time.time()
+            self.service.validate_word(word, LanguageEnum.FRENCH)
+            time_ms = (time.time() - start) * 1000
+            total_times.append(time_ms)
 
-            statut = "🟢" if temps_ms < 50 else "🟡" if temps_ms < 100 else "🔴"
-            print(f"    {statut} {mot:12} : {temps_ms:6.2f}ms")
+            status = "🟢" if time_ms < 50 else "🟡" if time_ms < 100 else "🔴"
+            print(f"    {status} {word:12} : {time_ms:6.2f}ms")
 
         # Global statistics
-        temps_moyen = sum(temps_total) / len(temps_total)
-        temps_max = max(temps_total)
+        avg_time = sum(total_times) / len(total_times)
+        max_time = max(total_times)
 
-        print("  \n  📊 Statistiques de performance :")
-        print(f"    • Temps moyen    : {temps_moyen:6.2f}ms")
-        print(f"    • Temps maximum  : {temps_max:6.2f}ms")
-        print("    • Objectif       : < 50.00ms")
-        print(f"    • Conformité     : {'✅ CONFORME' if temps_moyen < 50 else '⚠️ NON CONFORME'}")
+        print("  \n  📊 Performance statistics:")
+        print(f"    • Average time   : {avg_time:6.2f}ms")
+        print(f"    • Maximum time   : {max_time:6.2f}ms")
+        print("    • Target         : < 50.00ms")
+        print(f"    • Compliance     : {'✅ COMPLIANT' if avg_time < 50 else '⚠️ NON-COMPLIANT'}")
 
         # Batch test (10 words)
-        print("  \n  🔄 Test batch (10 mots, objectif : < 200ms)")
-        debut_batch = time.time()
+        print("  \n  🔄 Batch test (10 words, target: < 200ms)")
+        batch_start = time.time()
         for i in range(10):
-            self.service.validate_word(f"MOT{i:02d}", LanguageEnum.FRENCH)
-        temps_batch = (time.time() - debut_batch) * 1000
+            self.service.validate_word(f"WORD{i:02d}", LanguageEnum.FRENCH)
+        batch_time = (time.time() - batch_start) * 1000
 
-        statut_batch = "✅ CONFORME" if temps_batch < 200 else "⚠️ NON CONFORME"
-        print(f"    • Temps total batch : {temps_batch:6.2f}ms")
-        print(f"    • Conformité        : {statut_batch}")
+        batch_status = "✅ COMPLIANT" if batch_time < 200 else "⚠️ NON-COMPLIANT"
+        print(f"    • Total batch time  : {batch_time:6.2f}ms")
+        print(f"    • Compliance        : {batch_status}")
 
         # Service statistics
-        stats = self.service.obtenir_statistiques_performance()
-        print("  \n  📈 Statistiques du service :")
-        for cle, valeur in stats.items():
-            print(f"    • {cle:20} : {valeur}")
+        stats = self.service.get_performance_statistics()
+        print("  \n  📈 Service statistics:")
+        for key, value in stats.items():
+            print(f"    • {key:20} : {value}")
 
     def demo_rest_api(self):
         """Demonstrates the REST API for Godot."""
@@ -211,22 +211,22 @@ class DictionarySystemDemo:
 
         # Start server in background
         try:
-            self.demarrer_serveur_api()
+            self.start_api_server()
             time.sleep(2)  # Wait for server to start
 
             # Test endpoints
-            self.tester_endpoints_api()
+            self.test_api_endpoints()
 
         except Exception as e:
             print(f"  ❌ Error with REST API: {e}")
         finally:
-            self.arreter_serveur_api()
+            self.stop_api_server()
 
-    def demarrer_serveur_api(self):
-        """Démarre le serveur API en arrière-plan."""
+    def start_api_server(self):
+        """Start the API server in background."""
         api_script = self.base_dir / "shared" / "api" / "dictionary_service.py"
         if not api_script.exists():
-            print(f"  ⚠️  Script API introuvable : {api_script}")
+            print(f"  ⚠️  API script not found: {api_script}")
             return
 
         # Configure environment variables for test databases
@@ -257,89 +257,89 @@ class DictionarySystemDemo:
                 stderr=subprocess.PIPE,
             )
 
-            print("  ✅ Serveur API démarré sur http://127.0.0.1:8000")
+            print("  ✅ API server started on http://127.0.0.1:8000")
 
         except Exception as e:
             print(f"  ❌ Server startup error: {e}")
 
-    def tester_endpoints_api(self):
-        """Teste les endpoints de l'API."""
+    def test_api_endpoints(self):
+        """Test the API endpoints."""
         base_url = "http://127.0.0.1:8000/api/v1/dictionnaire"
 
-        print("  \n  🌐 Tests des endpoints API :")
+        print("  \n  🌐 API endpoints testing:")
 
         # Test health check
         try:
             response = requests.get(f"{base_url}/health", timeout=5)
             if response.status_code == 200:
-                print("    ✅ Health check : OK")
+                print("    ✅ Health check: OK")
                 data = response.json()
-                print(f"       Statut : {data.get('statut', 'N/A')}")
+                print(f"       Status: {data.get('statut', 'N/A')}")
             else:
-                print(f"    ❌ Health check : {response.status_code}")
+                print(f"    ❌ Health check: {response.status_code}")
         except Exception as e:
-            print(f"    ❌ Health check : Erreur - {e}")
+            print(f"    ❌ Health check: Error - {e}")
 
         # Test French validation
         try:
             response = requests.get(f"{base_url}/fr/valider/CHAT", timeout=5)
             if response.status_code == 200:
                 data = response.json()
-                print(f"    ✅ Validation FR : CHAT = {data.get('valide', False)}")
+                print(f"    ✅ French validation: CHAT = {data.get('valide', False)}")
                 if data.get("search_time_ms"):
-                    print(f"       Temps : {data['search_time_ms']:.1f}ms")
+                    print(f"       Time: {data['search_time_ms']:.1f}ms")
             else:
-                print(f"    ❌ Validation FR : {response.status_code}")
+                print(f"    ❌ French validation: {response.status_code}")
         except Exception as e:
-            print(f"    ❌ Validation FR : Erreur - {e}")
+            print(f"    ❌ French validation: Error - {e}")
 
         # Test English validation
         try:
             response = requests.get(f"{base_url}/en/valider/CAT", timeout=5)
             if response.status_code == 200:
                 data = response.json()
-                print(f"    ✅ Validation EN : CAT = {data.get('valide', False)}")
+                print(f"    ✅ English validation: CAT = {data.get('valide', False)}")
             else:
-                print(f"    ❌ Validation EN : {response.status_code}")
+                print(f"    ❌ English validation: {response.status_code}")
         except Exception as e:
-            print(f"    ❌ Validation EN : Erreur - {e}")
+            print(f"    ❌ English validation: Error - {e}")
 
         # Test definition
         try:
             response = requests.get(f"{base_url}/fr/definition/CHAT", timeout=5)
             if response.status_code == 200:
                 data = response.json()
-                trouve = data.get("trouve", False)
-                print(f"    ✅ Définition : CHAT trouvé = {trouve}")
-                if trouve and data.get("definition"):
-                    def_courte = data["definition"][:40] + "..." if len(data["definition"]) > 40 else data["definition"]
-                    print(f"       Définition : {def_courte}")
+                found = data.get("trouve", False)
+                print(f"    ✅ Definition: CHAT found = {found}")
+                if found and data.get("definition"):
+                    short_def = data["definition"][:40] + "..." if len(data["definition"]) > 40 else data["definition"]
+                    print(f"       Definition: {short_def}")
             else:
-                print(f"    ❌ Définition : {response.status_code}")
+                print(f"    ❌ Definition: {response.status_code}")
         except Exception as e:
-            print(f"    ❌ Définition : Erreur - {e}")
+            print(f"    ❌ Definition: Error - {e}")
 
         # Test search
         try:
             response = requests.get(f"{base_url}/fr/recherche?longueur=4&limite=3", timeout=5)
             if response.status_code == 200:
                 data = response.json()
-                nb_resultats = data.get("nb_resultats", 0)
-                print(f"    ✅ Search: {nb_resultats} 4-letter words found")
+                results_count = data.get("nb_resultats", 0)
+                print(f"    ✅ Search: {results_count} 4-letter words found")
                 if data.get("mots") and len(data["mots"]) > 0:
-                    premier_mot = data["mots"][0].get("mot", "N/A")
-                    print(f"       Premier résultat : {premier_mot}")
+                    first_word = data["mots"][0].get("mot", "N/A")
+                    print(f"       First result: {first_word}")
             else:
-                print(f"    ❌ Recherche : {response.status_code}")
+                print(f"    ❌ Search: {response.status_code}")
         except Exception as e:
-            print(f"    ❌ Recherche : Erreur - {e}")
+            print(f"    ❌ Search: Error - {e}")
 
-        print("  \n  📖 Documentation interactive disponible : http://127.0.0.1:8000/docs")
+        print("  \n  📖 Interactive documentation available: http://127.0.0.1:8000/docs")
 
-    def arreter_serveur_api(self):
-        """Arrête le serveur API."""
+    def stop_api_server(self):
+        """Stop the API server."""
         if self.api_server_process:
-            print("  🛑 Arrêt du serveur API...")
+            print("  🛑 Stopping API server...")
             self.api_server_process.terminate()
             try:
                 self.api_server_process.wait(timeout=5)
@@ -347,16 +347,16 @@ class DictionarySystemDemo:
                 self.api_server_process.kill()
             self.api_server_process = None
 
-    def nettoyer(self):
-        """Nettoyage des ressources."""
+    def cleanup(self):
+        """Resource cleanup."""
         if self.service:
-            self.service.fermer_connexions()
+            self.service.close_connections()
 
-        self.arreter_serveur_api()
+        self.stop_api_server()
 
         print("\n🧹 Cleanup completed")
         print(f"  • Demo databases preserved in: {self.databases_dir}")
-        print("  • Logs disponibles pour analyse")
+        print("  • Logs available for analysis")
 
 
 def main():

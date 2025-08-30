@@ -26,7 +26,7 @@ sys.path.append("/workspaces/scrabbot/shared")
 
 from algorithms.trie_search import AdvancedSearchEngine
 from cache.intelligent_cache import DictionaryCacheManager
-from models.dictionnaire import DictionaryService, LanguageEnum
+from models.dictionary import DictionaryService
 
 logger = logging.getLogger(__name__)
 
@@ -107,11 +107,8 @@ class PerformanceBenchmark:
 
     def setup_test_environment(self):
         """Setup test environment with sample data."""
-        # Initialize services
-        self.dictionary_service = DictionaryService(
-            "data/dictionaries/databases/french_demo.db",
-            "data/dictionaries/databases/english_demo.db",
-        )
+        # Initialize services with new signature
+        self.dictionary_service = DictionaryService("data/dictionaries/databases")
         self.search_engine = AdvancedSearchEngine()
         self.cache_manager = DictionaryCacheManager()
 
@@ -137,8 +134,8 @@ class PerformanceBenchmark:
         for i in range(iterations):
             try:
                 # Alternate between languages and words
-                language = LanguageEnum.FRENCH if i % 2 == 0 else LanguageEnum.ENGLISH
-                word_list = self.test_words["fr"] if language == LanguageEnum.FRENCH else self.test_words["en"]
+                language = "fr" if i % 2 == 0 else "en"
+                word_list = self.test_words["fr"] if language == "fr" else self.test_words["en"]
                 word = random.choice(word_list)
 
                 operation_start = time.time()
@@ -300,8 +297,8 @@ class PerformanceBenchmark:
 
             for _ in range(operations_per_user):
                 try:
-                    language = LanguageEnum.FRENCH if random.random() < 0.5 else LanguageEnum.ENGLISH
-                    word_list = self.test_words["fr"] if language == LanguageEnum.FRENCH else self.test_words["en"]
+                    language = "fr" if random.random() < 0.5 else "en"
+                    word_list = self.test_words["fr"] if language == "fr" else self.test_words["en"]
                     word = random.choice(word_list)
 
                     start_time = time.time()
@@ -399,8 +396,8 @@ class PerformanceBenchmark:
                 memory_samples.append(current_memory - initial_memory)
 
             # Perform a mixed workload
-            language = LanguageEnum.FRENCH if i % 2 == 0 else LanguageEnum.ENGLISH
-            word_list = self.test_words["fr"] if language == LanguageEnum.FRENCH else self.test_words["en"]
+            language = "fr" if i % 2 == 0 else "en"
+            word_list = self.test_words["fr"] if language == "fr" else self.test_words["en"]
             word = random.choice(word_list)
 
             # Validation
@@ -408,10 +405,10 @@ class PerformanceBenchmark:
 
             # Search operations (every 10th iteration)
             if i % 10 == 0:
-                self.search_engine.prefix_search(word[:2], "fr" if language == LanguageEnum.FRENCH else "en")
+                self.search_engine.prefix_search(word[:2], language)
 
             # Cache operations
-            self.cache_manager.get_word_validation(word, "fr" if language == LanguageEnum.FRENCH else "en")
+            self.cache_manager.get_word_validation(word, language)
 
         final_memory = self._get_memory_usage()
         tracemalloc.stop()

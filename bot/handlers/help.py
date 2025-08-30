@@ -1,5 +1,5 @@
 """
-Gestionnaire pour la commande /help.
+Handler for the /help command.
 """
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
@@ -13,50 +13,50 @@ class HelpHandler(BaseHandler):
 
     async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         """
-        Traite la commande /help.
+        Handle the /help command.
 
         Args:
-            update: Mise à jour Telegram
-            context: Contexte de la mise à jour
+            update: Telegram update
+            context: Update context
         """
         help_message = """
-📚 *Commandes disponibles :*
+📚 *Available Commands:*
 
-*🎮 Commandes de jeu :*
-• /newgame - Créer une nouvelle partie
-• /join <id> - Rejoindre une partie
-• /play <mot> <position> - Jouer un mot
-• /pass - Passer son tour
-• /exchange <lettres> - Échanger des lettres
+*🎮 Game Commands:*
+• /newgame - Create a new game
+• /join <id> - Join a game
+• /play <word> <position> - Play a word
+• /pass - Skip your turn
+• /exchange <letters> - Exchange letters
 
-*📋 Commandes d'information :*
+*📋 Information Commands:*
 • /start - Start the bot
-• /help - Afficher cette aide
-• /rules - Voir les règles du jeu
-• /status - État de la partie actuelle
-• /stats - Vos statistiques
+• /help - Display this help
+• /rules - View game rules
+• /status - Current game status
+• /stats - Your statistics
 
-*⚙️ Commandes de configuration :*
-• /language <fr/en> - Changer la langue
-• /difficulty <facile/moyen/difficile> - Niveau IA
+*⚙️ Configuration Commands:*
+• /language <fr/en> - Change language
+• /difficulty <easy/medium/hard> - AI level
 
-*💡 Exemples :*
-• `/newgame` - Créer une partie solo
-• `/play CHAT H8` - Placer "CHAT" en H8
-• `/exchange QZ` - Échanger Q et Z
+*💡 Examples:*
+• `/newgame` - Create a solo game
+• `/play CHAT H8` - Place "CHAT" at H8
+• `/exchange QZ` - Exchange Q and Z
 
-*Besoin d'aide ?* Contactez @support
+*Need help?* Contact @support
         """.strip()
 
         # Create inline buttons for quick actions
         keyboard = [
             [
-                InlineKeyboardButton("🎮 Nouvelle partie", callback_data="newgame"),
-                InlineKeyboardButton("📚 Règles", callback_data="rules"),
+                InlineKeyboardButton("🎮 New Game", callback_data="newgame"),
+                InlineKeyboardButton("📚 Rules", callback_data="rules"),
             ],
             [
-                InlineKeyboardButton("📊 Statistiques", callback_data="stats"),
-                InlineKeyboardButton("⚙️ Configuration", callback_data="settings"),
+                InlineKeyboardButton("📊 Statistics", callback_data="stats"),
+                InlineKeyboardButton("⚙️ Settings", callback_data="settings"),
             ],
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)

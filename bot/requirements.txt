@@ -35,6 +35,7 @@ aiofiles==23.2.1
 pandas==2.3.1  # For dictionary data manipulation
 beautifulsoup4==4.12.2  # For parsing Wiktionary HTML
 unidecode==1.4.0  # For word normalization (accent removal)
+PyYAML==6.0.2  # For language configuration files
 
 # Cache and performance
 redis==5.0.1

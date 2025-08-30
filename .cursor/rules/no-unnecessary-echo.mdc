@@ -1,0 +1,57 @@
+---
+alwaysApply: true
+---
+
+# No Unnecessary Echo Commands Policy
+
+## Critical Rule: Avoid Unnecessary Echo Commands
+
+**NEVER** use `echo` commands for confirmations, celebrations, or status messages as they cause terminal issues with incomplete command detection.
+
+### Forbidden Echo Usage
+
+❌ **NEVER use echo for:**
+- Status confirmations ("Task completed!")
+- Celebrations ("Success! 🎉")
+- Progress updates ("Step 1 done!")
+- Confirmation messages ("Files translated!")
+- Summary reports ("All tests passed!")
+
+### When Echo Is Allowed
+
+✅ **ONLY use echo when:**
+- Displaying actual program output data
+- Showing file contents or variables
+- Required for script functionality
+- User explicitly requests specific output
+
+### Problem Description
+
+Echo commands cause the terminal to enter `dquote>` mode, making it impossible to detect when commands complete properly. This breaks the command execution flow.
+
+### Better Alternatives
+
+Instead of confirmation echo commands:
+- ✅ Use tool result messages
+- ✅ Use direct user responses
+- ✅ Let command completion speak for itself
+- ✅ Use specific tool outputs when needed
+
+### Examples
+
+❌ **Bad (causes dquote> issues):**
+```bash
+echo "Task completed successfully!"
+echo "✅ All files translated!"
+echo "🎉 Project ready!"
+```
+
+✅ **Good (no unnecessary echo):**
+```bash
+# Just run the actual commands
+pytest tests/
+git status
+ls -la
+```
+
+**Remember: Silence is better than broken terminal state.**

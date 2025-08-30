@@ -68,7 +68,9 @@ USER vscode
 
 # Install Rust for the vscode user
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
-    && echo 'source $HOME/.cargo/env' >> ~/.bashrc
+    && echo 'source $HOME/.cargo/env' >> ~/.bashrc \
+    && source ~/.cargo/env \
+    && cargo install wrkflw
 
 # Configure Git to avoid pager blocking in terminal and set identity
 RUN git config --global core.pager cat \

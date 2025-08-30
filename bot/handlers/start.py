@@ -1,5 +1,5 @@
 """
-Gestionnaire pour la commande /start.
+Handler for the /start command.
 """
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, WebAppInfo
@@ -15,30 +15,30 @@ class StartHandler(BaseHandler):
 
     async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         """
-        Traite la commande /start.
+        Handle the /start command.
 
         Args:
-            update: Mise à jour Telegram
-            context: Contexte de la mise à jour
+            update: Telegram update
+            context: Update context
         """
         user_info = self.get_user_info(update)
 
         welcome_message = f"""
-🎲 *Bienvenue dans Scrabbot !*
+🎲 *Welcome to Scrabbot!*
 
-Bonjour {user_info.get('first_name', 'Joueur')} !
+Hello {user_info.get('first_name', 'Player')}!
 
-Je suis votre partenaire de jeu de Scrabble intelligent.
-Avec moi, vous pouvez :
+I am your intelligent Scrabble game partner.
+With me, you can:
 
-• 🎮 Jouer en solo contre l'IA
-• 👥 Jouer avec vos amis
-• 📚 Consulter les règles du jeu
-• 📊 Voir vos statistiques
+• 🎮 Play solo against AI
+• 👥 Play with your friends
+• 📚 Check game rules
+• 📊 View your statistics
 
-Utilisez /help pour voir toutes les commandes disponibles.
+Use /help to see all available commands.
 
-*Bon jeu !* 🎯
+*Have fun!* 🎯
         """.strip()
 
         # Launch Godot scene (game) on local side (desktop)
@@ -58,26 +58,26 @@ Utilisez /help pour voir toutes les commandes disponibles.
                 [
                     [
                         InlineKeyboardButton(
-                            "🎮 Ouvrir en plein écran (Mini App)",
+                            "🎮 Open Fullscreen (Mini App)",
                             web_app=WebAppInfo(url=settings.godot_web_url),
                         )
                     ],
                     [
                         InlineKeyboardButton(
-                            "🌐 Ouvrir dans le navigateur",
+                            "🌐 Open in Browser",
                             url=settings.godot_web_url,
                         )
                     ],
                 ]
             )
-            suffix = "\n\nAstuce: utilisez le bouton ‘Mini App’ pour le plein écran."
+            suffix = "\n\nTip: use the 'Mini App' button for fullscreen."
         elif launched:
-            suffix = "\n\n🖥️ Lancement de l'interface Godot..."
+            suffix = "\n\n🖥️ Launching Godot interface..."
 
         await self.send_message(
             update=update,
             context=context,
-            text=welcome_message + (suffix or "\n\n⚠️ Godot n'a pas pu être lancé automatiquement."),
+            text=welcome_message + (suffix or "\n\n⚠️ Godot could not be launched automatically."),
             parse_mode="Markdown",
             reply_markup=reply_markup,
         )

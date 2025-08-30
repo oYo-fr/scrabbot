@@ -2,39 +2,39 @@
 alwaysApply: true
 ---
 
-# Politique de Commit et Push Git
+# Git Commit and Push Policy
 
-## Règle Principale
-Ne créer un commit et ne pousser le code que lorsque l'utilisateur le demande explicitement.
+## Main Rule
+Only create commits and push code when the user explicitly requests it.
 
 ## Exceptions
-**Exception pour les fichiers dev container :** Les modifications sur les fichiers de configuration du dev container peuvent être committées et poussées automatiquement sans demander la permission :
+**Exception for dev container files:** Modifications to dev container configuration files can be committed and pushed automatically without asking permission:
 - `.devcontainer/devcontainer.json`
 - `.devcontainer/Dockerfile`
 - `.devcontainer/docker-compose.yml`
-- Autres fichiers dans le dossier `.devcontainer/`
+- Other files in the `.devcontainer/` folder
 
-## Comportement Attendu
-1. **Par défaut :** Attendre une demande explicite de l'utilisateur avant de créer un commit ou de pousser
-2. **Mots-clés pour déclencher commit/push :**
+## Expected Behavior
+1. **Default:** Wait for explicit user request before creating a commit or pushing
+2. **Keywords that trigger commit/push:**
    - "commit"
-   - "pousse le code"
+   - "push the code" / "pousse le code"
    - "push"
-   - "valide les changements"
-   - "enregistre les modifications"
+   - "validate the changes" / "valide les changements"
+   - "save the modifications" / "enregistre les modifications"
 
-## Exemples
-✅ **Autorisé automatiquement :**
-- Modifications du Dockerfile du dev container
-- Ajout de dépendances dans devcontainer.json
+## Examples
+✅ **Automatically allowed:**
+- Dev container Dockerfile modifications
+- Adding dependencies in devcontainer.json
 
-❌ **Nécessite autorisation explicite :**
-- Modifications de code
-- Nouveaux fichiers
-- Corrections de bugs
-- Nouvelles fonctionnalités
-- Renommage de fichiers
-- Modifications de configuration autre que dev container
+❌ **Requires explicit authorization:**
+- Code modifications
+- New files
+- Bug fixes
+- New features
+- File renaming
+- Configuration changes other than dev container
 
 ## Note
-Cette règle assure que l'utilisateur garde le contrôle total sur l'historique git de son projet.
+This rule ensures that the user maintains total control over their project's git history.

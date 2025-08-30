@@ -15,7 +15,7 @@ extends GutTest
 
 # Variables for tests
 var http_request: HTTPRequest
-var api_base_url: String = "http://localhost:8000/api/v1/dictionnaire"
+var api_base_url: String = "http://localhost:8000/api/v1/dictionary"
 var timeout_duration: float = 5.0
 var response_received: bool = false
 var last_response_data: Dictionary = {}
@@ -28,339 +28,339 @@ func before_each():
 	http_request = HTTPRequest.new()
 	add_child(http_request)
 
-	# Configuration des timeouts
+	# Timeout configuration
 	http_request.timeout = timeout_duration
 
-	# Connexion des signaux
+	# Signal connections
 	http_request.request_completed.connect(_on_request_completed)
 
-	# Réinitialisation des variables
+	# Reset variables
 	response_received = false
 	last_response_data = {}
 	last_error_code = 0
 
 func after_each():
-	"""Nettoyage après chaque test."""
+	"""Cleanup after each test."""
 	if http_request:
 		http_request.queue_free()
 	response_received = false
 
 # ============================================================================
-# TESTS D'ACCÈS API HTTP
+# HTTP API ACCESS TESTS
 # ============================================================================
 
-func test_acces_api_validation_francais():
-	"""Test d'accès API : validation mot français."""
-	var url = api_base_url + "/fr/valider/CHAT"
+func test_french_api_validation_access():
+	"""API access test: French word validation."""
+	var url = api_base_url + "/validate/CHAT?language=fr"
 	var error = http_request.request(url)
 
-	assert_eq(error, OK, "Erreur lors du lancement de la requête HTTP")
+	assert_eq(error, OK, "Error launching HTTP request")
 
-	# Attendre la réponse
-	await _attendre_reponse()
+	# Wait for response
+	await _wait_for_response()
 
-	assert_true(response_received, "Aucune réponse reçue du serveur")
-	assert_eq(last_error_code, 0, "Code d'erreur HTTP inattendu: " + str(last_error_code))
+	assert_true(response_received, "No response received from server")
+	assert_eq(last_error_code, 0, "Unexpected HTTP error code: " + str(last_error_code))
 
-	# Vérification de la structure de réponse
-	assert_true(last_response_data.has("mot"), "Champ 'mot' manquant dans la réponse")
-	assert_true(last_response_data.has("valide"), "Champ 'valide' manquant dans la réponse")
-	assert_true(last_response_data.has("langue"), "Champ 'langue' manquant dans la réponse")
+	# Response structure verification
+	assert_true(last_response_data.has("word"), "Field 'word' missing in response")
+	assert_true(last_response_data.has("valid"), "Field 'valid' missing in response")
+	assert_true(last_response_data.has("language"), "Field 'language' missing in response")
 
-	# Vérification des valeurs
-	assert_eq(last_response_data.langue, "fr", "Langue incorrecte dans la réponse")
-	assert_eq(last_response_data.mot, "CHAT", "Mot incorrect dans la réponse")
+	# Value verification
+	assert_eq(last_response_data.language, "fr", "Incorrect language in response")
+	assert_eq(last_response_data.word, "CHAT", "Incorrect word in response")
 
-func test_acces_api_validation_anglais():
-	"""Test d'accès API : validation mot anglais."""
-	var url = api_base_url + "/en/valider/CAT"
+func test_english_api_validation_access():
+	"""API access test: English word validation."""
+	var url = api_base_url + "/validate/CAT?language=en"
 	var error = http_request.request(url)
 
-	assert_eq(error, OK, "Erreur lors du lancement de la requête HTTP")
+	assert_eq(error, OK, "Error launching HTTP request")
 
-	await _attendre_reponse()
+	await _wait_for_response()
 
-	assert_true(response_received, "Aucune réponse reçue du serveur")
-	assert_eq(last_response_data.langue, "en", "Langue incorrecte pour l'anglais")
-	assert_eq(last_response_data.mot, "CAT", "Mot incorrect dans la réponse anglaise")
+	assert_true(response_received, "No response received from server")
+	assert_eq(last_response_data.language, "en", "Incorrect language for English")
+	assert_eq(last_response_data.word, "CAT", "Incorrect word in English response")
 
-func test_acces_api_definition_francaise():
-	"""Test d'accès API : récupération définition française."""
-	var url = api_base_url + "/fr/definition/CHAT"
+func test_french_api_definition_access():
+	"""API access test: French definition retrieval."""
+	var url = api_base_url + "/definition/CHAT?language=fr"
 	var error = http_request.request(url)
 
-	assert_eq(error, OK, "Erreur lors du lancement de la requête HTTP")
+	assert_eq(error, OK, "Error launching HTTP request")
 
-	await _attendre_reponse()
+	await _wait_for_response()
 
-	assert_true(response_received, "Aucune réponse reçue pour la définition")
-	assert_true(last_response_data.has("definition"), "Champ 'definition' manquant")
-	assert_true(last_response_data.has("trouve"), "Champ 'trouve' manquant")
-	assert_eq(last_response_data.langue, "fr", "Langue incorrecte pour définition française")
+	assert_true(response_received, "No response received for definition")
+	assert_true(last_response_data.has("definition"), "Field 'definition' missing")
+	assert_true(last_response_data.has("found"), "Field 'found' missing")
+	assert_eq(last_response_data.language, "fr", "Incorrect language for French definition")
 
-func test_acces_api_recherche_par_criteres():
-	"""Test d'accès API : recherche par critères."""
-	var url = api_base_url + "/fr/recherche?longueur=4&commence_par=C&limite=10"
+func test_api_criteria_search_access():
+	"""API access test: criteria-based search."""
+	var url = api_base_url + "/search?language=fr&length=4&starts_with=C&limit=10"
 	var error = http_request.request(url)
 
-	assert_eq(error, OK, "Erreur lors du lancement de la requête de recherche")
+	assert_eq(error, OK, "Error launching search request")
 
-	await _attendre_reponse()
+	await _wait_for_response()
 
-	assert_true(response_received, "Aucune réponse reçue pour la recherche")
-	assert_true(last_response_data.has("mots"), "Champ 'mots' manquant dans la recherche")
-	assert_true(last_response_data.has("nb_resultats"), "Champ 'nb_resultats' manquant")
-	assert_true(last_response_data.has("criteres"), "Champ 'criteres' manquant")
+	assert_true(response_received, "No response received for search")
+	assert_true(last_response_data.has("mots"), "Field 'mots' missing in search")
+	assert_true(last_response_data.has("nb_resultats"), "Field 'nb_resultats' missing")
+	assert_true(last_response_data.has("criteres"), "Field 'criteres' missing")
 
 # ============================================================================
-# TESTS DE VALIDATION JSON
+# JSON VALIDATION TESTS
 # ============================================================================
 
-func test_format_reponse_json_validation():
-	"""Test de validation du format de réponse JSON pour validation."""
-	var url = api_base_url + "/fr/valider/TEST"
+func test_validation_json_response_format():
+	"""JSON response format validation test for validation."""
+	var url = api_base_url + "/validate/TEST?language=fr"
 	var error = http_request.request(url)
 
-	assert_eq(error, OK, "Erreur lors du lancement de la requête")
+	assert_eq(error, OK, "Error launching request")
 
-	await _attendre_reponse()
+	await _wait_for_response()
 
-	# Vérification du format JSON complet
-	var champs_requis = ["mot", "valide", "langue"]
-	for champ in champs_requis:
-		assert_true(last_response_data.has(champ), "Champ requis manquant: " + champ)
+	# Complete JSON format verification
+	var required_fields = ["word", "valid", "language"]
+	for field in required_fields:
+		assert_true(last_response_data.has(field), "Required field missing: " + field)
 
-	# Vérification des types
-	assert_typeof(last_response_data.mot, TYPE_STRING, "Type incorrect pour 'mot'")
-	assert_typeof(last_response_data.valide, TYPE_BOOL, "Type incorrect pour 'valide'")
-	assert_typeof(last_response_data.langue, TYPE_STRING, "Type incorrect pour 'langue'")
+	# Type verification
+	assert_typeof(last_response_data.word, TYPE_STRING, "Incorrect type for 'word'")
+	assert_typeof(last_response_data.valid, TYPE_BOOL, "Incorrect type for 'valid'")
+	assert_typeof(last_response_data.language, TYPE_STRING, "Incorrect type for 'language'")
 
-	# Vérification des valeurs optionnelles
+	# Optional values verification
 	if last_response_data.has("definition") and last_response_data.definition != null:
-		assert_typeof(last_response_data.definition, TYPE_STRING, "Type incorrect pour 'definition'")
+		assert_typeof(last_response_data.definition, TYPE_STRING, "Incorrect type for 'definition'")
 
 	if last_response_data.has("points") and last_response_data.points != null:
-		assert_typeof(last_response_data.points, TYPE_INT, "Type incorrect pour 'points'")
-		assert_gt(last_response_data.points, 0, "Points doivent être positifs")
+		assert_typeof(last_response_data.points, TYPE_INT, "Incorrect type for 'points'")
+		assert_gt(last_response_data.points, 0, "Points must be positive")
 
-	if last_response_data.has("temps_recherche_ms") and last_response_data.temps_recherche_ms != null:
-		assert_typeof(last_response_data.temps_recherche_ms, TYPE_FLOAT, "Type incorrect pour 'temps_recherche_ms'")
-		assert_lt(last_response_data.temps_recherche_ms, 100.0, "Temps de recherche trop élevé")
+	if last_response_data.has("search_time_ms") and last_response_data.search_time_ms != null:
+		assert_typeof(last_response_data.search_time_ms, TYPE_FLOAT, "Incorrect type for 'search_time_ms'")
+		assert_lt(last_response_data.search_time_ms, 100.0, "Search time too high")
 
-func test_format_reponse_json_definition():
-	"""Test de validation du format JSON pour définition."""
-	var url = api_base_url + "/fr/definition/CHAT"
+func test_definition_json_response_format():
+	"""JSON format validation test for definition."""
+	var url = api_base_url + "/definition/CHAT?language=fr"
 	var error = http_request.request(url)
 
-	assert_eq(error, OK, "Erreur lors du lancement de la requête définition")
+	assert_eq(error, OK, "Error launching definition request")
 
-	await _attendre_reponse()
+	await _wait_for_response()
 
-	# Champs obligatoires pour définition
-	var champs_requis = ["mot", "trouve", "langue"]
-	for champ in champs_requis:
-		assert_true(last_response_data.has(champ), "Champ requis manquant pour définition: " + champ)
+	# Required fields for definition
+	var required_fields = ["word", "found", "language"]
+	for field in required_fields:
+		assert_true(last_response_data.has(field), "Required field missing for definition: " + field)
 
-	# Types corrects
-	assert_typeof(last_response_data.mot, TYPE_STRING, "Type incorrect pour 'mot' dans définition")
-	assert_typeof(last_response_data.trouve, TYPE_BOOL, "Type incorrect pour 'trouve'")
-	assert_typeof(last_response_data.langue, TYPE_STRING, "Type incorrect pour 'langue' dans définition")
+	# Correct types
+	assert_typeof(last_response_data.word, TYPE_STRING, "Incorrect type for 'word' in definition")
+	assert_typeof(last_response_data.found, TYPE_BOOL, "Incorrect type for 'found'")
+	assert_typeof(last_response_data.language, TYPE_STRING, "Incorrect type for 'language' in definition")
 
-func test_format_reponse_json_recherche():
-	"""Test de validation du format JSON pour recherche."""
-	var url = api_base_url + "/fr/recherche?limite=5"
+func test_search_json_response_format():
+	"""JSON format validation test for search."""
+	var url = api_base_url + "/search?language=fr&limit=5"
 	var error = http_request.request(url)
 
-	assert_eq(error, OK, "Erreur lors du lancement de la requête recherche")
+	assert_eq(error, OK, "Error launching search request")
 
-	await _attendre_reponse()
+	await _wait_for_response()
 
-	# Structure de réponse recherche
-	assert_true(last_response_data.has("mots"), "Champ 'mots' manquant dans recherche")
-	assert_true(last_response_data.has("nb_resultats"), "Champ 'nb_resultats' manquant")
-	assert_true(last_response_data.has("criteres"), "Champ 'criteres' manquant")
-	assert_true(last_response_data.has("langue"), "Champ 'langue' manquant dans recherche")
+		# Search response structure
+	assert_true(last_response_data.has("words"), "Field 'words' missing in search")
+	assert_true(last_response_data.has("results_count"), "Field 'results_count' missing")
+	assert_true(last_response_data.has("criteria"), "Field 'criteria' missing")
+	assert_true(last_response_data.has("language"), "Field 'language' missing in search")
 
-	# Types corrects
-	assert_typeof(last_response_data.mots, TYPE_ARRAY, "Type incorrect pour 'mots'")
-	assert_typeof(last_response_data.nb_resultats, TYPE_INT, "Type incorrect pour 'nb_resultats'")
-	assert_typeof(last_response_data.criteres, TYPE_DICTIONARY, "Type incorrect pour 'criteres'")
-	assert_typeof(last_response_data.langue, TYPE_STRING, "Type incorrect pour 'langue' recherche")
+	# Correct types
+	assert_typeof(last_response_data.words, TYPE_ARRAY, "Incorrect type for 'words'")
+	assert_typeof(last_response_data.results_count, TYPE_INT, "Incorrect type for 'results_count'")
+	assert_typeof(last_response_data.criteria, TYPE_DICTIONARY, "Incorrect type for 'criteria'")
+	assert_typeof(last_response_data.language, TYPE_STRING, "Incorrect type for 'language' search")
 
-	# Cohérence des données
-	assert_eq(last_response_data.nb_resultats, last_response_data.mots.size(),
-			  "Incohérence entre nb_resultats et taille du tableau mots")
+	# Data consistency
+	assert_eq(last_response_data.results_count, last_response_data.words.size(),
+		  "Inconsistency between results_count and words array size")
 
 # ============================================================================
-# TESTS DE TIMEOUT ET GESTION D'ERREURS
+# TIMEOUT AND ERROR HANDLING TESTS
 # ============================================================================
 
-func test_gestion_timeout():
-	"""Test de gestion du timeout de requête."""
-	# Configuration d'un timeout très court pour forcer l'erreur
+func test_timeout_handling():
+	"""Request timeout handling test."""
+	# Configure very short timeout to force error
 	http_request.timeout = 0.1
 
-	# URL avec délai artificiel (si disponible sur le serveur de test)
-	var url = api_base_url + "/fr/valider/MOTAVECTIMEOUT"
+	# URL with artificial delay (if available on test server)
+	var url = api_base_url + "/fr/valider/WORDWITHTIMEOUT"
 	var error = http_request.request(url)
 
-	assert_eq(error, OK, "Erreur lors du lancement de la requête timeout")
+	assert_eq(error, OK, "Error launching timeout request")
 
-	# Attendre plus longtemps que le timeout
+	# Wait longer than timeout
 	await get_tree().create_timer(0.5).timeout
 
-	# Le test pourrait échouer de différentes manières selon l'implémentation
-	# L'important est que l'application ne se bloque pas
+	# Test could fail in different ways depending on implementation
+	# Important thing is that application doesn't freeze
 
-func test_gestion_serveur_indisponible():
-	"""Test de gestion d'un serveur indisponible."""
-	# URL vers un serveur qui n'existe pas
-	var url_invalide = "http://localhost:9999/api/v1/dictionnaire/fr/valider/TEST"
-	var error = http_request.request(url_invalide)
+func test_unavailable_server_handling():
+	"""Unavailable server handling test."""
+	# URL to a server that doesn't exist
+	var invalid_url = "http://localhost:9999/api/v1/dictionary/validate/TEST?language=fr"
+	var error = http_request.request(invalid_url)
 
-	# La requête devrait se lancer sans erreur immédiate
-	assert_eq(error, OK, "Erreur lors du lancement vers serveur indisponible")
+	# Request should launch without immediate error
+	assert_eq(error, OK, "Error launching to unavailable server")
 
-	await _attendre_reponse_ou_timeout()
+	await _wait_for_response_or_timeout()
 
-	# Vérifier qu'on gère bien l'erreur de connexion
-	assert_false(response_received, "Réponse reçue d'un serveur qui devrait être indisponible")
+	# Verify we handle connection error properly
+	assert_false(response_received, "Response received from server that should be unavailable")
 
-func test_gestion_reponse_json_invalide():
-	"""Test de gestion d'une réponse JSON invalide."""
-	# Note: Ce test nécessiterait un serveur de test qui retourne du JSON invalide
-	# Pour l'instant, on teste la robustesse du parsing JSON
+func test_invalid_json_response_handling():
+	"""Invalid JSON response handling test."""
+	# Note: This test would need a test server that returns invalid JSON
+	# For now, we test JSON parsing robustness
 
-	var json_invalide = '{"mot": "TEST", "valide": true, "langue": "fr"'  # JSON mal formé
+	var invalid_json = '{"mot": "TEST", "valide": true, "langue": "fr"'  # Malformed JSON
 	var json_parser = JSON.new()
-	var result = json_parser.parse(json_invalide)
+	var result = json_parser.parse(invalid_json)
 
-	# Vérifier que le parsing détecte l'erreur
-	assert_ne(result, OK, "Le JSON invalide aurait dû être rejeté")
+	# Verify parsing detects the error
+	assert_ne(result, OK, "Invalid JSON should have been rejected")
 
-func test_gestion_erreur_http_404():
-	"""Test de gestion d'une erreur HTTP 404."""
-	var url_inexistante = api_base_url + "/fr/inexistant/MOT"
-	var error = http_request.request(url_inexistante)
+func test_http_404_error_handling():
+	"""HTTP 404 error handling test."""
+	var nonexistent_url = api_base_url + "/nonexistent/WORD?language=fr"
+	var error = http_request.request(nonexistent_url)
 
-	assert_eq(error, OK, "Erreur lors du lancement vers URL inexistante")
+	assert_eq(error, OK, "Error launching to nonexistent URL")
 
-	await _attendre_reponse()
+	await _wait_for_response()
 
-	# Vérifier qu'on reçoit une erreur HTTP appropriée
+	# Verify we receive appropriate HTTP error
 	if response_received:
-		# Si on reçoit une réponse, elle devrait indiquer une erreur
-		assert_true(last_error_code >= 400, "Code d'erreur HTTP attendu >= 400")
+		# If we receive a response, it should indicate an error
+		assert_true(last_error_code >= 400, "Expected HTTP error code >= 400")
 
 # ============================================================================
-# TESTS HORS LIGNE ET FALLBACK
+# OFFLINE AND FALLBACK TESTS
 # ============================================================================
 
-func test_detection_mode_hors_ligne():
-	"""Test de détection du mode hors ligne."""
-	# Simulation de la détection d'absence de connexion
-	var connexion_disponible = _verifier_connexion_internet()
+func test_offline_mode_detection():
+	"""Offline mode detection test."""
+	# Simulation of connection absence detection
+	var connection_available = _check_internet_connection()
 
-	# Ce test dépend de l'implémentation réelle
-	# En attendant, on vérifie juste que la fonction existe
-	assert_typeof(connexion_disponible, TYPE_BOOL, "La vérification de connexion doit retourner un booléen")
+	# This test depends on actual implementation
+	# For now, we just verify the function exists
+	assert_typeof(connection_available, TYPE_BOOL, "Connection verification must return a boolean")
 
-func test_fallback_dictionnaire_local():
-	"""Test du fallback vers dictionnaire local en mode hors ligne."""
-	# Ce test nécessiterait l'implémentation d'un dictionnaire local de fallback
-	# Pour l'instant, on teste la logique de base
+func test_local_dictionary_fallback():
+	"""Local dictionary fallback test in offline mode."""
+	# This test would require implementation of a local fallback dictionary
+	# For now, we test basic logic
 
-	var mot_test = "CHAT"
-	var resultat_fallback = _valider_mot_local(mot_test)
+	var test_word = "CHAT"
+	var fallback_result = _validate_local_word(test_word)
 
-	# Vérifier que le fallback retourne un format cohérent
-	assert_true(resultat_fallback.has("mot"), "Fallback doit retourner le mot")
-	assert_true(resultat_fallback.has("valide"), "Fallback doit retourner le statut de validation")
-	assert_eq(resultat_fallback.mot, mot_test, "Mot incorrect dans fallback")
+	# Verify fallback returns consistent format
+	assert_true(fallback_result.has("mot"), "Fallback must return the word")
+	assert_true(fallback_result.has("valide"), "Fallback must return validation status")
+	assert_eq(fallback_result.mot, test_word, "Incorrect word in fallback")
 
 # ============================================================================
-# TESTS D'INTÉGRATION BOUT-EN-BOUT
+# END-TO-END INTEGRATION TESTS
 # ============================================================================
 
-func test_integration_validation_complete():
-	"""Test d'intégration : validation complète d'un mot."""
-	var mot_test = "SCRABBLE"
+func test_complete_word_validation_integration():
+	"""Integration test: complete word validation."""
+	var test_word = "SCRABBLE"
 
-	# 1. Validation du mot
-	var url_validation = api_base_url + "/fr/valider/" + mot_test
-	var error = http_request.request(url_validation)
-	assert_eq(error, OK, "Erreur lors de la validation")
+	# 1. Word validation
+	var validation_url = api_base_url + "/validate/" + test_word + "?language=fr"
+	var error = http_request.request(validation_url)
+	assert_eq(error, OK, "Error during validation")
 
-	await _attendre_reponse()
-	assert_true(response_received, "Pas de réponse pour la validation")
+	await _wait_for_response()
+	assert_true(response_received, "No response for validation")
 
-	var mot_valide = last_response_data.get("valide", false)
+	var word_valid = last_response_data.get("valid", false)
 
-	if mot_valide:
-		# 2. Si valide, récupérer la définition
+	if word_valid:
+		# 2. If valid, retrieve definition
 		response_received = false
-		var url_definition = api_base_url + "/fr/definition/" + mot_test
-		error = http_request.request(url_definition)
-		assert_eq(error, OK, "Erreur lors de récupération définition")
+		var definition_url = api_base_url + "/definition/" + test_word + "?language=fr"
+		error = http_request.request(definition_url)
+		assert_eq(error, OK, "Error retrieving definition")
 
-		await _attendre_reponse()
-		assert_true(response_received, "Pas de réponse pour la définition")
-		assert_true(last_response_data.trouve, "Définition non trouvée pour mot valide")
-		assert_ne(last_response_data.definition, "", "Définition vide pour mot valide")
+		await _wait_for_response()
+		assert_true(response_received, "No response for definition")
+		assert_true(last_response_data.found, "Definition not found for valid word")
+		assert_ne(last_response_data.definition, "", "Empty definition for valid word")
 
-func test_integration_recherche_et_validation():
-	"""Test d'intégration : recherche puis validation des résultats."""
-	# 1. Recherche de mots de 4 lettres commençant par C
-	var url_recherche = api_base_url + "/fr/recherche?longueur=4&commence_par=C&limite=3"
-	var error = http_request.request(url_recherche)
-	assert_eq(error, OK, "Erreur lors de la recherche")
+func test_search_and_validation_integration():
+	"""Integration test: search then validation of results."""
+	# 1. Search for 4-letter words starting with C
+	var search_url = api_base_url + "/search?language=fr&length=4&starts_with=C&limit=3"
+	var error = http_request.request(search_url)
+	assert_eq(error, OK, "Error during search")
 
-	await _attendre_reponse()
-	assert_true(response_received, "Pas de réponse pour la recherche")
-	assert_gt(last_response_data.nb_resultats, 0, "Aucun résultat trouvé")
+	await _wait_for_response()
+	assert_true(response_received, "No response for search")
+	assert_gt(last_response_data.results_count, 0, "No results found")
 
-	# 2. Valider le premier mot trouvé
-	if last_response_data.mots.size() > 0:
-		var premier_mot = last_response_data.mots[0].mot
+	# 2. Validate first found word
+	if last_response_data.words.size() > 0:
+		var first_word = last_response_data.words[0].word
 
 		response_received = false
-		var url_validation = api_base_url + "/fr/valider/" + premier_mot
-		error = http_request.request(url_validation)
-		assert_eq(error, OK, "Erreur lors de validation du mot trouvé")
+		var validation_url = api_base_url + "/validate/" + first_word + "?language=fr"
+		error = http_request.request(validation_url)
+		assert_eq(error, OK, "Error validating found word")
 
-		await _attendre_reponse()
-		assert_true(response_received, "Pas de réponse pour validation du mot trouvé")
-		assert_true(last_response_data.valide, "Mot trouvé par recherche non valide : " + premier_mot)
+		await _wait_for_response()
+		assert_true(response_received, "No response for found word validation")
+		assert_true(last_response_data.valid, "Word found by search not valid: " + first_word)
 
-func test_integration_performance_multiple():
-	"""Test d'intégration : performance avec requêtes multiples."""
-	var mots_test = ["CHAT", "CHIEN", "MAISON", "SCRABBLE", "JEU"]
-	var temps_debut = Time.get_time_dict_from_system()
-	var validations_reussies = 0
+func test_multiple_requests_performance_integration():
+	"""Integration test: performance with multiple requests."""
+	var test_words = ["CHAT", "CHIEN", "MAISON", "SCRABBLE", "JEU"]
+	var start_time = Time.get_time_dict_from_system()
+	var successful_validations = 0
 
-	for mot in mots_test:
-		var url = api_base_url + "/fr/valider/" + mot
+	for word in test_words:
+		var url = api_base_url + "/validate/" + word + "?language=fr"
 		var error = http_request.request(url)
 
 		if error == OK:
-			await _attendre_reponse()
+			await _wait_for_response()
 			if response_received:
-				validations_reussies += 1
+				successful_validations += 1
 
 		response_received = false
 
-	var temps_fin = Time.get_time_dict_from_system()
-	var duree_totale = _calculer_duree_ms(temps_debut, temps_fin)
+	var end_time = Time.get_time_dict_from_system()
+	var total_duration = _calculate_duration_ms(start_time, end_time)
 
-	assert_gt(validations_reussies, 0, "Aucune validation réussie")
-	assert_lt(duree_totale, 1000.0, "Validation multiple trop lente: " + str(duree_totale) + "ms")
+	assert_gt(successful_validations, 0, "No successful validations")
+	assert_lt(total_duration, 1000.0, "Multiple validation too slow: " + str(total_duration) + "ms")
 
 # ============================================================================
-# FONCTIONS UTILITAIRES
+# UTILITY FUNCTIONS
 # ============================================================================
 
 func _on_request_completed(result: int, response_code: int, headers: PackedStringArray, body: PackedByteArray):
-	"""Callback appelé quand une requête HTTP est terminée."""
+	"""Callback called when an HTTP request is completed."""
 	response_received = true
 	last_error_code = response_code
 
@@ -372,75 +372,75 @@ func _on_request_completed(result: int, response_code: int, headers: PackedStrin
 		if parse_result == OK:
 			last_response_data = json_parser.data
 		else:
-			push_error("Erreur parsing JSON: " + json_string)
+			push_error("JSON parsing error: " + json_string)
 			last_response_data = {}
 	else:
-		push_error("Erreur HTTP: " + str(response_code))
+		push_error("HTTP error: " + str(response_code))
 		last_response_data = {}
 
-func _attendre_reponse():
-	"""Attend une réponse HTTP avec timeout."""
-	var temps_attente = 0.0
-	while not response_received and temps_attente < timeout_duration:
+func _wait_for_response():
+	"""Wait for HTTP response with timeout."""
+	var wait_time = 0.0
+	while not response_received and wait_time < timeout_duration:
 		await get_tree().process_frame
-		temps_attente += get_process_delta_time()
+		wait_time += get_process_delta_time()
 
 	if not response_received:
-		push_warning("Timeout atteint en attendant la réponse")
+		push_warning("Timeout reached waiting for response")
 
-func _attendre_reponse_ou_timeout():
-	"""Attend une réponse ou un timeout explicite."""
-	var temps_attente = 0.0
-	var timeout_long = timeout_duration * 2  # Timeout plus long pour tester les erreurs
+func _wait_for_response_or_timeout():
+	"""Wait for response or explicit timeout."""
+	var wait_time = 0.0
+	var long_timeout = timeout_duration * 2  # Longer timeout to test errors
 
-	while not response_received and temps_attente < timeout_long:
+	while not response_received and wait_time < long_timeout:
 		await get_tree().process_frame
-		temps_attente += get_process_delta_time()
+		wait_time += get_process_delta_time()
 
-func _verifier_connexion_internet() -> bool:
-	"""Vérifie si une connexion internet est disponible."""
-	# Implémentation simplifiée pour les tests
-	# En production, on pourrait pinguer le serveur ou utiliser OS.get_network_interfaces()
+func _check_internet_connection() -> bool:
+	"""Check if internet connection is available."""
+	# Simplified implementation for tests
+	# In production, we could ping server or use OS.get_network_interfaces()
 	return true
 
-func _valider_mot_local(mot: String) -> Dictionary:
-	"""Validation locale en mode fallback (simulation)."""
-	# Dictionnaire local minimal pour les tests
-	var mots_locaux = ["CHAT", "CHIEN", "MAISON", "JEU", "SCRABBLE"]
+func _validate_local_word(word: String) -> Dictionary:
+	"""Local validation in fallback mode (simulation)."""
+	# Minimal local dictionary for tests
+	var local_words = ["CHAT", "CHIEN", "MAISON", "JEU", "SCRABBLE"]
 
 	return {
-		"mot": mot.to_upper(),
-		"valide": mot.to_upper() in mots_locaux,
-		"definition": "Définition locale pour " + mot if mot.to_upper() in mots_locaux else null,
+		"word": word.to_upper(),
+		"valid": word.to_upper() in local_words,
+		"definition": "Local definition for " + word if word.to_upper() in local_words else null,
 		"source": "local"
 	}
 
-func _calculer_duree_ms(debut: Dictionary, fin: Dictionary) -> float:
-	"""Calcule la durée en millisecondes entre deux timestamps."""
-	# Calcul simplifié pour les tests
-	var duree_sec = (fin.hour - debut.hour) * 3600 + (fin.minute - debut.minute) * 60 + (fin.second - debut.second)
-	return duree_sec * 1000.0
+func _calculate_duration_ms(start: Dictionary, end: Dictionary) -> float:
+	"""Calculate duration in milliseconds between two timestamps."""
+	# Simplified calculation for tests
+	var duration_sec = (end.hour - start.hour) * 3600 + (end.minute - start.minute) * 60 + (end.second - start.second)
+	return duration_sec * 1000.0
 
 # ============================================================================
-# TESTS DE CONFIGURATION
+# CONFIGURATION TESTS
 # ============================================================================
 
-func test_configuration_api_url():
-	"""Test de configuration de l'URL de l'API."""
-	assert_ne(api_base_url, "", "URL de base de l'API ne doit pas être vide")
-	assert_true(api_base_url.begins_with("http"), "URL doit commencer par http")
-	assert_true(api_base_url.contains("dictionnaire"), "URL doit contenir 'dictionnaire'")
+func test_api_url_configuration():
+	"""API URL configuration test."""
+	assert_ne(api_base_url, "", "API base URL must not be empty")
+	assert_true(api_base_url.begins_with("http"), "URL must start with http")
+	assert_true(api_base_url.contains("dictionary"), "URL must contain 'dictionary'")
 
-func test_configuration_timeout():
-	"""Test de configuration du timeout."""
-	assert_gt(timeout_duration, 0.0, "Timeout doit être positif")
-	assert_lt(timeout_duration, 30.0, "Timeout ne doit pas être trop long")
+func test_timeout_configuration():
+	"""Timeout configuration test."""
+	assert_gt(timeout_duration, 0.0, "Timeout must be positive")
+	assert_lt(timeout_duration, 30.0, "Timeout must not be too long")
 
-# Point d'entrée pour les tests manuels
+# Entry point for manual tests
 func _ready():
-	"""Point d'entrée pour exécution manuelle des tests."""
+	"""Entry point for manual test execution."""
 	if get_parent().name == "SceneTree":
-		print("=== Tests API Dictionnaires Godot ===")
-		print("Utiliser GUT pour lancer ces tests automatiquement")
-		print("URL API: ", api_base_url)
+		print("=== Godot Dictionary API Tests ===")
+		print("Use GUT to run these tests automatically")
+		print("API URL: ", api_base_url)
 		print("Timeout: ", timeout_duration, "s")

@@ -56,7 +56,7 @@ class DictionaryWord:
     length: int
     first_letter: str
     last_letter: str
-    language: LanguageEnum
+    language: str
     source: str
     date_added: Optional[str] = None
     id: Optional[int] = None
@@ -80,7 +80,8 @@ class ValidationResult:
     is_valid: bool
     definition: Optional[str] = None
     points: Optional[int] = None
-    language: Optional[LanguageEnum] = None
+    part_of_speech: Optional[str] = None
+    language: Optional[str] = None
     search_time_ms: Optional[float] = None
 
 
@@ -95,17 +96,17 @@ class DictionaryService:
     - Performance statistics
     """
 
-    def __init__(self, french_db_path: str, english_db_path: str):
+    def __init__(self, base_path: str = "data/dictionaries/databases"):
         """
         Initialize the dictionary service.
 
         Args:
-            french_db_path: Path to the French SQLite database
-            english_db_path: Path to the English SQLite database
+            base_path: Base directory path containing language databases (default: data/dictionaries/databases)
+
+        The service will automatically look for {language}.db files in the base path.
         """
-        self.french_db_path = Path(french_db_path)
-        self.english_db_path = Path(english_db_path)
-        self._connection_cache: Dict[LanguageEnum, sqlite3.Connection] = {}
+        self.base_path = Path(base_path)
+        self._connection_cache: Dict[str, sqlite3.Connection] = {}
         self._performance_stats = {
             "total_requests": 0,
             "total_time_ms": 0.0,
@@ -113,15 +114,34 @@ class DictionaryService:
         }
 
         logger.info("Dictionary service initialized")
-        logger.info(f"  French DB: {self.french_db_path}")
-        logger.info(f"  English DB: {self.english_db_path}")
+        logger.info(f"  Base path: {self.base_path}")
 
-    def _get_connection(self, language: LanguageEnum) -> sqlite3.Connection:
+        # Verify that supported language databases exist
+        for lang in ["fr", "en"]:
+            db_path = self._get_db_path(lang)
+            if db_path.exists():
+                logger.info(f"  {lang.upper()} DB: {db_path}")
+            else:
+                logger.warning(f"  {lang.upper()} DB not found: {db_path}")
+
+    def _get_db_path(self, language: str) -> Path:
+        """
+        Get the database path for a specific language.
+
+        Args:
+            language: Language code (fr, en, etc.)
+
+        Returns:
+            Path to the database file
+        """
+        return self.base_path / f"{language}.db"
+
+    def _get_connection(self, language: str) -> sqlite3.Connection:
         """
         Get a database connection for the specified language.
 
         Args:
-            language: Dictionary language
+            language: Language code (fr, en, etc.)
 
         Returns:
             SQLite connection
@@ -130,7 +150,7 @@ class DictionaryService:
             FileNotFoundError: If the database does not exist
             sqlite3.Error: In case of connection error
         """
-        db_path = self.french_db_path if language == LanguageEnum.FRENCH else self.english_db_path
+        db_path = self._get_db_path(language)
 
         if not db_path.exists():
             raise FileNotFoundError(f"Database not found: {db_path}")
@@ -138,16 +158,17 @@ class DictionaryService:
         if language not in self._connection_cache:
             try:
                 conn = sqlite3.connect(str(db_path))
-                conn.row_factory = sqlite3.Row  # To access columns by name
+                # Use default tuple factory instead of Row for compatibility
+                # conn.row_factory = sqlite3.Row  # To access columns by name
                 self._connection_cache[language] = conn
-                logger.debug(f"Connection established to database {language.value}")
+                logger.debug(f"Connection established to database {language}")
             except sqlite3.Error as e:
-                logger.error(f"Connection error for database {language.value}: {e}")
+                logger.error(f"Connection error for database {language}: {e}")
                 raise
 
         return self._connection_cache[language]
 
-    def validate_word(self, word: str, language: LanguageEnum) -> ValidationResult:
+    def validate_word(self, word: str, language: str) -> ValidationResult:
         """
         Validate a word in the specified dictionary.
 
@@ -164,19 +185,18 @@ class DictionaryService:
         try:
             conn = self._get_connection(language)
 
-            # Query according to language
-            if language == LanguageEnum.FRENCH:
-                query = """
-                SELECT mot as word, definition, points, valide_scrabble as is_valid_scrabble, categorie_grammaticale as part_of_speech
-                FROM mots_fr
-                WHERE mot = ? AND valide_scrabble = 1
-                """
-            else:
-                query = """
-                SELECT word, definition, points, scrabble_valid as is_valid_scrabble, part_of_speech
-                FROM mots_en
-                WHERE word = ? AND scrabble_valid = 1
-                """
+            # Query with JOIN to get definitions - both databases use same structure
+            query = """
+            SELECT
+                w.word_normalized as word,
+                w.word_original as original,
+                d.text as definition,
+                d.part_of_speech
+            FROM words w
+            LEFT JOIN definitions d ON w.id = d.word_id
+            WHERE w.word_normalized = ?
+            LIMIT 1
+            """
 
             cursor = conn.cursor()
             cursor.execute(query, (normalized_word,))
@@ -187,11 +207,18 @@ class DictionaryService:
             self._performance_stats["total_time_ms"] += elapsed_ms
 
             if result:
+                # Extract data from JOIN result (using indices, not names)
+                word_normalized = result[0]  # word_normalized
+                # word_original = result[1]  # Available if needed    # word_original
+                definition = result[2]       # definition from definitions table
+                part_of_speech = result[3]   # part_of_speech
+
                 return ValidationResult(
-                    word=normalized_word,
+                    word=word_normalized,
                     is_valid=True,
-                    definition=result["definition"],
-                    points=result["points"],
+                    definition=definition,
+                    points=None,  # Not available in current structure
+                    part_of_speech=part_of_speech,
                     language=language,
                     search_time_ms=elapsed_ms,
                 )
@@ -204,7 +231,7 @@ class DictionaryService:
                 )
 
         except Exception as e:
-            logger.error(f"Error validating word '{word}' in {language.value}: {e}")
+            logger.error(f"Error validating word '{word}' in {language}: {e}")
             return ValidationResult(
                 word=normalized_word,
                 is_valid=False,
@@ -212,7 +239,7 @@ class DictionaryService:
                 search_time_ms=(time.time() - start_time) * 1000,
             )
 
-    def get_definition(self, word: str, language: LanguageEnum) -> Optional[str]:
+    def get_definition(self, word: str, language: str) -> Optional[str]:
         """
         Retrieve the definition of a word.
 
@@ -228,7 +255,7 @@ class DictionaryService:
 
     def search_words_by_criteria(
         self,
-        language: LanguageEnum,
+        language: str,
         length: Optional[int] = None,
         starts_with: Optional[str] = None,
         ends_with: Optional[str] = None,
@@ -254,39 +281,31 @@ class DictionaryService:
             conditions = []
             params: List[Any] = []
 
-            if language == LanguageEnum.FRENCH:
-                table = "mots_fr"
-                word_col = "mot"
-                length_col = "longueur"
-                first_col = "premiere_lettre"
-                last_col = "derniere_lettre"
-                valid_col = "valide_scrabble"
-            else:
-                table = "mots_en"
-                word_col = "word"
-                length_col = "length"
-                first_col = "first_letter"
-                last_col = "last_letter"
-                valid_col = "scrabble_valid"
+            # Both databases use 'words' table with same structure
+            table = "words"
+            # word_col = "word_normalized"  # Used in query construction
 
-            conditions.append(f"{valid_col} = 1")
+            # Note: current simple structure doesn't have validation fields
 
             if length:
-                conditions.append(f"{length_col} = ?")
+                conditions.append("LENGTH(word_normalized) = ?")
                 params.append(length)
 
             if starts_with:
-                conditions.append(f"{first_col} = ?")
-                params.append(starts_with.upper())
+                conditions.append("word_normalized LIKE ?")
+                params.append(f"{starts_with.upper()}%")
 
             if ends_with:
-                conditions.append(f"{last_col} = ?")
-                params.append(ends_with.upper())
+                conditions.append("word_normalized LIKE ?")
+                params.append(f"%{ends_with.upper()}")
 
+            # Build query for search with real structure
+            where_clause = " AND ".join(conditions) if conditions else "1=1"
             query = f"""
-            SELECT * FROM {table}
-            WHERE {' AND '.join(conditions)}
-            ORDER BY {word_col}
+            SELECT DISTINCT w.word_normalized as word
+            FROM {table} w
+            WHERE {where_clause}
+            ORDER BY w.word_normalized
             LIMIT ?
             """
             params.append(limit)
@@ -298,7 +317,7 @@ class DictionaryService:
             # Convert to DictionaryWord objects
             words = []
             for row in results:
-                if language == LanguageEnum.FRENCH:
+                if language == "fr":
                     word = DictionaryWord(
                         id=row["id"],
                         word=row["mot"],
@@ -333,7 +352,7 @@ class DictionaryService:
             return words
 
         except Exception as e:
-            logger.error(f"Error searching by criteria in {language.value}: {e}")
+            logger.error(f"Error searching by criteria in {language}: {e}")
             return []
 
     def get_performance_statistics(self) -> Dict[str, float]:
@@ -356,9 +375,9 @@ class DictionaryService:
         for language, conn in self._connection_cache.items():
             try:
                 conn.close()
-                logger.debug(f"Connection closed for {language.value}")
+                logger.debug(f"Connection closed for {language}")
             except Exception as e:
-                logger.error(f"Error closing connection for {language.value}: {e}")
+                logger.error(f"Error closing connection for {language}: {e}")
 
         self._connection_cache.clear()
 

@@ -1,0 +1,101 @@
+# English language configuration for Scrabble
+language_code: "en"
+language_name: "English"
+
+# Letter values in English Scrabble
+letter_values:
+  A: 1
+  B: 3
+  C: 3
+  D: 2
+  E: 1
+  F: 4
+  G: 2
+  H: 4
+  I: 1
+  J: 8
+  K: 5   # Different from French
+  L: 1
+  M: 3   # Different from French
+  N: 1
+  O: 1
+  P: 3
+  Q: 10  # Different from French
+  R: 1
+  S: 1
+  T: 1
+  U: 1
+  V: 4
+  W: 4   # Different from French
+  X: 8   # Different from French
+  Y: 4   # Different from French
+  Z: 10
+
+# Letter frequency in English language
+letter_frequencies:
+  E: 0.127  # Most common in English
+  T: 0.091
+  A: 0.082
+  O: 0.075
+  I: 0.070
+  N: 0.067
+  S: 0.063
+  H: 0.061  # More common in English
+  R: 0.060
+  D: 0.043
+  L: 0.040
+  C: 0.028
+  U: 0.028
+  M: 0.024
+  W: 0.024
+  F: 0.022
+  G: 0.020
+  Y: 0.020
+  P: 0.019
+  B: 0.015
+  V: 0.010
+  K: 0.008
+  J: 0.002
+  X: 0.002
+  Q: 0.001
+  Z: 0.001
+
+# Tile distribution in English Scrabble
+tile_distribution:
+  A: 9
+  B: 2
+  C: 2
+  D: 4
+  E: 12  # Different from French
+  F: 2
+  G: 3
+  H: 2
+  I: 9
+  J: 1
+  K: 1
+  L: 4
+  M: 2
+  N: 6
+  O: 8
+  P: 2
+  Q: 1
+  R: 6
+  S: 4
+  T: 6
+  U: 4
+  V: 2
+  W: 2
+  X: 1
+  Y: 2
+  Z: 1
+  # Blank tiles
+  "*": 2
+
+# Special English Scrabble rules
+special_rules:
+  max_word_length: 15
+  bingo_bonus: 50
+  rack_size: 7
+  vowels: ["A", "E", "I", "O", "U"]
+  high_value_letters: ["J", "Q", "X", "Z"]
+  common_letters: ["E", "T", "A", "O", "I", "N", "S", "H", "R", "D", "L", "U"]

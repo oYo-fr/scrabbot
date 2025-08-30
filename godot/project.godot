@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Scrabbot"
-config/description="Interface de jeu pour le bot Scrabble intelligent"
+config/description="Game interface for the intelligent Scrabble bot"
 run/main_scene="res://scenes/main_menu.tscn"
 config/features=PackedStringArray("4.4")
 config/icon="res://icon.svg"

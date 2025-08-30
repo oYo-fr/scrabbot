@@ -1,0 +1,58 @@
+---
+alwaysApply: true
+---
+
+# Terminal Echo Policy
+
+## Mandatory Rule: No Multiline Echo Commands
+
+When using the terminal, **NEVER** use multiline `echo` commands as they cause issues in the user's environment.
+
+### Forbidden Commands
+
+❌ **NEVER use multiline echo:**
+```bash
+echo "Line 1
+Line 2
+Line 3"
+```
+
+❌ **NEVER use echo with multiline strings:**
+```bash
+echo "✅ Task complete!
+
+🔍 Summary:
+• Item 1 ✅
+• Item 2 ✅"
+```
+
+### Allowed Commands
+
+✅ **Use single-line echo:**
+```bash
+echo "Task completed successfully!"
+echo "All tests passed: 6/6"
+echo "Project is ready for production!"
+```
+
+✅ **Use multiple single echo commands:**
+```bash
+echo "✅ Task completed!"
+echo "🔍 Summary: All items processed"
+echo "🚀 Ready for next step!"
+```
+
+### Why This Rule Exists
+
+- **Environment Compatibility**: Multiline echo causes terminal issues in the user's WSL environment
+- **Command Reliability**: Single-line commands execute more reliably
+- **User Experience**: Prevents interrupted or cancelled commands
+
+### Implementation
+
+- Always use single-line `echo` statements
+- Break multiline messages into multiple `echo` commands if needed
+- Prefer concise, single-line status messages
+- Use simple text without complex Unicode when possible
+
+**Remember: Simple, single-line echo commands work best in this environment.**

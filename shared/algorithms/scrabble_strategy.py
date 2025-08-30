@@ -12,10 +12,17 @@ This module implements:
 
 import itertools
 import logging
+
+# Import configuration loader
+import sys
 from collections import defaultdict
 from dataclasses import dataclass
 from enum import Enum
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
+
+sys.path.append(str(Path(__file__).parent.parent / "models"))
+from language_config import LanguageConfig, get_language_config
 
 logger = logging.getLogger(__name__)
 
@@ -81,42 +88,16 @@ class ScrabbleBoard:
     Handles board state, placement validation, and scoring calculations.
     """
 
-    def __init__(self):
+    def __init__(self, language_config: LanguageConfig):
         self.size = 15
         self.board = self._initialize_board()
         self.occupied_squares: Set[Tuple[int, int]] = set()
+        self.language_config = language_config
 
-        # Scrabble letter values
-        self.letter_values = {
-            "A": 1,
-            "B": 3,
-            "C": 3,
-            "D": 2,
-            "E": 1,
-            "F": 4,
-            "G": 2,
-            "H": 4,
-            "I": 1,
-            "J": 8,
-            "K": 5,
-            "L": 1,
-            "M": 3,
-            "N": 1,
-            "O": 1,
-            "P": 3,
-            "Q": 10,
-            "R": 1,
-            "S": 1,
-            "T": 1,
-            "U": 1,
-            "V": 4,
-            "W": 4,
-            "X": 8,
-            "Y": 4,
-            "Z": 10,
-        }
+        # Use language-specific letter values
+        self.letter_values = language_config.letter_values
 
-        logger.info("Scrabble board initialized")
+        logger.info(f"Scrabble board initialized for {language_config.language_name}")
 
     def _initialize_board(self) -> List[List[BoardSquare]]:
         """Initialize the standard Scrabble board layout."""
@@ -302,9 +283,9 @@ class ScrabbleBoard:
 
         total_score = word_score + cross_word_score
 
-        # Bingo bonus (using all 7 tiles)
-        if len(new_tiles) == 7:
-            total_score += 50
+        # Bingo bonus (using all tiles from rack)
+        if len(new_tiles) == self.language_config.rack_size:
+            total_score += self.language_config.bingo_bonus
 
         return total_score
 
@@ -427,41 +408,15 @@ class StrategyEngine:
     Analyzes board state and player rack to recommend optimal plays.
     """
 
-    def __init__(self, dictionary_words: Set[str]):
+    def __init__(self, dictionary_words: Set[str], language_code: str):
         self.dictionary = dictionary_words
-        self.board = ScrabbleBoard()
+        self.language_config = get_language_config(language_code)
+        self.board = ScrabbleBoard(self.language_config)
 
-        # Common letter frequencies for rack management
-        self.letter_frequencies = {
-            "E": 0.127,
-            "T": 0.091,
-            "A": 0.082,
-            "O": 0.075,
-            "I": 0.070,
-            "N": 0.067,
-            "S": 0.063,
-            "H": 0.061,
-            "R": 0.060,
-            "D": 0.043,
-            "L": 0.040,
-            "C": 0.028,
-            "U": 0.028,
-            "M": 0.024,
-            "W": 0.024,
-            "F": 0.022,
-            "G": 0.020,
-            "Y": 0.020,
-            "P": 0.019,
-            "B": 0.015,
-            "V": 0.010,
-            "K": 0.008,
-            "J": 0.002,
-            "X": 0.002,
-            "Q": 0.001,
-            "Z": 0.001,
-        }
+        # Use language-specific letter frequencies
+        self.letter_frequencies = self.language_config.letter_frequencies
 
-        logger.info(f"Strategy engine initialized with {len(dictionary_words)} words")
+        logger.info(f"Strategy engine initialized with {len(dictionary_words)} words for {self.language_config.language_name}")
 
     def find_best_plays(self, rack: List[str], max_plays: int = 10) -> List[WordPlacement]:
         """
@@ -520,7 +475,7 @@ class StrategyEngine:
                                     start_col=start_col,
                                     direction=Direction.HORIZONTAL,
                                     points=score,
-                                    uses_all_tiles=(len(word) == len(rack)),
+                                    uses_all_tiles=(len(word) == self.language_config.rack_size),
                                     bonus_squares_used=[self.board.board[center_row][center_col].square_type],
                                     tiles_needed=list(letter_combo),
                                 )
@@ -546,7 +501,7 @@ class StrategyEngine:
                                     start_col=center_col,
                                     direction=Direction.VERTICAL,
                                     points=score,
-                                    uses_all_tiles=(len(word) == len(rack)),
+                                    uses_all_tiles=(len(word) == self.language_config.rack_size),
                                     bonus_squares_used=[self.board.board[center_row][center_col].square_type],
                                     tiles_needed=list(letter_combo),
                                 )
@@ -583,16 +538,16 @@ class StrategyEngine:
         for letter in rack:
             rack_counter[letter.upper()] += 1
 
-        # Calculate vowel/consonant ratio
-        vowels = set("AEIOU")
+        # Calculate vowel/consonant ratio using language-specific vowels
+        vowels = set(self.language_config.vowels)
         vowel_count = sum(rack_counter[letter] for letter in vowels if letter in rack_counter)
         consonant_count = len(rack) - vowel_count
 
         vowel_ratio = vowel_count / len(rack) if rack else 0
 
-        # Analyze letter balance
-        high_value_letters = sum(rack_counter[letter] for letter in "JQXZ" if letter in rack_counter)
-        common_letters = sum(rack_counter[letter] for letter in "ETAOINSHRDLU" if letter in rack_counter)
+        # Analyze letter balance using language-specific definitions
+        high_value_letters = sum(rack_counter[letter] for letter in self.language_config.high_value_letters if letter in rack_counter)
+        common_letters = sum(rack_counter[letter] for letter in self.language_config.common_letters if letter in rack_counter)
 
         # Calculate rack score potential
         total_value = sum(self.board.letter_values.get(letter, 0) for letter in rack)
@@ -635,7 +590,7 @@ class StrategyEngine:
         elif vowel_ratio > 0.6:
             suggestions.append("Consider exchanging vowels for consonants")
 
-        high_value_count = sum(rack_counter[letter] for letter in "JQXZ" if letter in rack_counter)
+        high_value_count = sum(rack_counter[letter] for letter in self.language_config.high_value_letters if letter in rack_counter)
         if high_value_count > 2:
             suggestions.append("Too many high-value letters - consider exchanging some")
 
@@ -678,11 +633,11 @@ class StrategyEngine:
             strategy_type = "balanced"
             explanation = "Balance offense and defense"
 
-        # Priority letters based on strategy
+        # Priority letters based on strategy using language-specific definitions
         if strategy_type == "aggressive":
-            priority_letters = ["J", "Q", "X", "Z"]  # High-value letters
+            priority_letters = self.language_config.high_value_letters
         else:
-            priority_letters = ["S", "R", "N", "T"]  # Versatile letters
+            priority_letters = self.language_config.common_letters[:4]  # Top 4 common letters
 
         return StrategyRecommendation(
             placements=best_plays,
@@ -694,6 +649,6 @@ class StrategyEngine:
 
 
 # Factory function
-def create_strategy_engine(dictionary_words: Set[str]) -> StrategyEngine:
-    """Create and return a new strategy engine."""
-    return StrategyEngine(dictionary_words)
+def create_strategy_engine(dictionary_words: Set[str], language_code: str) -> StrategyEngine:
+    """Create and return a new strategy engine for the specified language."""
+    return StrategyEngine(dictionary_words, language_code)

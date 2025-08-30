@@ -75,10 +75,10 @@ class ValidateurMot:
 def validate_word(word: str) -> bool:
     """
     Validates a word against the dictionary.
-    
+
     Args:
         word: The word to validate
-        
+
     Returns:
         True if valid, False otherwise
     """
@@ -89,10 +89,10 @@ def validate_word(word: str) -> bool:
 def validate_word(mot: str) -> bool:
     """
     Valide un mot contre le dictionnaire.
-    
+
     Args:
         mot: Le mot à valider
-        
+
     Returns:
         True si valide, False sinon
     """
@@ -112,7 +112,7 @@ CREATE TABLE french_words (
     is_valid_scrabble BOOLEAN
 );
 
--- ❌ FORBIDDEN  
+-- ❌ FORBIDDEN
 CREATE TABLE mots_fr (
     id INTEGER PRIMARY KEY,
     mot TEXT NOT NULL,
@@ -131,28 +131,28 @@ SCRABBLE_LETTER_POINTS = {...}
 
 # ❌ FORBIDDEN
 LONGUEUR_MAX_MOT = 15
-LANGUE_DEFAUT = "fr" 
+LANGUE_DEFAUT = "fr"
 POINTS_LETTRES_SCRABBLE = {...}
 ```
 
 ## File Naming
 - **REQUIRED**: English file names
-- **EXAMPLES**: 
+- **EXAMPLES**:
   - `dictionary_service.py` ✅
   - `word_validator.py` ✅
   - `test_dictionary_api.py` ✅
   - `service_dictionnaire.py` ❌
 
 ## API Endpoints
-- **REQUIRED**: English endpoint names
+- **REQUIRED**: English endpoint names with language as parameter
 ```python
 # ✅ CORRECT
-@app.get("/api/v1/dictionary/fr/validate/{word}")
-@app.get("/api/v1/dictionary/en/validate/{word}")
+@app.get("/api/v1/dictionary/validate/{word}")  # language=fr|en as query parameter
+@app.get("/api/v1/dictionary/search")  # language=fr|en as query parameter
 
 # ❌ FORBIDDEN
-@app.get("/api/v1/dictionnaire/fr/valider/{mot}")
-@app.get("/api/v1/dictionnaire/en/valider/{word}")
+@app.get("/api/v1/dictionnaire/valider/{mot}")
+@app.get("/api/v1/dictionnaire/rechercher")
 ```
 
 ## Exceptions
@@ -169,7 +169,7 @@ POINTS_LETTRES_SCRABBLE = {...}
 ## Migration
 When refactoring existing French code:
 1. Update variable names to English
-2. Update function names to English  
+2. Update function names to English
 3. Update class names to English
 4. Update comments to English
 5. Update docstrings to English

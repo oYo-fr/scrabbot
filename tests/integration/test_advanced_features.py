@@ -22,7 +22,7 @@ from algorithms.trie_search import create_search_engine
 from algorithms.word_suggestions import create_suggestion_engine
 from analytics.dictionary_analytics import create_analytics_engine
 from cache.intelligent_cache import create_cache_manager
-from models.dictionnaire import DictionaryService
+from models.dictionary import DictionaryService
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -73,11 +73,8 @@ class AdvancedFeaturesTestSuite:
         """Initialize all services with test data."""
         logger.info("Setting up test services...")
 
-        # Initialize dictionary service
-        self.dictionary_service = DictionaryService(
-            "data/dictionaries/databases/french_demo.db",
-            "data/dictionaries/databases/english_demo.db",
-        )
+        # Initialize dictionary service with new signature
+        self.dictionary_service = DictionaryService("data/dictionaries/databases")
 
         # Initialize search engine
         self.search_engine = create_search_engine()
@@ -94,18 +91,15 @@ class AdvancedFeaturesTestSuite:
         self.suggestion_engine.load_word_list(self.test_words["fr"], "fr")
         self.suggestion_engine.load_word_list(self.test_words["en"], "en")
 
-        # Initialize strategy engine
+        # Initialize strategy engine with language code (defaulting to French)
         all_words = set(self.test_words["fr"] + self.test_words["en"])
-        self.strategy_engine = create_strategy_engine(all_words)
+        self.strategy_engine = create_strategy_engine(all_words, "fr")
 
         # Initialize cache manager
         self.cache_manager = create_cache_manager()
 
-        # Initialize analytics engine
-        self.analytics_engine = create_analytics_engine(
-            "data/dictionaries/databases/french_demo.db",
-            "data/dictionaries/databases/english_demo.db",
-        )
+        # Initialize analytics engine with new signature
+        self.analytics_engine = create_analytics_engine("data/dictionaries/databases")
 
         logger.info("All services initialized successfully")
 

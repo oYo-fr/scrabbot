@@ -25,8 +25,28 @@ git config --global pull.rebase false || true
 
 echo "Python environment ready."
 
-# Build Godot targets sequentially (Linux, Windows, Web)
+# Install GUT testing framework for Godot
 cd /workspaces/scrabbot
+echo "Installing GUT testing framework..."
+if [ ! -d "godot/addons/gut" ]; then
+    mkdir -p godot/addons
+    cd godot/addons
+    git clone https://github.com/bitwes/Gut.git gut
+    cd ../..
+    echo "GUT framework installed successfully"
+else
+    echo "GUT framework already installed"
+fi
+
+# Copy test files into Godot project for testing
+echo "Setting up Godot test environment..."
+mkdir -p godot/tests/dictionaries
+if [ -f "tests/dictionaries/test_godot_api.gd" ]; then
+    cp tests/dictionaries/test_godot_api.gd godot/tests/dictionaries/
+    echo "Godot test files copied"
+fi
+
+# Build Godot targets sequentially (Linux, Windows, Web)
 echo "Running Godot exports..."
 bash scripts/export_godot.sh "Linux/X11" "godot" "build/linux/scrabbot.x86_64" || true
 bash scripts/export_godot.sh "Windows Desktop" "godot" "build/windows/Scrabbot.exe" || true

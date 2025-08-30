@@ -6,14 +6,11 @@ This API provides REST endpoints to allow the Godot application
 to access dictionaries and validate words.
 
 Available endpoints:
-- GET /api/v1/dictionnaire/fr/valider/{mot}
-- GET /api/v1/dictionnaire/en/valider/{word}
-- GET /api/v1/dictionnaire/fr/definition/{mot}
-- GET /api/v1/dictionnaire/en/definition/{word}
-- GET /api/v1/dictionnaire/fr/recherche
-- GET /api/v1/dictionnaire/en/recherche
-- GET /api/v1/dictionnaire/statistiques
-- GET /api/v1/dictionnaire/health
+- GET /api/v1/dictionary/validate/{word}?language={lang}
+- GET /api/v1/dictionary/definition/{word}?language={lang}
+- GET /api/v1/dictionary/search?language={lang}
+- GET /api/v1/dictionary/statistics
+- GET /api/v1/dictionary/health
 
 Uses FastAPI for performance and automatic documentation.
 """
@@ -32,7 +29,7 @@ from pydantic import BaseModel, Field
 
 # Import dictionary service
 sys.path.append(str(PathLib(__file__).parent.parent / "models"))
-from dictionary import DictionaryConstants, DictionaryService, LanguageEnum, DictionaryWord, ValidationResult
+from dictionary import DictionaryService, DictionaryWord, ValidationResult
 
 # Logging configuration
 logging.basicConfig(level=logging.INFO)
@@ -40,6 +37,7 @@ logger = logging.getLogger(__name__)
 
 # Global service instance
 dictionary_service: Optional[DictionaryService] = None
+global_settings: Optional[Any] = None
 
 
 @asynccontextmanager
@@ -49,10 +47,13 @@ async def lifespan(app: FastAPI):
 
     # Initialization at startup
     try:
-        dictionary_service = DictionaryService(
-            french_db_path=DictionaryConstants.DEFAULT_FRENCH_DB_PATH,
-            english_db_path=DictionaryConstants.DEFAULT_ENGLISH_DB_PATH,
-        )
+        # Use real database paths
+        from bot.config.settings import Settings
+        settings = Settings()
+        global global_settings
+        global_settings = settings
+
+        dictionary_service = DictionaryService(base_path=settings.dictionaries_base_path)
         logger.info("Dictionary service initialized")
         yield
     except Exception as e:
@@ -91,55 +92,55 @@ app.add_middleware(
 class ReponseValidation(BaseModel):
     """Response model for word validation."""
 
-    mot: str = Field(..., description="The validated word")
-    valide: bool = Field(..., description="Whether the word is valid")
+    word: str = Field(..., description="The validated word")
+    valid: bool = Field(..., description="Whether the word is valid")
     definition: Optional[str] = Field(None, description="Word definition if found")
     points: Optional[int] = Field(None, description="Scrabble points for the word")
-    langue: str = Field(..., description="Dictionary language (fr/en)")
-    temps_recherche_ms: Optional[float] = Field(None, description="Search time in milliseconds")
+    language: str = Field(..., description="Dictionary language (fr/en)")
+    search_time_ms: Optional[float] = Field(None, description="Search time in milliseconds")
 
 
 class ReponseDefinition(BaseModel):
     """Response model for a definition."""
 
-    mot: str = Field(..., description="The searched word")
+    word: str = Field(..., description="The searched word")
     definition: Optional[str] = Field(None, description="Word definition")
-    trouve: bool = Field(..., description="Whether the word was found")
-    langue: str = Field(..., description="Dictionary language")
+    found: bool = Field(..., description="Whether the word was found")
+    language: str = Field(..., description="Dictionary language")
 
 
 class MotComplet(BaseModel):
     """Model for a complete word with all its information."""
 
     id: Optional[int] = Field(None, description="Word ID")
-    mot: str = Field(..., description="The word")
+    word: str = Field(..., description="The word")
     definition: str = Field(..., description="Word definition")
-    categorie_grammaticale: Optional[str] = Field(None, description="Grammatical category")
+    part_of_speech: Optional[str] = Field(None, description="Grammatical category")
     points: int = Field(..., description="Scrabble points")
-    valide_scrabble: bool = Field(..., description="Valid in Scrabble")
-    longueur: int = Field(..., description="Number of letters")
-    premiere_lettre: str = Field(..., description="First letter")
-    derniere_lettre: str = Field(..., description="Last letter")
-    langue: str = Field(..., description="Word language")
+    scrabble_valid: bool = Field(..., description="Valid in Scrabble")
+    length: int = Field(..., description="Number of letters")
+    first_letter: str = Field(..., description="First letter")
+    last_letter: str = Field(..., description="Last letter")
+    language: str = Field(..., description="Word language")
     source: str = Field(..., description="Dictionary source")
 
 
 class ReponseRecherche(BaseModel):
     """Response model for a search."""
 
-    mots: List[MotComplet] = Field(..., description="List of found words")
-    nb_resultats: int = Field(..., description="Number of results")
-    criteres: Dict[str, Any] = Field(..., description="Search criteria used")
-    langue: str = Field(..., description="Search language")
+    words: List[MotComplet] = Field(..., description="List of found words")
+    results_count: int = Field(..., description="Number of results")
+    criteria: Dict[str, Any] = Field(..., description="Search criteria used")
+    language: str = Field(..., description="Search language")
 
 
 class StatistiquesPerformance(BaseModel):
     """Model for performance statistics."""
 
-    requetes_totales: int = Field(..., description="Total number of requests")
-    temps_total_ms: float = Field(..., description="Total time in milliseconds")
-    temps_moyen_ms: float = Field(..., description="Average time per request")
-    requetes_cache: int = Field(..., description="Requests served by cache")
+    total_requests: int = Field(..., description="Total number of requests")
+    total_time_ms: float = Field(..., description="Total time in milliseconds")
+    average_time_ms: float = Field(..., description="Average time per request")
+    cache_requests: int = Field(..., description="Requests served by cache")
 
 
 class ReponseStatistiques(BaseModel):
@@ -172,32 +173,32 @@ def get_service() -> DictionaryService:
 
 
 def convert_validation_result(
-    resultat: ValidationResult,
+    result: ValidationResult,
 ) -> ReponseValidation:
-    """Converts a ResultatValidation to ReponseValidation."""
+    """Converts a ValidationResult to ReponseValidation."""
     return ReponseValidation(
-        mot=resultat.word,
-        valide=resultat.is_valid,
-        definition=resultat.definition,
-        points=resultat.points,
-        langue=resultat.language.value if resultat.language else "unknown",
-        temps_recherche_ms=resultat.search_time_ms,
+        word=result.word,
+        valid=result.is_valid,
+        definition=result.definition,
+        points=result.points,
+        language=result.language if result.language else "unknown",
+        search_time_ms=result.search_time_ms,
     )
 
 
 def convert_dictionary_word(mot: DictionaryWord) -> MotComplet:
-    """Converts a MotDictionnaire to MotComplet."""
+    """Converts a DictionaryWord to MotComplet."""
     return MotComplet(
         id=mot.id,
-        mot=mot.word,
+        word=mot.word,
         definition=mot.definition,
-        categorie_grammaticale=mot.part_of_speech,
+        part_of_speech=mot.part_of_speech,
         points=mot.points,
-        valide_scrabble=mot.is_valid_scrabble,
-        longueur=mot.length,
-        premiere_lettre=mot.first_letter,
-        derniere_lettre=mot.last_letter,
-        langue=mot.language.value,
+        scrabble_valid=mot.is_valid_scrabble,
+        length=mot.length,
+        first_letter=mot.first_letter,
+        last_letter=mot.last_letter,
+        language=mot.language,
         source=mot.source,
     )
 
@@ -208,38 +209,24 @@ def convert_dictionary_word(mot: DictionaryWord) -> MotComplet:
 
 
 @app.get(
-    "/api/v1/dictionnaire/fr/valider/{mot}",
+    "/api/v1/dictionary/validate/{word}",
     response_model=ReponseValidation,
-    summary="Validate French word",
-    description="Validates a word in the French dictionary and returns its definition if found",
+    summary="Validate word",
+    description="Validates a word in the specified dictionary and returns its definition if found",
     tags=["Validation"],
 )
-async def validate_french_word(mot: str = Path(..., description="Word to validate", min_length=1, max_length=15)) -> ReponseValidation:
-    """Validates a French word."""
+async def validate_word(
+    word: str = Path(..., description="Word to validate", min_length=1, max_length=15),
+    language: str = Query(..., description="Dictionary language (fr/en)", regex="^(fr|en)$")
+) -> ReponseValidation:
+    """Validates a word in the specified language dictionary."""
     try:
         service = get_service()
-        resultat = service.validate_word(mot, LanguageEnum.FRENCH)
-        return convert_validation_result(resultat)
+        # Language is now passed as string directly
+        result = service.validate_word(word, language)
+        return convert_validation_result(result)
     except Exception as e:
-        logger.error(f"French word validation error '{mot}': {e}")
-        raise HTTPException(status_code=500, detail=f"Internal error: {str(e)}")
-
-
-@app.get(
-    "/api/v1/dictionnaire/en/valider/{word}",
-    response_model=ReponseValidation,
-    summary="Validate English word",
-    description="Validates a word in the English dictionary and returns its definition if found",
-    tags=["Validation"],
-)
-async def validate_english_word(word: str = Path(..., description="Word to validate", min_length=1, max_length=15)) -> ReponseValidation:
-    """Validates an English word."""
-    try:
-        service = get_service()
-        resultat = service.validate_word(word, LanguageEnum.ENGLISH)
-        return convert_validation_result(resultat)
-    except Exception as e:
-        logger.error(f"English word validation error '{word}': {e}")
+        logger.error(f"Word validation error '{word}' in '{language}': {e}")
         raise HTTPException(status_code=500, detail=f"Internal error: {str(e)}")
 
 
@@ -249,48 +236,29 @@ async def validate_english_word(word: str = Path(..., description="Word to valid
 
 
 @app.get(
-    "/api/v1/dictionnaire/fr/definition/{mot}",
+    "/api/v1/dictionary/definition/{word}",
     response_model=ReponseDefinition,
-    summary="Get French definition",
-    description="Retrieves the definition of a French word",
+    summary="Get word definition",
+    description="Retrieves the definition of a word in the specified language",
     tags=["Definitions"],
 )
-async def get_french_definition(mot: str = Path(..., description="Word to get definition for")) -> ReponseDefinition:
-    """Gets the definition of a French word."""
+async def get_definition(
+    word: str = Path(..., description="Word to get definition for"),
+    language: str = Query(..., description="Dictionary language (fr/en)", regex="^(fr|en)$")
+) -> ReponseDefinition:
+    """Gets the definition of a word in the specified language."""
     try:
         service = get_service()
-        definition = service.get_definition(mot, LanguageEnum.FRENCH)
+        # Language is now passed as string directly
+        definition = service.get_definition(word, language)
         return ReponseDefinition(
-            mot=mot.upper(),
+            word=word.upper(),
             definition=definition,
-            trouve=definition is not None,
-            langue="fr",
+            found=definition is not None,
+            language=language,
         )
     except Exception as e:
-        logger.error(f"French definition retrieval error '{mot}': {e}")
-        raise HTTPException(status_code=500, detail=f"Internal error: {str(e)}")
-
-
-@app.get(
-    "/api/v1/dictionnaire/en/definition/{word}",
-    response_model=ReponseDefinition,
-    summary="Get English definition",
-    description="Retrieves the definition of an English word",
-    tags=["Definitions"],
-)
-async def get_english_definition(word: str = Path(..., description="Word to get definition for")) -> ReponseDefinition:
-    """Gets the definition of an English word."""
-    try:
-        service = get_service()
-        definition = service.get_definition(word, LanguageEnum.ENGLISH)
-        return ReponseDefinition(
-            mot=word.upper(),
-            definition=definition,
-            trouve=definition is not None,
-            langue="en",
-        )
-    except Exception as e:
-        logger.error(f"English definition retrieval error '{word}': {e}")
+        logger.error(f"Definition retrieval error '{word}' in '{language}': {e}")
         raise HTTPException(status_code=500, detail=f"Internal error: {str(e)}")
 
 
@@ -300,78 +268,30 @@ async def get_english_definition(word: str = Path(..., description="Word to get 
 
 
 @app.get(
-    "/api/v1/dictionnaire/fr/recherche",
+    "/api/v1/dictionary/search",
     response_model=ReponseRecherche,
-    summary="Search French words",
-    description="Searches French words according to criteria",
+    summary="Search words",
+    description="Searches words according to criteria in the specified language",
     tags=["Search"],
 )
-async def search_french_words(
-    longueur: Optional[int] = Query(None, ge=2, le=15, description="Word length"),
-    commence_par: Optional[str] = Query(None, min_length=1, max_length=1, description="First letter"),
-    finit_par: Optional[str] = Query(None, min_length=1, max_length=1, description="Last letter"),
-    limite: int = Query(50, ge=1, le=500, description="Maximum number of results"),
-) -> ReponseRecherche:
-    """Searches French words according to criteria."""
-    try:
-        service = get_service()
-
-        # Parameter normalization
-        commence_par_norm = commence_par.upper() if commence_par else None
-        finit_par_norm = finit_par.upper() if finit_par else None
-
-        mots = service.search_words_by_criteria(
-            language=LanguageEnum.FRENCH,
-            length=longueur,
-            starts_with=commence_par_norm,
-            ends_with=finit_par_norm,
-            limit=limite,
-        )
-
-        mots_convertis = [convert_dictionary_word(mot) for mot in mots]
-
-        criteres = {
-            "longueur": longueur,
-            "commence_par": commence_par_norm,
-            "finit_par": finit_par_norm,
-            "limite": limite,
-        }
-
-        return ReponseRecherche(
-            mots=mots_convertis,
-            nb_resultats=len(mots_convertis),
-            criteres=criteres,
-            langue="fr",
-        )
-
-    except Exception as e:
-        logger.error(f"French search error: {e}")
-        raise HTTPException(status_code=500, detail=f"Internal error: {str(e)}")
-
-
-@app.get(
-    "/api/v1/dictionnaire/en/recherche",
-    response_model=ReponseRecherche,
-    summary="Search English words",
-    description="Searches English words according to criteria",
-    tags=["Search"],
-)
-async def search_english_words(
+async def search_words(
+    language: str = Query(..., description="Dictionary language (fr/en)", regex="^(fr|en)$"),
     length: Optional[int] = Query(None, ge=2, le=15, description="Word length"),
     starts_with: Optional[str] = Query(None, min_length=1, max_length=1, description="First letter"),
     ends_with: Optional[str] = Query(None, min_length=1, max_length=1, description="Last letter"),
     limit: int = Query(50, ge=1, le=500, description="Maximum number of results"),
 ) -> ReponseRecherche:
-    """Searches English words according to criteria."""
+    """Searches words according to criteria in the specified language."""
     try:
         service = get_service()
+        # Language is now passed as string directly
 
         # Parameter normalization
         starts_with_norm = starts_with.upper() if starts_with else None
         ends_with_norm = ends_with.upper() if ends_with else None
 
         mots = service.search_words_by_criteria(
-            language=LanguageEnum.ENGLISH,
+            language=language,
             length=length,
             starts_with=starts_with_norm,
             ends_with=ends_with_norm,
@@ -381,6 +301,7 @@ async def search_english_words(
         mots_convertis = [convert_dictionary_word(mot) for mot in mots]
 
         criteres = {
+            "language": language,
             "length": length,
             "starts_with": starts_with_norm,
             "ends_with": ends_with_norm,
@@ -388,14 +309,14 @@ async def search_english_words(
         }
 
         return ReponseRecherche(
-            mots=mots_convertis,
-            nb_resultats=len(mots_convertis),
-            criteres=criteres,
-            langue="en",
+            words=mots_convertis,
+            results_count=len(mots_convertis),
+            criteria=criteres,
+            language=language,
         )
 
     except Exception as e:
-        logger.error(f"English search error: {e}")
+        logger.error(f"Search error in '{language}': {e}")
         raise HTTPException(status_code=500, detail=f"Internal error: {str(e)}")
 
 
@@ -405,7 +326,7 @@ async def search_english_words(
 
 
 @app.get(
-    "/api/v1/dictionnaire/statistiques",
+    "/api/v1/dictionary/statistics",
     response_model=ReponseStatistiques,
     summary="Service statistics",
     description="Returns performance and usage statistics",
@@ -419,8 +340,8 @@ async def get_statistics() -> ReponseStatistiques:
 
         # Check database availability
         bases_dispo = {
-            "francais": PathLib(DictionaryConstants.DEFAULT_FRENCH_DB_PATH).exists(),
-            "anglais": PathLib(DictionaryConstants.DEFAULT_ENGLISH_DB_PATH).exists(),
+            "francais": PathLib(global_settings.dictionaries_base_path, "fr.db").exists() if global_settings else False,
+            "anglais": PathLib(global_settings.dictionaries_base_path, "en.db").exists() if global_settings else False,
         }
 
         return ReponseStatistiques(
@@ -435,7 +356,7 @@ async def get_statistics() -> ReponseStatistiques:
 
 
 @app.get(
-    "/api/v1/dictionnaire/health",
+    "/api/v1/dictionary/health",
     response_model=ReponseHealth,
     summary="Health check",
     description="Checks the service health status",
@@ -446,8 +367,8 @@ async def health_check() -> ReponseHealth:
     try:
         # Database verification
         bases = {
-            "francais": PathLib(DictionaryConstants.DEFAULT_FRENCH_DB_PATH).exists(),
-            "anglais": PathLib(DictionaryConstants.DEFAULT_ENGLISH_DB_PATH).exists(),
+            "francais": PathLib(global_settings.dictionaries_base_path, "fr.db").exists() if global_settings else False,
+            "anglais": PathLib(global_settings.dictionaries_base_path, "en.db").exists() if global_settings else False,
         }
 
         # Global status determination
@@ -476,7 +397,7 @@ async def health_check() -> ReponseHealth:
 
 
 @app.get(
-    "/api/v1/dictionnaire/",
+    "/api/v1/dictionary/",
     summary="API documentation",
     description="Returns the list of available endpoints",
     tags=["Utilities"],
@@ -487,21 +408,12 @@ async def api_documentation():
         "api": "Scrabbot Dictionaries",
         "version": "1.0.0",
         "endpoints": {
-            "validation": {
-                "fr": "/api/v1/dictionnaire/fr/valider/{mot}",
-                "en": "/api/v1/dictionnaire/en/valider/{word}",
-            },
-            "definitions": {
-                "fr": "/api/v1/dictionnaire/fr/definition/{mot}",
-                "en": "/api/v1/dictionnaire/en/definition/{word}",
-            },
-            "search": {
-                "fr": "/api/v1/dictionnaire/fr/recherche",
-                "en": "/api/v1/dictionnaire/en/recherche",
-            },
+            "validation": "/api/v1/dictionary/validate/{word}?language={fr|en}",
+            "definitions": "/api/v1/dictionary/definition/{word}?language={fr|en}",
+            "search": "/api/v1/dictionary/search?language={fr|en}",
             "monitoring": {
-                "statistics": "/api/v1/dictionnaire/statistiques",
-                "health": "/api/v1/dictionnaire/health",
+                "statistics": "/api/v1/dictionary/statistics",
+                "health": "/api/v1/dictionary/health",
             },
         },
         "documentation": "/docs",

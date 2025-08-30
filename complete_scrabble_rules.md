@@ -11,19 +11,66 @@ Scrabble is a word game where players form words on a grid using letter tiles. T
 - **1 notepad** to record scores
 
 ## 🔤 Letter Distribution
-- **A, E, I, L, N, O, R, S, T, U**: 6 copies each
-- **D, M**: 3 copies each
-- **B, C, F, G, H, P, V**: 2 copies each
-- **J, Q, K, W, X, Y, Z**: 1 copy each
-- **Blanks**: 2 copies (represented by white tiles)
+
+### 🇫🇷 **French Scrabble**
+- **A**: 9 tiles
+- **B, C**: 2 tiles each
+- **D**: 3 tiles
+- **E**: 15 tiles
+- **F, G, H**: 2 tiles each
+- **I**: 8 tiles
+- **J, K, Q, W, X, Y, Z**: 1 tile each
+- **L**: 5 tiles
+- **M**: 3 tiles
+- **N, O, P**: 6, 6, 2 tiles
+- **R, S, T, U**: 6 tiles each
+- **V**: 2 tiles
+- **Blanks**: 2 tiles
+
+### 🇺🇸 **English Scrabble**
+- **A**: 9 tiles
+- **B, C**: 2 tiles each
+- **D**: 4 tiles
+- **E**: 12 tiles
+- **F**: 2 tiles
+- **G**: 3 tiles
+- **H**: 2 tiles
+- **I**: 9 tiles
+- **J, K, Q**: 1 tile each
+- **L**: 4 tiles
+- **M**: 2 tiles
+- **N**: 6 tiles
+- **O**: 8 tiles
+- **P**: 2 tiles
+- **R**: 6 tiles
+- **S**: 4 tiles
+- **T**: 6 tiles
+- **U**: 4 tiles
+- **V**: 2 tiles
+- **W**: 2 tiles
+- **X, Z**: 1 tile each
+- **Y**: 2 tiles
+- **Blanks**: 2 tiles
 
 ## 📊 Letter Values
+
+### 🇫🇷 **French Scrabble Values**
 - **1 point**: A, E, I, L, N, O, R, S, T, U
 - **2 points**: D, G, M
 - **3 points**: B, C, P
 - **4 points**: F, H, V
 - **8 points**: J, Q
 - **10 points**: K, W, X, Y, Z
+- **0 point**: Blank (can replace any letter)
+
+### 🇺🇸 **English Scrabble Values**
+- **1 point**: A, E, I, L, N, O, R, S, T, U
+- **2 points**: D, G
+- **3 points**: B, C, M, P
+- **4 points**: F, H, V, W, Y
+- **5 points**: K
+- **8 points**: J, X
+- **10 points**: Q, Z
 - **0 point**: Blank (can replace any letter)
 
 ## 🎮 Game Flow
@@ -58,11 +105,21 @@ Scrabble is a word game where players form words on a grid using letter tiles. T
 3. **Apply word multipliers** (pink/red)
 4. **50-point bonus** if the player uses all 7 tiles at once
 
-### **Calculation Example:**
+### **Calculation Examples:**
+
+#### 🇫🇷 **French Example:**
 Word "CHAT" on a light blue square (C counts double) and a pink square (word counts double):
 - Base value: C(3) + H(4) + A(1) + T(1) = 9 points
 - C counts double: 9 + 3 = 12 points
 - Word counts double: 12 × 2 = **24 points**
+
+#### 🇺🇸 **English Example:**
+Word "CAT" with W on a dark blue square (W counts triple) and a red square (word counts triple):
+- Base value: C(3) + A(1) + T(1) = 5 points
+- No letter multipliers applied
+- Word counts triple: 5 × 3 = **15 points**
+
+Note: Letter values differ between languages (French W=10pts, English W=4pts)
 
 ## 🎯 Special Rules
 
@@ -93,15 +150,29 @@ Word "CHAT" on a light blue square (C counts double) and a pink square (word cou
 
 ## 📚 Allowed Words
 
-### **Accepted:**
-- French dictionary words
+### 🇫🇷 **French Dictionary:**
+#### **Accepted:**
+- French dictionary words (Larousse, Robert)
 - Plurals and conjugated forms
 - Common abbreviations
 - Proper nouns (with capital letter)
 
-### **Forbidden:**
+#### **Forbidden:**
 - Hyphenated compound words
 - Foreign words not adopted into French
+- Acronyms and initialisms
+- Words with apostrophes
+
+### 🇺🇸 **English Dictionary:**
+#### **Accepted:**
+- English dictionary words (Merriam-Webster, Oxford)
+- Plurals and past tenses
+- Common abbreviations
+- Proper nouns (with capital letter)
+
+#### **Forbidden:**
+- Hyphenated compound words
+- Foreign words not adopted into English
 - Acronyms and initialisms
 - Words with apostrophes
 
@@ -112,8 +183,9 @@ Word "CHAT" on a light blue square (C counts double) and a pink square (word cou
 - **If the word is invalid**: The player takes back their tiles and loses their turn
 - **If the word is valid**: The challenger loses their turn
 
-### **Reference Dictionary:**
-- **Larousse** or **Robert** recommended
+### **Reference Dictionaries:**
+- **French**: Larousse or Robert recommended
+- **English**: Merriam-Webster or Oxford recommended
 - Final decision by consensus or referee
 
 ## 🎲 Variants
@@ -141,15 +213,41 @@ Word "CHAT" on a light blue square (C counts double) and a pink square (word cou
 - Keep a good balance of vowels/consonants
 
 ### **Tile Management:**
-- Exchange difficult tiles (Q, Z, K, W, X, Y)
-- Keep tiles for endgame
-- Anticipate vowel needs
+
+#### 🇫🇷 **French Strategy:**
+- Exchange difficult tiles (K, W, X, Y, Z - all worth 10pts)
+- Y is a vowel in French
+- Keep balanced vowel/consonant ratio
+- Q often comes with U in French words
+
+#### 🇺🇸 **English Strategy:**
+- Exchange difficult tiles (Q, Z worth 10pts; J, X worth 8pts)
+- Y is a consonant in English
+- K (5pts) and W (4pts) are more manageable than in French
+- Q without U words are rare but valuable
 
 ### **Defense:**
 - Avoid leaving bonus squares accessible
 - Close off difficult play areas
 - Challenge doubtful words
 
+## 🌍 Language-Specific Differences
+
+### **Key Differences Between French and English Scrabble:**
+
+| Aspect | 🇫🇷 French | 🇺🇸 English |
+|--------|-------------|---------------|
+| **W Value** | 10 points | 4 points |
+| **K Value** | 10 points | 5 points |
+| **Q Value** | 8 points | 10 points |
+| **Y Value** | 10 points | 4 points |
+| **M Value** | 2 points | 3 points |
+| **E Tiles** | 15 tiles | 12 tiles |
+| **Y Status** | Vowel | Consonant |
+| **High-Value** | J,K,Q,W,X,Y,Z | J,Q,X,Z |
+
 ---
 
-*These rules are based on the official French Scrabble rules. For official tournaments, refer to the rules of the International Federation of French-speaking Scrabble.*
+*These rules are based on official Scrabble regulations. For tournaments, refer to:*
+- *🇫🇷 French: International Federation of French-speaking Scrabble*
+- *🇺🇸 English: North American Scrabble Players Association (NASPA)*
