@@ -23,7 +23,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent.parent / "shared" / "models"))
 sys.path.append(str(Path(__file__).parent.parent.parent / "shared" / "api"))
 
-from dictionary import DictionaryService, LanguageEnum
+from shared.models.dictionary import DictionaryService, LanguageEnum
 
 
 class TestRealDatabaseAccess(unittest.TestCase):
@@ -56,7 +56,7 @@ class TestRealDatabaseAccess(unittest.TestCase):
         self.assertEqual(result.word, "DICTIONNAIRE")
         self.assertTrue(result.is_valid)
         self.assertIsNotNone(result.definition)  # Should have definition from real DB
-        self.assertEqual(result.language, LanguageEnum.FRENCH)
+        self.assertEqual(result.language, LanguageEnum.FRENCH.value)
 
     def test_english_word_validation(self):
         """Test validation of English words from real database."""
@@ -67,7 +67,7 @@ class TestRealDatabaseAccess(unittest.TestCase):
         self.assertEqual(result.word, "MANGA")
         self.assertTrue(result.is_valid)
         self.assertIsNotNone(result.definition)  # Should have definition from real DB
-        self.assertEqual(result.language, LanguageEnum.ENGLISH)
+        self.assertEqual(result.language, LanguageEnum.ENGLISH.value)
 
     def test_invalid_word_french(self):
         """Test invalid French word returns False."""
@@ -75,7 +75,7 @@ class TestRealDatabaseAccess(unittest.TestCase):
 
         self.assertFalse(result.is_valid)
         self.assertIsNone(result.definition)
-        self.assertEqual(result.language, LanguageEnum.FRENCH)
+        self.assertEqual(result.language, LanguageEnum.FRENCH.value)
 
     def test_invalid_word_english(self):
         """Test invalid English word returns False."""
@@ -83,7 +83,7 @@ class TestRealDatabaseAccess(unittest.TestCase):
 
         self.assertFalse(result.is_valid)
         self.assertIsNone(result.definition)
-        self.assertEqual(result.language, LanguageEnum.ENGLISH)
+        self.assertEqual(result.language, LanguageEnum.ENGLISH.value)
 
     def test_performance_requirement(self):
         """Test that validation meets performance requirement < 50ms."""
