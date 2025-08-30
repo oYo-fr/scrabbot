@@ -8,9 +8,11 @@ extend-exclude = '''
 (
   ^/data/.*\.py$      # exclude generated data files
   | migrations/.*     # exclude migrations
+  | \.tools/godot/.*  # exclude godot tools
 )
 '''
 
 [tool.isort]
 profile = "black"
 line_length = 150
+skip_glob = [".tools/godot/**", "data/**/*.py"]

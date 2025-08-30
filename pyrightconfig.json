@@ -1,0 +1,16 @@
+{
+  "exclude": [
+    ".tools/**",
+    "godot/addons/**",
+    "data/dictionaries/databases/**",
+    "**/__pycache__/**",
+    "**/.venv/**",
+    "**/venv/**"
+  ],
+  "ignore": [
+    ".tools/**",
+    "godot/addons/**"
+  ],
+  "pythonVersion": "3.10",
+  "typeCheckingMode": "basic"
+}

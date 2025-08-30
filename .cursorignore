@@ -1,0 +1,7 @@
+# Ignore external tools and generated files
+.tools/
+godot/addons/gut/
+data/dictionaries/databases/
+*.db
+*.sqlite
+*.sqlite3

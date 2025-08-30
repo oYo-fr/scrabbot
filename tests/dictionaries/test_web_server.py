@@ -13,6 +13,7 @@ Tests covered:
 """
 
 import logging
+
 # import os  # Not needed
 import sys
 import unittest
@@ -22,7 +23,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent.parent / "shared" / "models"))
 sys.path.append(str(Path(__file__).parent.parent.parent / "shared" / "api"))
 
-from dictionary import DictionaryService
+from dictionary import DictionaryService, LanguageEnum
 
 
 class TestRealDatabaseAccess(unittest.TestCase):

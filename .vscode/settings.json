@@ -1,0 +1,24 @@
+{
+  "python.analysis.extraPaths": [
+    ".",
+    "./shared",
+    "./bot"
+  ],
+  "python.analysis.exclude": [
+    ".tools/**",
+    "godot/addons/**"
+  ],
+  "python.analysis.autoSearchPaths": true,
+  "python.analysis.diagnosticMode": "workspace",
+  "python.defaultInterpreterPath": "/usr/bin/python3",
+  "python.linting.enabled": true,
+  "python.linting.pylintEnabled": false,
+  "python.linting.flake8Enabled": true,
+  "python.linting.mypyEnabled": true,
+  "python.formatting.provider": "black",
+  "python.sortImports.provider": "isort",
+  "python.linting.ignorePatterns": [
+    ".tools/godot/**",
+    "godot/addons/gut/**"
+  ]
+}

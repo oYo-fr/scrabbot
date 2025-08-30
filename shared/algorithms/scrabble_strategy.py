@@ -12,8 +12,6 @@ This module implements:
 
 import itertools
 import logging
-
-# Import configuration loader
 import sys
 from collections import defaultdict
 from dataclasses import dataclass
@@ -21,8 +19,9 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
 
+# Import configuration loader
 sys.path.append(str(Path(__file__).parent.parent / "models"))
-from language_config import LanguageConfig, get_language_config
+from shared.models.language_config import LanguageConfig, get_language_config
 
 logger = logging.getLogger(__name__)
 

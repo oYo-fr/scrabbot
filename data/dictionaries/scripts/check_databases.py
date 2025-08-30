@@ -32,7 +32,7 @@ def check_database(db_path, language):
 
         print(f"📊 Unique words: {nb_words:,}")
         print(f"📊 Total definitions: {nb_definitions:,}")
-        print(f"📊 Average definitions/word: {nb_definitions/nb_words:.1f}")
+        print(f"📊 Average definitions/word: {nb_definitions / nb_words:.1f}")
 
         # Top 10 parts of speech
         cursor.execute(
@@ -46,7 +46,7 @@ def check_database(db_path, language):
         )
         top_categories = cursor.fetchall()
 
-        print(f"\n📋 Top parts of speech:")
+        print("\n📋 Top parts of speech:")
         for cat, nb in top_categories:
             print(f"  • {cat}: {nb:,}")
 
@@ -63,9 +63,11 @@ def check_database(db_path, language):
         )
         examples = cursor.fetchall()
 
-        print(f"\n📝 Sample words:")
+        print("\n📝 Sample words:")
         for word_norm, word_orig, definition, cat in examples:
-            definition_short = definition[:60] + "..." if len(definition) > 60 else definition
+            definition_short = (
+                definition[:60] + "..." if len(definition) > 60 else definition
+            )
             print(f"  • {word_norm} ({word_orig}) [{cat}]")
             print(f"    → {definition_short}")
 
@@ -80,7 +82,7 @@ def check_database(db_path, language):
         """
         )
         len_stats = cursor.fetchone()
-        print(f"\n📏 Word lengths:")
+        print("\n📏 Word lengths:")
         print(f"  • Min: {len_stats[0]} characters")
         print(f"  • Max: {len_stats[1]} characters")
         print(f"  • Average: {len_stats[2]:.1f} characters")
@@ -105,7 +107,7 @@ def main():
     check_database(fr_db, "French")
     check_database(en_db, "English")
 
-    print(f"\n✅ Verification completed!")
+    print("\n✅ Verification completed!")
 
 
 if __name__ == "__main__":

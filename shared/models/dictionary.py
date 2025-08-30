@@ -210,8 +210,8 @@ class DictionaryService:
                 # Extract data from JOIN result (using indices, not names)
                 word_normalized = result[0]  # word_normalized
                 # word_original = result[1]  # Available if needed    # word_original
-                definition = result[2]       # definition from definitions table
-                part_of_speech = result[3]   # part_of_speech
+                definition = result[2]  # definition from definitions table
+                part_of_speech = result[3]  # part_of_speech
 
                 return ValidationResult(
                     word=word_normalized,

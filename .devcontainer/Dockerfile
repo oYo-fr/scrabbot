@@ -80,7 +80,8 @@ RUN git config --global core.pager cat \
     && git config --global --add safe.directory /workspaces/Scrabbot
 
 # Install Python dependencies for the project
-RUN pip3 install --user unidecode==1.4.0
+COPY bot/requirements.txt /tmp/requirements.txt
+RUN pip3 install --user -r /tmp/requirements.txt
 
 # Add Rust to PATH for the current session
 ENV PATH="/home/vscode/.cargo/bin:${PATH}"

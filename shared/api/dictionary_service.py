@@ -29,7 +29,7 @@ from pydantic import BaseModel, Field
 
 # Import dictionary service
 sys.path.append(str(PathLib(__file__).parent.parent / "models"))
-from dictionary import DictionaryService, DictionaryWord, ValidationResult
+from shared.models.dictionary import DictionaryService, DictionaryWord, ValidationResult
 
 # Logging configuration
 logging.basicConfig(level=logging.INFO)
@@ -49,6 +49,7 @@ async def lifespan(app: FastAPI):
     try:
         # Use real database paths
         from bot.config.settings import Settings
+
         settings = Settings()
         global global_settings
         global_settings = settings
@@ -217,7 +218,7 @@ def convert_dictionary_word(mot: DictionaryWord) -> MotComplet:
 )
 async def validate_word(
     word: str = Path(..., description="Word to validate", min_length=1, max_length=15),
-    language: str = Query(..., description="Dictionary language (fr/en)", regex="^(fr|en)$")
+    language: str = Query(..., description="Dictionary language (fr/en)", regex="^(fr|en)$"),
 ) -> ReponseValidation:
     """Validates a word in the specified language dictionary."""
     try:
@@ -244,7 +245,7 @@ async def validate_word(
 )
 async def get_definition(
     word: str = Path(..., description="Word to get definition for"),
-    language: str = Query(..., description="Dictionary language (fr/en)", regex="^(fr|en)$")
+    language: str = Query(..., description="Dictionary language (fr/en)", regex="^(fr|en)$"),
 ) -> ReponseDefinition:
     """Gets the definition of a word in the specified language."""
     try:
