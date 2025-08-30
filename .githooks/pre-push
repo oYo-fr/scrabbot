@@ -2,43 +2,43 @@
 
 set -euo pipefail
 
-echo "[pre-push] Initialisation du hook..."
+echo "[pre-push] Initializing hook..."
 
-# Bypass optionnel via variable d'environnement
+# Optional bypass via environment variable
 case "${SKIP_HOOK_CHECKS:-}" in
     1|true|TRUE|yes|YES)
-        echo "[pre-push] SKIP_HOOK_CHECKS activé. Bypass du hook."
+        echo "[pre-push] SKIP_HOOK_CHECKS enabled. Bypassing hook."
         exit 0
         ;;
 esac
 
-# Se placer à la racine du dépôt
+# Move to repository root
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 cd "$REPO_ROOT"
 
-echo "[pre-push] Nettoyage des fichiers et dossiers temporaires..."
+echo "[pre-push] Cleaning temporary files and directories..."
 
-# Fonctions utilitaires
+# Utility functions
 remove_dirs() {
 	local name="$1"
-	# Supprime tous les dossiers correspondant au motif partout dans le repo, en évitant d'entrer dans les node_modules supprimés ensuite
-	# Ignore les erreurs (fichiers verrouillés sous Windows)
+	# Remove all directories matching pattern throughout repo, avoiding entering node_modules that are deleted later
+	# Ignore errors (locked files on Windows)
 	find . -path "*/.git" -prune -o -type d -name "$name" -print0 | xargs -0 -I {} sh -c 'rm -rf "$1" || true' _ {}
 }
 
 remove_globs() {
 	local pattern="$1"
-	# Supprime fichiers correspondant au motif
+	# Remove files matching pattern
 	find . -path "*/.git" -prune -o -type f -name "$pattern" -print0 | xargs -0 -I {} rm -f {}
 }
 
-# Dossiers Python / caches
+# Python directories / caches
 remove_dirs "__pycache__"
 remove_dirs ".pytest_cache"
 remove_dirs ".mypy_cache"
 remove_dirs ".ruff_cache"
 
-# Dossiers Node / sorties
+# Node directories / outputs
 remove_dirs "node_modules"
 remove_dirs "dist"
 remove_dirs "build"
@@ -46,17 +46,17 @@ remove_dirs ".cache"
 remove_dirs "coverage"
 remove_dirs "htmlcov"
 
-# Environnements virtuels: NE PAS supprimer .venv pour éviter les verrous Windows
+# Virtual environments: DO NOT remove .venv to avoid Windows locks
 
-# Fichiers temporaires courants
+# Common temporary files
 remove_globs "*.log"
 remove_globs "*.tmp"
 remove_globs "*.pyc"
 remove_globs "*.pyo"
 
-echo "[pre-push] Dépendances: réinstallation..."
+echo "[pre-push] Dependencies: reinstallation..."
 
-# Détection Python
+# Python detection
 PYTHON_BIN=""
 if command -v python3 >/dev/null 2>&1; then
 	PYTHON_BIN="python3"
@@ -70,8 +70,8 @@ if [[ -n "${PYTHON_BIN}" ]]; then
 fi
 
 if $USE_PYTHON; then
-	# Crée un venv propre et installe les dépendances si un requirements existe
-	echo "[pre-push] Python: préparation de l'environnement virtuel et installation des dépendances..."
+	# Create clean venv and install dependencies if requirements exists
+	echo "[pre-push] Python: preparing virtual environment and installing dependencies..."
 	if [[ ! -d ".venv" ]]; then
 		"${PYTHON_BIN}" -m venv .venv
 	fi
@@ -81,33 +81,33 @@ if $USE_PYTHON; then
 	elif [[ -f ".venv/Scripts/activate" ]]; then
 		source .venv/Scripts/activate
 	else
-		echo "[pre-push] Avertissement: script d'activation venv introuvable."
+		echo "[pre-push] Warning: venv activation script not found."
 	fi
 	python -m pip install --upgrade pip >/dev/null
 	if [[ -f "bot/requirements.txt" ]]; then
 		pip install -r bot/requirements.txt
 	else
-		echo "[pre-push] Avertissement: bot/requirements.txt introuvable, étape d'installation Python ignorée."
+		echo "[pre-push] Warning: bot/requirements.txt not found, Python installation step skipped."
 	fi
 else
-	echo "[pre-push] Avertissement: Python introuvable, étapes Python ignorées."
+	echo "[pre-push] Warning: Python not found, Python steps skipped."
 fi
 
-# Détection de projets Node et réinstallation
+# Node project detection and reinstallation
 if command -v npm >/dev/null 2>&1; then
-	echo "[pre-push] npm: réinstallation des dépendances (npm ci) pour chaque package.json détecté..."
-	# Cherche tous les package.json (en excluant node_modules)
+	echo "[pre-push] npm: reinstalling dependencies (npm ci) for each detected package.json..."
+	# Find all package.json files (excluding node_modules)
 	mapfile -t PKG_JSONS < <(find . -path "*/node_modules" -prune -o -name package.json -print)
 	for pkg in "${PKG_JSONS[@]}"; do
 		dir="$(dirname "$pkg")"
-		echo "[pre-push] npm ci dans: $dir"
+		echo "[pre-push] npm ci in: $dir"
 		(
 			cd "$dir"
 			npm ci --no-audit --no-fund
 		)
 	done
 else
-	echo "[pre-push] Avertissement: npm introuvable, étapes npm ignorées."
+	echo "[pre-push] Warning: npm not found, npm steps skipped."
 fi
 
 echo "[pre-push] Linting..."
@@ -132,11 +132,11 @@ if $USE_PYTHON; then
 	fi
 fi
 
-# Lint npm si script présent
+# Lint npm if script present
 if command -v npm >/dev/null 2>&1; then
 	for pkg in "${PKG_JSONS[@]:-}"; do
 		dir="$(dirname "$pkg")"
-		echo "[pre-push] vérification et exécution du script lint (si présent) dans: $dir"
+		echo "[pre-push] checking and running lint script (if present) in: $dir"
 		(
 			cd "$dir"
 			npm run -s lint --if-present || true
@@ -146,17 +146,17 @@ fi
 
 echo "[pre-push] Build..."
 
-# Build Python: compilation bytecode
+# Build Python: bytecode compilation
 if $USE_PYTHON; then
 	echo "[pre-push] Python: compilation (compileall)"
 	python -m compileall -q .
 fi
 
-# Build npm si script présent
+# Build npm if script present
 if command -v npm >/dev/null 2>&1; then
 	for pkg in "${PKG_JSONS[@]:-}"; do
 		dir="$(dirname "$pkg")"
-		echo "[pre-push] exécution du script build (si présent) dans: $dir"
+		echo "[pre-push] running build script (if present) in: $dir"
 		(
 			cd "$dir"
 			npm run -s build --if-present || true
@@ -164,19 +164,19 @@ if command -v npm >/dev/null 2>&1; then
 	done
 fi
 
-# Export Godot Web si projet godot présent
+# Export Godot Web if godot project present
 if [[ -d "godot" && -f "scripts/export_godot.sh" ]]; then
-	echo "[pre-push] Godot: export web vers docs/miniapp/game/"
+	echo "[pre-push] Godot: web export to docs/miniapp/game/"
 	if bash scripts/export_godot.sh "Web" "godot" "../docs/miniapp/game/index.html" 2>/dev/null; then
-		echo "[pre-push] Export Godot web terminé avec succès"
+		echo "[pre-push] Godot web export completed successfully"
 	else
-		echo "[pre-push] Avertissement: échec de l'export Godot web (ignoré)"
+		echo "[pre-push] Warning: Godot web export failed (ignored)"
 	fi
 fi
 
 echo "[pre-push] Tests..."
 
-# Tests Python
+# Python tests
 if $USE_PYTHON; then
 	if command -v pytest >/dev/null 2>&1; then
 		echo "[pre-push] pytest"
@@ -184,11 +184,11 @@ if $USE_PYTHON; then
 	fi
 fi
 
-# Tests npm si script présent
+# npm tests if script present
 if command -v npm >/dev/null 2>&1; then
 	for pkg in "${PKG_JSONS[@]:-}"; do
 		dir="$(dirname "$pkg")"
-		echo "[pre-push] exécution du script test (si présent) dans: $dir"
+		echo "[pre-push] running test script (if present) in: $dir"
 		(
 			cd "$dir"
 			npm test --silent --if-present || true
@@ -196,4 +196,4 @@ if command -v npm >/dev/null 2>&1; then
 	done
 fi
 
-echo "[pre-push] Tous les contrôles sont terminés avec succès. Autorisation du push."
+echo "[pre-push] All checks completed successfully. Authorizing push."
