@@ -29,7 +29,7 @@ sys.path.append(str(Path(__file__).parent.parent.parent / "shared" / "models"))
 sys.path.append(str(Path(__file__).parent.parent.parent / "shared" / "api"))
 
 from dictionary import DictionaryService, LanguageEnum, ValidationResult
-from dictionnaire_service import app
+from dictionary_service import app
 from fastapi.testclient import TestClient
 
 
@@ -68,7 +68,7 @@ class TestAccesSQLiteBasique(unittest.TestCase):
         # Metadata table
         cursor.execute(
             """
-        CREATE TABLE dictionnaires (
+        CREATE TABLE dictionaries (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             code_langue CHAR(2) NOT NULL,
             nom TEXT NOT NULL,
@@ -765,7 +765,7 @@ class TestAPIREST(unittest.TestCase):
     def test_endpoint_validation_francais(self):
         """French validation endpoint test."""
         # Mock service for tests
-        with patch("dictionnaire_service.get_service") as mock_service:
+        with patch("dictionary_service.get_service") as mock_service:
             mock_service.return_value.validate_word.return_value = ValidationResult(
                 word="TEST",
                 is_valid=True,
@@ -788,7 +788,7 @@ class TestAPIREST(unittest.TestCase):
 
     def test_endpoint_validation_anglais(self):
         """English validation endpoint test."""
-        with patch("dictionnaire_service.get_service") as mock_service:
+        with patch("dictionary_service.get_service") as mock_service:
             mock_service.return_value.validate_word.return_value = ValidationResult(
                 word="TEST",
                 is_valid=True,
@@ -808,7 +808,7 @@ class TestAPIREST(unittest.TestCase):
 
     def test_endpoint_definition_francaise(self):
         """French definition endpoint test."""
-        with patch("dictionnaire_service.get_service") as mock_service:
+        with patch("dictionary_service.get_service") as mock_service:
             mock_service.return_value.get_definition.return_value = "Définition de test"
 
             response = self.client.get("/api/v1/dictionnaire/fr/definition/TEST")

@@ -1,5 +1,5 @@
 """
-Classe de base pour les gestionnaires de commandes.
+Base class for command handlers.
 """
 
 from abc import ABC, abstractmethod
@@ -10,20 +10,20 @@ from telegram.ext import ContextTypes
 
 
 class BaseHandler(ABC):
-    """Classe de base pour tous les gestionnaires de commandes."""
+    """Base class for all command handlers."""
 
     def __init__(self):
-        """Initialise le gestionnaire."""
+        """Initialize the handler."""
         self.name = self.__class__.__name__.replace("Handler", "").lower()
 
     @abstractmethod
     async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         """
-        Traite la commande.
+        Handle the command.
 
         Args:
-            update: Mise à jour Telegram
-            context: Contexte de la mise à jour
+            update: Telegram update
+            context: Update context
         """
 
     async def send_message(
@@ -35,13 +35,13 @@ class BaseHandler(ABC):
         reply_markup: Optional[Any] = None,
     ) -> None:
         """
-        Envoie un message.
+        Send a message.
 
         Args:
-            update: Mise à jour Telegram
-            text: Texte du message
-            parse_mode: Mode de parsing (Markdown, HTML)
-            reply_markup: Clavier de réponse
+            update: Telegram update
+            text: Message text
+            parse_mode: Parsing mode (Markdown, HTML)
+            reply_markup: Reply keyboard
         """
         if update.effective_chat:
             await context.bot.send_message(
@@ -53,13 +53,13 @@ class BaseHandler(ABC):
 
     def get_user_info(self, update: Update) -> Dict[str, Any]:
         """
-        Récupère les informations de l'utilisateur.
+        Retrieve user information.
 
         Args:
-            update: Mise à jour Telegram
+            update: Telegram update
 
         Returns:
-            Informations de l'utilisateur
+            User information
         """
         user = update.effective_user
         if user:

@@ -1,24 +1,24 @@
-# Bot Telegram
+# Telegram Bot
 python-telegram-bot==20.7
 python-dotenv==1.0.0
 
-# Base de données
+# Database
 sqlalchemy==2.0.23
 alembic==1.13.1
 
-# API et communication
+# API and communication
 fastapi==0.104.1
 uvicorn==0.24.0
 websockets==12.0
 requests==2.31.0
 
-# Tests
+# Testing
 pytest==7.4.3
 pytest-cov==4.1.0
 pytest-asyncio==0.21.1
 pytest-mock==3.12.0
 
-# Linting et formatting
+# Linting and formatting
 flake8==6.1.0
 black==23.11.0
 isort==5.12.0
@@ -27,20 +27,20 @@ mypy==1.7.1
 # Logging
 loguru==0.7.2
 
-# Utilitaires
+# Utilities
 pydantic==2.5.0
 pydantic-settings==2.2.1
 python-multipart==0.0.6
 aiofiles==23.2.1
-pandas==2.3.1  # Pour la manipulation des données de dictionnaires
-beautifulsoup4==4.12.2  # Pour parser le HTML du Wiktionnaire
-unidecode==1.4.0  # Pour la normalisation des mots (suppression des accents)
+pandas==2.3.1  # For dictionary data manipulation
+beautifulsoup4==4.12.2  # For parsing Wiktionary HTML
+unidecode==1.4.0  # For word normalization (accent removal)
 
-# Cache et performance
+# Cache and performance
 redis==5.0.1
 aioredis==2.0.1
 
-# Sécurité
+# Security
 cryptography==43.0.1
 passlib==1.7.4
 

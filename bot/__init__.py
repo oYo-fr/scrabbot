@@ -1,7 +1,7 @@
 """
-Scrabbot - Bot de Scrabble Intelligent
+Scrabbot - Intelligent Scrabble Bot
 
-Un bot Telegram de Scrabble avec intelligence artificielle.
+A Telegram Scrabble bot with artificial intelligence.
 """
 
 __version__ = "0.1.0"

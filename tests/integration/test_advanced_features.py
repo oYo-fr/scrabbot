@@ -75,8 +75,8 @@ class AdvancedFeaturesTestSuite:
 
         # Initialize dictionary service
         self.dictionary_service = DictionaryService(
-            "data/dictionnaires/databases/french_demo.db",
-            "data/dictionnaires/databases/english_demo.db",
+            "data/dictionaries/databases/french_demo.db",
+            "data/dictionaries/databases/english_demo.db",
         )
 
         # Initialize search engine
@@ -103,8 +103,8 @@ class AdvancedFeaturesTestSuite:
 
         # Initialize analytics engine
         self.analytics_engine = create_analytics_engine(
-            "data/dictionnaires/databases/french_demo.db",
-            "data/dictionnaires/databases/english_demo.db",
+            "data/dictionaries/databases/french_demo.db",
+            "data/dictionaries/databases/english_demo.db",
         )
 
         logger.info("All services initialized successfully")

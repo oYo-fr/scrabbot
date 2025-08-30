@@ -13,10 +13,10 @@ from .handlers import HelpHandler, StartHandler
 
 
 class ScrabbotBot:
-    """Bot principal de Scrabbot."""
+    """Main Scrabbot bot."""
 
     def __init__(self):
-        """Initialise le bot."""
+        """Initialize the bot."""
         settings = get_settings()
         self.application = Application.builder().token(settings.telegram_bot_token).build()
         self.handlers: Dict[str, Type] = {
@@ -27,7 +27,7 @@ class ScrabbotBot:
         self._setup_logging()
 
     def _setup_logging(self):
-        """Configure le système de logging."""
+        """Configure logging system."""
         settings = get_settings()
         logging.basicConfig(
             format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -36,34 +36,34 @@ class ScrabbotBot:
         self.logger = logging.getLogger(__name__)
 
     def _setup_handlers(self):
-        """Configure les gestionnaires de commandes."""
-        # Commandes de base
+        """Configure command handlers."""
+        # Basic commands
         self.application.add_handler(CommandHandler("start", self._handle_start))
         self.application.add_handler(CommandHandler("help", self._handle_help))
 
-        # Callbacks pour les boutons inline
+        # Callbacks for inline buttons
         self.application.add_handler(CallbackQueryHandler(self._handle_callback))
 
         # Gestionnaire d'erreurs
         self.application.add_error_handler(self._handle_error)
 
     async def _handle_start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Gère la commande /start."""
+        """Handle /start command."""
         handler = StartHandler()
         await handler.handle(update, context)
 
     async def _handle_help(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Gère la commande /help."""
+        """Handle /help command."""
         handler = HelpHandler()
         await handler.handle(update, context)
 
     async def _handle_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Gère les callbacks des boutons inline."""
+        """Handle inline button callbacks."""
         query = update.callback_query
         if query:
             await query.answer()
 
-            # Traiter les différents types de callbacks
+            # Handle different types of callbacks
             if query.data == "newgame":
                 await self._handle_newgame_callback(update, context)
             elif query.data == "rules":
@@ -74,39 +74,39 @@ class ScrabbotBot:
                 await self._handle_settings_callback(update, context)
 
     async def _handle_newgame_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Gère le callback pour une nouvelle partie."""
+        """Handle callback for new game."""
         await update.callback_query.edit_message_text(
-            text="🎮 *Nouvelle partie*\n\nFonctionnalité en cours de développement...",
+            text="🎮 *New Game*\n\nFeature under development...",
             parse_mode="Markdown",
         )
 
     async def _handle_rules_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Gère le callback pour les règles."""
+        """Handle callback for rules."""
         await update.callback_query.edit_message_text(
-            text="📚 *Règles du jeu*\n\nFonctionnalité en cours de développement...",
+            text="📚 *Game Rules*\n\nFeature under development...",
             parse_mode="Markdown",
         )
 
     async def _handle_stats_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Gère le callback pour les statistiques."""
+        """Handle callback for statistics."""
         await update.callback_query.edit_message_text(
-            text="📊 *Statistiques*\n\nFonctionnalité en cours de développement...",
+            text="📊 *Statistics*\n\nFeature under development...",
             parse_mode="Markdown",
         )
 
     async def _handle_settings_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Gère le callback pour les paramètres."""
+        """Handle callback for settings."""
         await update.callback_query.edit_message_text(
-            text="⚙️ *Configuration*\n\nFonctionnalité en cours de développement...",
+            text="⚙️ *Settings*\n\nFeature under development...",
             parse_mode="Markdown",
         )
 
     async def _handle_error(self, update: Optional[Update], context: ContextTypes.DEFAULT_TYPE):
-        """Gère les erreurs du bot."""
+        """Handle bot errors."""
         err_text = str(getattr(context, "error", ""))
         self.logger.error(f"Exception while handling an update: {err_text}")
 
-        # Ne pas répondre au chat pour les erreurs globales ou conflits de polling
+        # Don't respond to chat for global errors or polling conflicts
         if not update or "Conflict: terminated by other getUpdates request" in err_text:
             return
 
@@ -117,23 +117,23 @@ class ScrabbotBot:
                     text="❌ Une erreur s'est produite. Veuillez réessayer.",
                 )
             except Exception:
-                # Évite une boucle d'erreurs si l'envoi échoue
+                # Avoid error loop if sending fails
                 pass
 
     def start_polling(self) -> None:
-        """Démarre le bot en mode polling (bloquant)."""
+        """Start bot in polling mode (blocking)."""
         self.logger.info("Démarrage du bot Scrabbot (polling)...")
-        # Méthode bloquante et non asynchrone en PTB 20+
+        # Blocking and non-async method in PTB 20+
         self.application.run_polling()
 
     def start_webhook(self) -> None:
-        """Démarre le bot en mode webhook (bloquant)."""
+        """Start bot in webhook mode (blocking)."""
         settings = get_settings()
         if not settings.telegram_webhook_url:
             raise ValueError("TELEGRAM_WEBHOOK_URL doit être configuré pour le mode webhook")
 
         self.logger.info("Démarrage du bot Scrabbot (webhook)...")
-        # Méthode bloquante et non asynchrone en PTB 20+
+        # Blocking and non-async method in PTB 20+
         self.application.run_webhook(
             listen="0.0.0.0",
             port=get_settings().api_port,
@@ -142,7 +142,7 @@ class ScrabbotBot:
 
 
 def main() -> None:
-    """Fonction principale pour démarrer le bot (bloquante)."""
+    """Main function to start the bot (blocking)."""
     settings = get_settings()
     bot = ScrabbotBot()
     try:
@@ -153,7 +153,7 @@ def main() -> None:
     except KeyboardInterrupt:
         logging.info("Arrêt demandé par l'utilisateur.")
     except Exception as e:
-        logging.error(f"Erreur lors du démarrage du bot: {e}")
+        logging.error(f"Error starting bot: {e}")
 
 
 if __name__ == "__main__":

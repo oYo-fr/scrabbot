@@ -94,7 +94,7 @@ data/
 │   │   ├── french.db
 │   │   └── english.db
 │   └── scripts/              # Scripts de conversion
-└── tests/dictionnaires/      # Tests unitaires complets
+└── tests/dictionaries/      # Tests unitaires complets
 ```
 
 ## 📋 Critères d'Acceptation

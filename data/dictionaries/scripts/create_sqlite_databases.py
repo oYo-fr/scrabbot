@@ -465,7 +465,7 @@ def main():
 
     if success:
         logger.info("\n🎉 === DATABASES CREATED SUCCESSFULLY ===")
-        logger.info("📁 SQLite databases created in data/dictionnaires/databases/")
+        logger.info("📁 SQLite databases created in data/dictionaries/databases/")
     else:
         logger.error("\n❌ === ERRORS DURING CREATION ===")
         sys.exit(1)

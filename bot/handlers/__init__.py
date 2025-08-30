@@ -1,5 +1,5 @@
 """
-Gestionnaires de commandes du bot Telegram.
+Telegram bot command handlers.
 """
 
 from .base import BaseHandler

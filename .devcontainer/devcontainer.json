@@ -53,7 +53,7 @@
       "onAutoForward": "notify"
     },
     "8080": {
-      "label": "Interface Web Godot",
+      "label": "Godot Web Interface",
       "onAutoForward": "openBrowser"
     },
     "3000": {

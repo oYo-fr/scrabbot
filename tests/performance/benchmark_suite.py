@@ -109,8 +109,8 @@ class PerformanceBenchmark:
         """Setup test environment with sample data."""
         # Initialize services
         self.dictionary_service = DictionaryService(
-            "data/dictionnaires/databases/french_demo.db",
-            "data/dictionnaires/databases/english_demo.db",
+            "data/dictionaries/databases/french_demo.db",
+            "data/dictionaries/databases/english_demo.db",
         )
         self.search_engine = AdvancedSearchEngine()
         self.cache_manager = DictionaryCacheManager()

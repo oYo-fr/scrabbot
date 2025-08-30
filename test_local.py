@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from typing import Any
 
 
-# Configuration pour simuler Telegram
+# Configuration to simulate Telegram
 @dataclass
 class MockUser:
     id: int
@@ -62,7 +62,7 @@ class MockContext:
 
 
 def create_mock_update(text: str, user_id: int = 123, chat_id: int = 123) -> MockUpdate:
-    """Crée un update mock pour simuler une commande."""
+    """Create a mock update to simulate a command."""
     user = MockUser(user_id, "TestUser", "testuser", "Dupont", "fr")
     chat = MockChat(chat_id)
     message = MockMessage(1, text, chat, user)
@@ -75,14 +75,14 @@ def create_mock_update(text: str, user_id: int = 123, chat_id: int = 123) -> Moc
 
 
 async def test_bot_commands():
-    """Teste les commandes du bot localement."""
+    """Test bot commands locally."""
     from bot.handlers.help import HelpHandler
     from bot.handlers.start import StartHandler
 
     print("🎮 Scrabbot - Test Local")
     print("=" * 50)
 
-    # Configuration de l'environnement de test
+    # Test environment configuration
     import os
 
     os.environ["GODOT_WEB_URL"] = "http://localhost:8080"
@@ -90,14 +90,14 @@ async def test_bot_commands():
 
     context = MockContext()
 
-    # Test de la commande /start
+    # Test the /start command
     print("\n🚀 Test de la commande /start")
     print("-" * 30)
     start_handler = StartHandler()
     start_update = create_mock_update("/start")
     await start_handler.handle(start_update, context)
 
-    # Test de la commande /help
+    # Test the /help command
     print("\n❓ Test de la commande /help")
     print("-" * 30)
     help_handler = HelpHandler()
@@ -109,8 +109,8 @@ async def test_bot_commands():
 
 
 async def interactive_test():
-    """Mode interactif pour tester les commandes."""
-    # Configuration de l'environnement
+    """Interactive mode to test commands."""
+    # Environment configuration
     import os
 
     from bot.handlers.help import HelpHandler
@@ -125,7 +125,7 @@ async def interactive_test():
     print("\n🎮 Scrabbot - Mode Interactif")
     print("=" * 50)
     print("Commandes disponibles:")
-    print("  /start - Démarrer le bot")
+    print("  /start - Start the bot")
     print("  /help  - Afficher l'aide")
     print("  quit   - Quitter")
     print("-" * 50)

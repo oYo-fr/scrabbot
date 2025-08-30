@@ -1,1 +1,1 @@
-# Package shared pour les composants partagés du projet Scrabbot
+# Shared package for Scrabbot project shared components

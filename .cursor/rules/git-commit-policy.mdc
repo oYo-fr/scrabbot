@@ -1,0 +1,40 @@
+---
+alwaysApply: true
+---
+
+# Politique de Commit et Push Git
+
+## Règle Principale
+Ne créer un commit et ne pousser le code que lorsque l'utilisateur le demande explicitement.
+
+## Exceptions
+**Exception pour les fichiers dev container :** Les modifications sur les fichiers de configuration du dev container peuvent être committées et poussées automatiquement sans demander la permission :
+- `.devcontainer/devcontainer.json`
+- `.devcontainer/Dockerfile`
+- `.devcontainer/docker-compose.yml`
+- Autres fichiers dans le dossier `.devcontainer/`
+
+## Comportement Attendu
+1. **Par défaut :** Attendre une demande explicite de l'utilisateur avant de créer un commit ou de pousser
+2. **Mots-clés pour déclencher commit/push :**
+   - "commit"
+   - "pousse le code"
+   - "push"
+   - "valide les changements"
+   - "enregistre les modifications"
+
+## Exemples
+✅ **Autorisé automatiquement :**
+- Modifications du Dockerfile du dev container
+- Ajout de dépendances dans devcontainer.json
+
+❌ **Nécessite autorisation explicite :**
+- Modifications de code
+- Nouveaux fichiers
+- Corrections de bugs
+- Nouvelles fonctionnalités
+- Renommage de fichiers
+- Modifications de configuration autre que dev container
+
+## Note
+Cette règle assure que l'utilisateur garde le contrôle total sur l'historique git de son projet.

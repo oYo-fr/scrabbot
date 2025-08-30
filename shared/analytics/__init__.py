@@ -1,1 +1,1 @@
-# Package analytics pour les analyses et statistiques
+# Analytics package for analysis and statistics

@@ -1,1 +1,1 @@
-# Package models pour les modèles de données partagés
+# Models package for shared data models

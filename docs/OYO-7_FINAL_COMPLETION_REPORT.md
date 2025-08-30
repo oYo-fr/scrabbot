@@ -44,7 +44,7 @@
 │   ├── sources/                         # CSV sources
 │   ├── databases/                       # SQLite optimisées
 │   └── scripts/                         # Outils de conversion
-└── tests/dictionnaires/                 # Tests unitaires
+└── tests/dictionaries/                 # Tests unitaires
 ```
 
 ### 2. Systèmes Avancés (Bonus)

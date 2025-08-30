@@ -1,61 +1,61 @@
 ---
-description: Rappel pour mettre à jour le Dockerfile du dev container lors des installations pip
+description: Reminder to update the dev container Dockerfile when installing pip packages
 ---
 
-# Installation de Packages Python
+# Python Package Installation
 
-## Règle importante : Synchronisation pip install avec Dockerfile
+## Important Rule: Synchronize pip install with Dockerfile
 
-**À chaque fois qu'un `pip install` est effectué pendant le développement, il FAUT également l'ajouter dans le Dockerfile du dev container.**
+**Every time a `pip install` is performed during development, it MUST also be added to the dev container Dockerfile.**
 
-### Processus à suivre :
+### Process to follow:
 
-1. **Lors d'un `pip install` en développement :**
+1. **When doing a `pip install` in development:**
    ```bash
    pip install pandas
    ```
 
-2. **Immédiatement après, mettre à jour le fichier [.devcontainer/Dockerfile](mdc:.devcontainer/Dockerfile) :**
-   - Ajouter le package à la liste des dépendances
-   - Ou mettre à jour [requirements.txt](mdc:requirements.txt) si existant
+2. **Immediately after, update the [.devcontainer/Dockerfile](mdc:.devcontainer/Dockerfile) file:**
+   - Add the package to the dependency list
+   - Or update [requirements.txt](mdc:requirements.txt) if it exists
 
-### Exemples :
+### Examples:
 
-**Option 1 - Ajout direct dans Dockerfile :**
+**Option 1 - Direct addition in Dockerfile:**
 ```dockerfile
 RUN pip install pandas numpy requests
 ```
 
-**Option 2 - Via requirements.txt :**
+**Option 2 - Via requirements.txt:**
 ```dockerfile
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 ```
 
-### Pourquoi c'est important :
+### Why this is important:
 
-- ✅ **Environnement reproductible** pour tous les développeurs
-- ✅ **Évite les erreurs** "module not found" lors de la reconstruction du container
-- ✅ **Déploiement cohérent** entre développement et production
-- ✅ **Documentation** automatique des dépendances
+- ✅ **Reproducible environment** for all developers
+- ✅ **Avoids errors** "module not found" when rebuilding the container
+- ✅ **Consistent deployment** between development and production
+- ✅ **Automatic documentation** of dependencies
 
-### Fichiers concernés :
+### Affected files:
 - [.devcontainer/Dockerfile](mdc:.devcontainer/Dockerfile)
 - [.devcontainer/devcontainer.json](mdc:.devcontainer/devcontainer.json)
-- [requirements.txt](mdc:requirements.txt) (si utilisé)
-- [bot/requirements.txt](mdc:bot/requirements.txt) (spécifique au bot)
+- [requirements.txt](mdc:requirements.txt) (if used)
+- [bot/requirements.txt](mdc:bot/requirements.txt) (bot-specific)
 
-⚠️ **Ne jamais oublier cette étape !** Un pip install sans mise à jour du Dockerfile = problème pour les autres développeurs.
+⚠️ **Never forget this step!** A pip install without Dockerfile update = problem for other developers.
 
-## Gestion des commandes terminal
+## Terminal command management
 
-**Important :** Quand l'utilisateur clique sur "skip" pendant l'exécution d'une commande, c'est souvent parce que :
+**Important:** When the user clicks "skip" during command execution, it's often because:
 
-- ✅ **La commande s'est déjà terminée** et a rendu la main
-- ✅ **Le résultat est déjà affiché** dans le terminal
-- ⚠️ **Je n'ai pas remarqué** que la commande était finie
+- ✅ **The command has already finished** and returned control
+- ✅ **The result is already displayed** in the terminal
+- ⚠️ **I didn't notice** that the command was finished
 
-**Réflexe à avoir :**
-1. **Vérifier le prompt** : Si on voit `$` ou le prompt, la commande est finie
-2. **Lire le dernier output** : La réponse est souvent déjà là
-3. **Continuer sans relancer** : Pas besoin de re-exécuter
+**Reflex to have:**
+1. **Check the prompt**: If you see `$` or the prompt, the command is finished
+2. **Read the last output**: The response is often already there
+3. **Continue without rerunning**: No need to re-execute

@@ -1,5 +1,5 @@
 """
-Configuration du bot Scrabbot avec Pydantic.
+Scrabbot bot configuration with Pydantic.
 """
 
 from typing import Optional
@@ -9,51 +9,51 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    """Configuration du bot Scrabbot."""
+    """Scrabbot bot configuration."""
 
-    # Configuration du bot Telegram
-    telegram_bot_token: str = Field("dev-token", description="Token du bot Telegram")
-    telegram_webhook_url: Optional[str] = Field(None, description="URL du webhook Telegram")
+    # Telegram bot configuration
+    telegram_bot_token: str = Field("dev-token", description="Telegram bot token")
+    telegram_webhook_url: Optional[str] = Field(None, description="Telegram webhook URL")
 
-    # Configuration de la base de données
-    database_url: str = Field("sqlite:///./data/scrabbot.db", description="URL de la base de données")
+    # Database configuration
+    database_url: str = Field("sqlite:///./data/scrabbot.db", description="Database URL")
 
-    # Configuration Redis (optionnel)
-    redis_url: Optional[str] = Field(None, description="URL Redis")
+    # Redis configuration (optional)
+    redis_url: Optional[str] = Field(None, description="Redis URL")
 
-    # Configuration de l'API
-    api_host: str = Field("0.0.0.0", description="Adresse d'écoute de l'API")
-    api_port: int = Field(8000, description="Port d'écoute de l'API")
-    api_secret_key: str = Field("dev-secret-key", description="Clé secrète de l'API")
+    # API configuration
+    api_host: str = Field("0.0.0.0", description="API listening address")
+    api_port: int = Field(8000, description="API listening port")
+    api_secret_key: str = Field("dev-secret-key", description="API secret key")
 
     # Godot
-    godot_executable_path: Optional[str] = Field(None, description="Chemin vers l'exécutable Godot")
-    godot_project_path: str = Field("./godot", description="Chemin vers le projet Godot")
-    godot_web_url: Optional[str] = Field(None, description="URL de l'application web Godot")
+    godot_executable_path: Optional[str] = Field(None, description="Path to Godot executable")
+    godot_project_path: str = Field("./godot", description="Path to Godot project")
+    godot_web_url: Optional[str] = Field(None, description="Godot web application URL")
 
-    # Configuration des logs
-    log_level: str = Field("INFO", description="Niveau de log")
-    log_file: str = Field("logs/scrabbot.log", description="Fichier de log")
+    # Logging configuration
+    log_level: str = Field("INFO", description="Log level")
+    log_file: str = Field("logs/scrabbot.log", description="Log file")
 
-    # Configuration de l'environnement
-    environment: str = Field("development", description="Environnement d'exécution")
-    debug: bool = Field(True, description="Mode debug")
+    # Environment configuration
+    environment: str = Field("development", description="Runtime environment")
+    debug: bool = Field(True, description="Debug mode")
 
-    # Configuration des dictionnaires
+    # Dictionaries configuration
     dictionary_fr_path: str = Field(
-        "./data/dictionnaires/databases/french_extended.db",
-        description="Chemin du dictionnaire français",
+        "./data/dictionaries/databases/french_extended.db",
+        description="French dictionary path",
     )
     dictionary_en_path: str = Field(
-        "./data/dictionnaires/databases/english_extended.db",
-        description="Chemin du dictionnaire anglais",
+        "./data/dictionaries/databases/english_extended.db",
+        description="English dictionary path",
     )
 
-    # Configuration des tests
-    testing: bool = Field(False, description="Mode test")
+    # Testing configuration
+    testing: bool = Field(False, description="Test mode")
     test_database_url: str = Field(
         "sqlite:///./tests/test.db",
-        description="URL de la base de données de test",
+        description="Test database URL",
     )
 
     model_config = ConfigDict(
@@ -65,15 +65,15 @@ class Settings(BaseSettings):
 
     @property
     def is_development(self) -> bool:
-        """Retourne True si l'environnement est en développement."""
+        """Returns True if the environment is in development."""
         return self.environment.lower() == "development"
 
     @property
     def is_production(self) -> bool:
-        """Retourne True si l'environnement est en production."""
+        """Returns True if the environment is in production."""
         return self.environment.lower() == "production"
 
     @property
     def is_testing(self) -> bool:
-        """Retourne True si l'environnement est en test."""
+        """Returns True if the environment is in test."""
         return self.testing or self.environment.lower() == "testing"

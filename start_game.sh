@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script pour lancer Scrabbot en mode test local
+# Script to launch Scrabbot in local test mode
 
 set -e
 
@@ -8,79 +8,79 @@ WORKDIR="/workspaces/scrabbot"
 WEB_DIR="$WORKDIR/build/web"
 WEB_PORT=8080
 
-echo "🎮 Scrabbot - Démarrage du jeu"
+echo "🎮 Scrabbot - Game startup"
 echo "================================"
 
-# Vérifier que nous sommes dans le bon répertoire
+# Verify we are in the correct directory
 cd "$WORKDIR"
 
-# Créer le dossier web s'il n'existe pas
+# Create web directory if it doesn't exist
 mkdir -p "$WEB_DIR"
 
-# Vérifier que l'interface web existe
+# Verify that web interface exists
 if [ ! -f "$WEB_DIR/index.html" ]; then
-    echo "❌ Interface web manquante dans $WEB_DIR/index.html"
+    echo "❌ Web interface missing in $WEB_DIR/index.html"
     exit 1
 fi
 
-# Fonction pour nettoyer les processus en arrière-plan
+# Function to clean up background processes
 cleanup() {
     echo ""
-    echo "🧹 Nettoyage des processus..."
-    
-    # Tuer le serveur web s'il existe
+    echo "🧹 Cleaning up processes..."
+
+    # Kill web server if it exists
     if [ ! -z "$WEB_PID" ]; then
         kill $WEB_PID 2>/dev/null || true
-        echo "   Serveur web arrêté"
+        echo "   Web server stopped"
     fi
-    
-    # Tuer les autres serveurs Python sur le port 8080
+
+    # Kill other Python servers on port 8080
     pkill -f "python.*http.server.*8080" 2>/dev/null || true
-    
-    echo "✅ Nettoyage terminé"
+
+    echo "✅ Cleanup completed"
     exit 0
 }
 
-# Configurer le nettoyage sur interruption
+# Configure cleanup on interruption
 trap cleanup SIGINT SIGTERM
 
-# Vérifier si le port est déjà utilisé
+# Check if port is already in use
 if lsof -i:$WEB_PORT >/dev/null 2>&1; then
-    echo "⚠️  Port $WEB_PORT déjà utilisé, tentative d'arrêt des processus..."
+    echo "⚠️  Port $WEB_PORT already in use, attempting to stop processes..."
     pkill -f "python.*http.server.*$WEB_PORT" 2>/dev/null || true
     sleep 2
 fi
 
-# Démarrer le serveur web en arrière-plan
-echo "🌐 Démarrage du serveur web sur le port $WEB_PORT..."
+# Start web server in background
+echo "🌐 Starting web server on port $WEB_PORT..."
 cd "$WEB_DIR"
 python3 -m http.server $WEB_PORT > /dev/null 2>&1 &
 WEB_PID=$!
 
-# Attendre que le serveur démarre
+# Wait for server to start
 sleep 2
 
-# Vérifier que le serveur fonctionne
+# Verify that server is working
 if ! curl -s http://localhost:$WEB_PORT >/dev/null; then
-    echo "❌ Impossible de démarrer le serveur web"
+    echo "❌ Unable to start web server"
     cleanup
 fi
 
-echo "✅ Serveur web démarré (PID: $WEB_PID)"
-echo "🔗 Interface disponible sur: http://localhost:$WEB_PORT"
+echo "✅ Web server started (PID: $WEB_PID)"
+echo "🔗 Interface available at: http://localhost:$WEB_PORT"
 
-# Retourner au répertoire de travail
+# Return to working directory
 cd "$WORKDIR"
 
-# Configurer l'environnement pour le bot
+# Configure environment for bot
 export GODOT_WEB_URL="http://localhost:$WEB_PORT"
 export TELEGRAM_BOT_TOKEN="test-token"
 
 echo ""
-echo "🤖 Démarrage du test du bot..."
+echo "🤖 Starting bot test..."
 echo "==============================="
 
-# Lancer le test du bot
+# Launch bot test
 python3 test_local.py
 
-# Le nettoyage sera appelé automatiquement à la fin
+# Cleanup will be called automatically at the end

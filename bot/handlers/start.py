@@ -11,7 +11,7 @@ from .base import BaseHandler
 
 
 class StartHandler(BaseHandler):
-    """Gestionnaire pour la commande /start."""
+    """Handler for /start command."""
 
     async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         """
@@ -41,7 +41,7 @@ Utilisez /help pour voir toutes les commandes disponibles.
 *Bon jeu !* 🎯
         """.strip()
 
-        # Lancer la scène Godot (jeu) côté local (desktop)
+        # Launch Godot scene (game) on local side (desktop)
         settings = get_settings()
         launched = False
         if settings.godot_executable_path:
@@ -53,7 +53,7 @@ Utilisez /help pour voir toutes les commandes disponibles.
         suffix = ""
         reply_markup = None
         if settings.godot_web_url:
-            # Ajoute des boutons pour ouvrir la Mini App (plein écran) et un fallback navigateur
+            # Add buttons to open Mini App (full screen) and browser fallback
             reply_markup = InlineKeyboardMarkup(
                 [
                     [

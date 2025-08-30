@@ -105,7 +105,7 @@ data/
 │   │   ├── french_demo.db
 │   │   └── english_demo.db
 │   └── scripts/              # Conversion scripts
-└── tests/dictionnaires/      # Complete unit tests
+└── tests/dictionaries/      # Complete unit tests
 ```
 
 ---

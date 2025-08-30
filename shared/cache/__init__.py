@@ -1,1 +1,1 @@
-# Package cache pour la gestion du cache intelligent
+# Cache package for intelligent cache management

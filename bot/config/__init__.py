@@ -1,15 +1,15 @@
 """
-Configuration du bot Scrabbot.
+Scrabbot bot configuration.
 
-Expose un constructeur paresseux pour éviter l'initialisation
-des variables d'environnement au moment de l'import (utile en tests).
+Exposes a lazy constructor to avoid initializing
+environment variables at import time (useful in tests).
 """
 
 from .settings import Settings
 
 
 def get_settings() -> Settings:
-    """Retourne une instance de paramètres fraîchement initialisée."""
+    """Returns a freshly initialized settings instance."""
     return Settings()
 
 

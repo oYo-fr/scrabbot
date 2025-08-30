@@ -9,7 +9,7 @@ from .base import BaseHandler
 
 
 class HelpHandler(BaseHandler):
-    """Gestionnaire pour la commande /help."""
+    """Handler for /help command."""
 
     async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         """
@@ -30,7 +30,7 @@ class HelpHandler(BaseHandler):
 • /exchange <lettres> - Échanger des lettres
 
 *📋 Commandes d'information :*
-• /start - Démarrer le bot
+• /start - Start the bot
 • /help - Afficher cette aide
 • /rules - Voir les règles du jeu
 • /status - État de la partie actuelle
@@ -48,7 +48,7 @@ class HelpHandler(BaseHandler):
 *Besoin d'aide ?* Contactez @support
         """.strip()
 
-        # Créer des boutons inline pour les actions rapides
+        # Create inline buttons for quick actions
         keyboard = [
             [
                 InlineKeyboardButton("🎮 Nouvelle partie", callback_data="newgame"),

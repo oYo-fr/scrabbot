@@ -1,1 +1,1 @@
-# Package algorithms pour les algorithmes de traitement Scrabble
+# Algorithms package for Scrabble processing algorithms

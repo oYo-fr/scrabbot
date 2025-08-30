@@ -1,1 +1,1 @@
-# Package api pour les services web et API
+# API package for web services and APIs

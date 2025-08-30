@@ -419,7 +419,7 @@ def create_dictionary_service() -> DictionaryService:
     )
 
 
-# Aliases français pour compatibilité avec les tests existants
+# French aliases for compatibility with existing tests
 LangueEnum = LanguageEnum
 DictionnaireService = DictionaryService
 ResultatValidation = ValidationResult

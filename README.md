@@ -1,100 +1,100 @@
-# 🎲 Scrabbot - Bot de Scrabble Intelligent
+# 🎲 Scrabbot - Intelligent Scrabble Bot
 
-Un bot Telegram de Scrabble intelligent capable de jouer contre des humains ou d'autres bots, avec une interface graphique moderne développée en Godot.
+An intelligent Telegram Scrabble bot capable of playing against humans or other bots, with a modern graphical interface developed in Godot.
 
-## 🎯 Objectif
+## 🎯 Objective
 
-Développer un bot de Scrabble capable de jouer intelligemment, d'analyser les parties et d'aider les joueurs à améliorer leurs compétences grâce à l'intelligence artificielle.
+Develop a Scrabble bot capable of playing intelligently, analyzing games, and helping players improve their skills through artificial intelligence.
 
-## 🚀 Fonctionnalités
+## 🚀 Features
 
-### Phase 1 - Structure de base et CI/CD
-- [x] Structure de base du bot Telegram
-- [ ] Écran "Hello World" avec Godot
-- [ ] Mise en place des tests unitaires
-- [ ] Configuration de la CI/CD (GitHub Actions)
-- [ ] Documentation de base
+### Phase 1 - Basic structure and CI/CD
+- [x] Basic Telegram bot structure
+- [ ] "Hello World" screen with Godot
+- [ ] Unit tests setup
+- [ ] CI/CD configuration (GitHub Actions)
+- [ ] Basic documentation
 
-### Phase 1.5 - Menu du jeu et gestion des parties
-- [ ] Menu principal multilingue (FR/EN)
-- [ ] Mode solo avec 3 niveaux de difficulté
-- [ ] Mode multijoueur avec invitations Telegram
-- [ ] Gestion des parties en cours
-- [ ] Système de reprise de parties
+### Phase 1.5 - Game menu and game management
+- [ ] Multilingual main menu (FR/EN)
+- [ ] Solo mode with 3 difficulty levels
+- [ ] Multiplayer mode with Telegram invitations
+- [ ] Current games management
+- [ ] Game resume system
 
-### Phase 2 - Intelligence Artificielle
-- [ ] Algorithme de minimax pour la prise de décision
-- [ ] Évaluation de position
-- [ ] Stratégie offensive et défensive
-- [ ] 3 niveaux de difficulté (facile, moyen, difficile)
+### Phase 2 - Artificial Intelligence
+- [ ] Minimax algorithm for decision making
+- [ ] Position evaluation
+- [ ] Offensive and defensive strategy
+- [ ] 3 difficulty levels (easy, medium, hard)
 
-### Phase 3 - Interface de jeu complète
-- [ ] Interface Godot moderne et interactive
-- [ ] Visualisation du plateau en temps réel
-- [ ] Système de drag and drop des tuiles
-- [ ] Historique des parties
-- [ ] Statistiques de jeu
+### Phase 3 - Complete game interface
+- [ ] Modern and interactive Godot interface
+- [ ] Real-time board visualization
+- [ ] Tile drag and drop system
+- [ ] Game history
+- [ ] Game statistics
 
-### Phase 4 - Fonctionnalités Avancées
-- [ ] Mode entraînement
-- [ ] Analyse de parties
-- [ ] Suggestions de coups
-- [ ] Tournois et classements
-- [ ] Fonctionnalités sociales
+### Phase 4 - Advanced Features
+- [ ] Training mode
+- [ ] Game analysis
+- [ ] Move suggestions
+- [ ] Tournaments and rankings
+- [ ] Social features
 
 ## 🛠️ Technologies
 
-- **Bot Telegram** : Python avec python-telegram-bot
-- **Moteur de jeu** : Python (logique métier)
-- **Interface graphique** : Godot 4.x (GDScript/C#)
-- **Base de données** : SQLite pour les dictionnaires
-- **IA** : Algorithmes de recherche, minimax
-- **Communication** : API REST entre Telegram et Godot
-- **Tests** : pytest, Godot tests
-- **CI/CD** : GitHub Actions
-- **Déploiement** : Docker, VPS/Cloud
+- **Telegram Bot**: Python with python-telegram-bot
+- **Game Engine**: Python (business logic)
+- **Graphical Interface**: Godot 4.x (GDScript/C#)
+- **Database**: SQLite for dictionaries
+- **AI**: Search algorithms, minimax
+- **Communication**: REST API between Telegram and Godot
+- **Testing**: pytest, Godot tests
+- **CI/CD**: GitHub Actions
+- **Deployment**: Docker, VPS/Cloud
 
-## 📋 Règles du Jeu
+## 📋 Game Rules
 
-Le projet respecte les règles officielles du Scrabble français :
-- Distribution des lettres standard (102 tuiles)
-- Calcul des scores avec cases bonus
-- Validation des mots via dictionnaire
-- Règles de contestation
+The project follows official French Scrabble rules:
+- Standard letter distribution (102 tiles)
+- Score calculation with bonus squares
+- Word validation via dictionary
+- Challenge rules
 
-## 🎲 Matériel de Référence
+## 🎲 Reference Material
 
-- Plateau 15x15
-- 102 tuiles (100 lettres + 2 jokers)
-- Valeurs des lettres standardisées
-- Cases bonus (double/triple lettre/mot)
+- 15x15 board
+- 102 tiles (100 letters + 2 blanks)
+- Standardized letter values
+- Bonus squares (double/triple letter/word)
 
-## 📚 Dictionnaires
+## 📚 Dictionaries
 
-- **Français** : ODS, Larousse, Wiktionnaire
-- **Anglais** : SOWPODS, TWL, Wiktionary
-- Stockage local SQLite avec définitions
-- Recherche optimisée pour les algorithmes IA
+- **French**: ODS, Larousse, Wiktionnaire
+- **English**: SOWPODS, TWL, Wiktionary
+- Local SQLite storage with definitions
+- Optimized search for AI algorithms
 
 ## 🏗️ Architecture
 
 ```
 scrabbot/
-├── bot/                 # Bot Telegram
-│   ├── handlers/        # Gestionnaires de commandes
+├── bot/                 # Telegram Bot
+│   ├── handlers/        # Command handlers
 │   ├── config/          # Configuration
-│   └── utils/           # Utilitaires
-├── godot/              # Projet Godot
-│   ├── scenes/         # Scènes du jeu
-│   ├── scripts/        # Scripts GDScript
-│   └── assets/         # Ressources graphiques
-├── shared/             # Code partagé
-│   ├── models/         # Modèles de données
-│   └── api/            # API REST
+│   └── utils/           # Utilities
+├── godot/              # Godot Project
+│   ├── scenes/         # Game scenes
+│   ├── scripts/        # GDScript scripts
+│   └── assets/         # Graphic resources
+├── shared/             # Shared code
+│   ├── models/         # Data models
+│   └── api/            # REST API
 ├── tests/              # Tests
-│   ├── bot/            # Tests du bot
-│   └── godot/          # Tests Godot
-├── data/               # Dictionnaires, règles
+│   ├── bot/            # Bot tests
+│   └── godot/          # Godot tests
+├── data/               # Dictionaries, rules
 └── docs/               # Documentation
 ```
 
@@ -142,38 +142,38 @@ cd godot
 # Utiliser l'interface de test de Godot
 ```
 
-## 📊 Métriques de Succès
+## 📊 Success Metrics
 
-- Performance du bot (win rate)
-- Temps de réponse Telegram
-- Qualité des suggestions
-- Expérience utilisateur
-- Couverture des règles de jeu
-- Performance Godot (FPS, fluidité)
-- Couverture de tests (>80%)
+- Bot performance (win rate)
+- Telegram response time
+- Suggestion quality
+- User experience
+- Game rules coverage
+- Godot performance (FPS, fluidity)
+- Test coverage (>80%)
 
-## 🤝 Contribution
+## 🤝 Contributing
 
-1. Fork le projet
-2. Créer une branche pour votre fonctionnalité (`git checkout -b feature/AmazingFeature`)
-3. Commit vos changements (`git commit -m 'Add some AmazingFeature'`)
-4. Push vers la branche (`git push origin feature/AmazingFeature`)
-5. Ouvrir une Pull Request
+1. Fork the project
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ## 📝 License
 
-Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
+This project is under MIT license. See the `LICENSE` file for more details.
 
-## 🔗 Liens utiles
+## 🔗 Useful Links
 
-- [Règles du jeu](https://www.notion.so/yoanndiguet/Scrabble-R-gles-du-jeu-2535567a9a9c80ab9195daff3a3e556d)
-- [Documentation technique](https://www.notion.so/yoanndiguet/Scrabbot-2535567a9a9c805b9fe8d65998296874)
-- [Projet Linear](https://linear.app/oyo-fr/project/scrabbot-3d6f70e33e88)
+- [Game Rules](https://www.notion.so/yoanndiguet/Scrabble-R-gles-du-jeu-2535567a9a9c80ab9195daff3a3e556d)
+- [Technical Documentation](https://www.notion.so/yoanndiguet/Scrabbot-2535567a9a9c805b9fe8d65998296874)
+- [Linear Project](https://linear.app/oyo-fr/project/scrabbot-3d6f70e33e88)
 
-## 👥 Équipe
+## 👥 Team
 
-- **Yoann Diguet** - Développeur principal
+- **Yoann Diguet** - Lead Developer
 
 ---
 
-*Ce projet est développé avec ❤️ pour les amateurs de Scrabble et d'intelligence artificielle.*
+*This project is developed with ❤️ for Scrabble and artificial intelligence enthusiasts.*

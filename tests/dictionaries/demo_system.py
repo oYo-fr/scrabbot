@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Script de démonstration du système de dictionnaires multilingues Scrabbot.
+Demonstration script for Scrabbot multilingual dictionaries system.
 
 Ce script démontre le fonctionnement complet du système développé pour le ticket OYO-7.
 
@@ -20,13 +20,13 @@ import sys
 import time
 from pathlib import Path
 
-# Ajout des chemins pour les imports
+# Add paths for imports
 sys.path.append(str(Path(__file__).parent.parent.parent / "shared" / "models"))
 sys.path.append(str(Path(__file__).parent.parent.parent / "shared" / "api"))
 sys.path.append(str(Path(__file__).parent.parent.parent / "data" / "dictionaries" / "scripts"))
 
 import requests
-from csv_to_sqlite import ConvertisseurCSVSQLite
+from csv_to_sqlite import CSVToSQLiteConverter
 from dictionary import DictionaryService, LanguageEnum
 
 
@@ -35,7 +35,7 @@ class DictionarySystemDemo:
 
     def __init__(self):
         self.base_dir = Path(__file__).parent.parent.parent
-        self.data_dir = self.base_dir / "data" / "dictionnaires"
+        self.data_dir = self.base_dir / "data" / "dictionaries"
         self.sources_dir = self.data_dir / "sources"
         self.databases_dir = self.data_dir / "databases"
 
@@ -83,12 +83,12 @@ class DictionarySystemDemo:
         """Demonstrates CSV to SQLite conversion."""
         print("  📝 Converting example CSV files...")
 
-        convertisseur = ConvertisseurCSVSQLite()
+        convertisseur = CSVToSQLiteConverter()
 
-        # Conversion français
+        # French conversion
         csv_fr = str(self.sources_dir / "dictionnaire_fr_exemple.csv")
         if Path(csv_fr).exists():
-            succes_fr = convertisseur.convertir_csv_vers_sqlite(csv_fr, self.db_fr_path, "fr", "demo-1.0")
+            succes_fr = convertisseur.convert_csv_to_sqlite(csv_fr, self.db_fr_path, "fr", "demo-1.0")
             print(f"  ✅ Conversion française : {'✓' if succes_fr else '✗'}")
         else:
             print(f"  ⚠️  Fichier CSV français introuvable : {csv_fr}")
@@ -96,12 +96,12 @@ class DictionarySystemDemo:
         # Conversion anglaise
         csv_en = str(self.sources_dir / "dictionnaire_en_exemple.csv")
         if Path(csv_en).exists():
-            succes_en = convertisseur.convertir_csv_vers_sqlite(csv_en, self.db_en_path, "en", "demo-1.0")
+            succes_en = convertisseur.convert_csv_to_sqlite(csv_en, self.db_en_path, "en", "demo-1.0")
             print(f"  ✅ Conversion anglaise : {'✓' if succes_en else '✗'}")
         else:
             print(f"  ⚠️  Fichier CSV anglais introuvable : {csv_en}")
 
-        # Vérification des bases créées
+        # Verify created databases
         if Path(self.db_fr_path).exists():
             taille_fr = Path(self.db_fr_path).stat().st_size / 1024
             print(f"  📁 Base française créée : {taille_fr:.1f} KB")
@@ -116,10 +116,10 @@ class DictionarySystemDemo:
             print("  ❌ Databases not available for validation")
             return
 
-        print("  🔍 Initialisation du service de dictionnaires...")
+        print("  🔍 Initializing dictionary service...")
         self.service = DictionaryService(self.db_fr_path, self.db_en_path)
 
-        # Tests français
+        # French tests
         print("  \n  🇫🇷 Tests de validation française :")
         mots_test_fr = [
             ("CHAT", True, "Mot simple"),
@@ -165,7 +165,7 @@ class DictionarySystemDemo:
 
         print("  ⏱️  Tests de performance (objectif : < 50ms par recherche)")
 
-        # Test de performance individuelle
+        # Individual performance test
         mots_perf = ["CHAT", "DOG", "SCRABBLE", "API", "PERFORMANCE"]
         temps_total = []
 
@@ -178,7 +178,7 @@ class DictionarySystemDemo:
             statut = "🟢" if temps_ms < 50 else "🟡" if temps_ms < 100 else "🔴"
             print(f"    {statut} {mot:12} : {temps_ms:6.2f}ms")
 
-        # Statistiques globales
+        # Global statistics
         temps_moyen = sum(temps_total) / len(temps_total)
         temps_max = max(temps_total)
 
@@ -188,7 +188,7 @@ class DictionarySystemDemo:
         print("    • Objectif       : < 50.00ms")
         print(f"    • Conformité     : {'✅ CONFORME' if temps_moyen < 50 else '⚠️ NON CONFORME'}")
 
-        # Test batch (10 mots)
+        # Batch test (10 words)
         print("  \n  🔄 Test batch (10 mots, objectif : < 200ms)")
         debut_batch = time.time()
         for i in range(10):
@@ -199,7 +199,7 @@ class DictionarySystemDemo:
         print(f"    • Temps total batch : {temps_batch:6.2f}ms")
         print(f"    • Conformité        : {statut_batch}")
 
-        # Statistiques du service
+        # Service statistics
         stats = self.service.obtenir_statistiques_performance()
         print("  \n  📈 Statistiques du service :")
         for cle, valeur in stats.items():
@@ -209,38 +209,38 @@ class DictionarySystemDemo:
         """Demonstrates the REST API for Godot."""
         print("  🚀 Starting REST API server...")
 
-        # Démarrage du serveur en arrière-plan
+        # Start server in background
         try:
             self.demarrer_serveur_api()
-            time.sleep(2)  # Attendre que le serveur démarre
+            time.sleep(2)  # Wait for server to start
 
-            # Tests des endpoints
+            # Test endpoints
             self.tester_endpoints_api()
 
         except Exception as e:
-            print(f"  ❌ Erreur avec l'API REST : {e}")
+            print(f"  ❌ Error with REST API: {e}")
         finally:
             self.arreter_serveur_api()
 
     def demarrer_serveur_api(self):
         """Démarre le serveur API en arrière-plan."""
-        api_script = self.base_dir / "shared" / "api" / "dictionnaire_service.py"
+        api_script = self.base_dir / "shared" / "api" / "dictionary_service.py"
         if not api_script.exists():
             print(f"  ⚠️  Script API introuvable : {api_script}")
             return
 
-        # Configuration des variables d'environnement pour les bases de test
+        # Configure environment variables for test databases
         env = os.environ.copy()
         env["SCRABBOT_DB_FR"] = self.db_fr_path
         env["SCRABBOT_DB_EN"] = self.db_en_path
 
         try:
-            # Lancement du serveur avec uvicorn
+            # Launch server with uvicorn
             cmd = [
                 sys.executable,
                 "-m",
                 "uvicorn",
-                "dictionnaire_service:app",
+                "dictionary_service:app",
                 "--host",
                 "127.0.0.1",
                 "--port",
@@ -260,7 +260,7 @@ class DictionarySystemDemo:
             print("  ✅ Serveur API démarré sur http://127.0.0.1:8000")
 
         except Exception as e:
-            print(f"  ❌ Erreur démarrage serveur : {e}")
+            print(f"  ❌ Server startup error: {e}")
 
     def tester_endpoints_api(self):
         """Teste les endpoints de l'API."""
@@ -280,7 +280,7 @@ class DictionarySystemDemo:
         except Exception as e:
             print(f"    ❌ Health check : Erreur - {e}")
 
-        # Test validation française
+        # Test French validation
         try:
             response = requests.get(f"{base_url}/fr/valider/CHAT", timeout=5)
             if response.status_code == 200:
@@ -293,7 +293,7 @@ class DictionarySystemDemo:
         except Exception as e:
             print(f"    ❌ Validation FR : Erreur - {e}")
 
-        # Test validation anglaise
+        # Test English validation
         try:
             response = requests.get(f"{base_url}/en/valider/CAT", timeout=5)
             if response.status_code == 200:
@@ -304,7 +304,7 @@ class DictionarySystemDemo:
         except Exception as e:
             print(f"    ❌ Validation EN : Erreur - {e}")
 
-        # Test définition
+        # Test definition
         try:
             response = requests.get(f"{base_url}/fr/definition/CHAT", timeout=5)
             if response.status_code == 200:
@@ -319,13 +319,13 @@ class DictionarySystemDemo:
         except Exception as e:
             print(f"    ❌ Définition : Erreur - {e}")
 
-        # Test recherche
+        # Test search
         try:
             response = requests.get(f"{base_url}/fr/recherche?longueur=4&limite=3", timeout=5)
             if response.status_code == 200:
                 data = response.json()
                 nb_resultats = data.get("nb_resultats", 0)
-                print(f"    ✅ Recherche : {nb_resultats} mots de 4 lettres trouvés")
+                print(f"    ✅ Search: {nb_resultats} 4-letter words found")
                 if data.get("mots") and len(data["mots"]) > 0:
                     premier_mot = data["mots"][0].get("mot", "N/A")
                     print(f"       Premier résultat : {premier_mot}")
@@ -354,8 +354,8 @@ class DictionarySystemDemo:
 
         self.arreter_serveur_api()
 
-        print("\n🧹 Nettoyage terminé")
-        print(f"  • Bases de démonstration conservées dans : {self.databases_dir}")
+        print("\n🧹 Cleanup completed")
+        print(f"  • Demo databases preserved in: {self.databases_dir}")
         print("  • Logs disponibles pour analyse")
 
 
