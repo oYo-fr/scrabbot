@@ -54,9 +54,7 @@ async def lifespan(app: FastAPI):
         global global_settings
         global_settings = settings
 
-        dictionary_service = DictionaryService(
-            base_path=settings.dictionaries_base_path
-        )
+        dictionary_service = DictionaryService(base_path=settings.dictionaries_base_path)
         logger.info("Dictionary service initialized")
         yield
     except Exception as e:
@@ -100,9 +98,7 @@ class ReponseValidation(BaseModel):
     definition: Optional[str] = Field(None, description="Word definition if found")
     points: Optional[int] = Field(None, description="Scrabble points for the word")
     language: str = Field(..., description="Dictionary language (fr/en)")
-    search_time_ms: Optional[float] = Field(
-        None, description="Search time in milliseconds"
-    )
+    search_time_ms: Optional[float] = Field(None, description="Search time in milliseconds")
 
 
 class ReponseDefinition(BaseModel):
@@ -151,9 +147,7 @@ class StatistiquesPerformance(BaseModel):
 class ReponseStatistiques(BaseModel):
     """Response model for statistics."""
 
-    performance: StatistiquesPerformance = Field(
-        ..., description="Performance statistics"
-    )
+    performance: StatistiquesPerformance = Field(..., description="Performance statistics")
     bases_disponibles: Dict[str, bool] = Field(..., description="Database availability")
     timestamp: str = Field(..., description="Response timestamp")
 
@@ -175,9 +169,7 @@ class ReponseHealth(BaseModel):
 def get_service() -> DictionaryService:
     """Gets the dictionary service instance."""
     if dictionary_service is None:
-        raise HTTPException(
-            status_code=500, detail="Dictionary service not initialized"
-        )
+        raise HTTPException(status_code=500, detail="Dictionary service not initialized")
     return dictionary_service
 
 
@@ -226,9 +218,7 @@ def convert_dictionary_word(mot: DictionaryWord) -> MotComplet:
 )
 async def validate_word(
     word: str = Path(..., description="Word to validate", min_length=1, max_length=15),
-    language: str = Query(
-        ..., description="Dictionary language (fr/en)", regex="^(fr|en)$"
-    ),
+    language: str = Query(..., description="Dictionary language (fr/en)", regex="^(fr|en)$"),
 ) -> ReponseValidation:
     """Validates a word in the specified language dictionary."""
     try:
@@ -255,9 +245,7 @@ async def validate_word(
 )
 async def get_definition(
     word: str = Path(..., description="Word to get definition for"),
-    language: str = Query(
-        ..., description="Dictionary language (fr/en)", regex="^(fr|en)$"
-    ),
+    language: str = Query(..., description="Dictionary language (fr/en)", regex="^(fr|en)$"),
 ) -> ReponseDefinition:
     """Gets the definition of a word in the specified language."""
     try:
@@ -288,16 +276,10 @@ async def get_definition(
     tags=["Search"],
 )
 async def search_words(
-    language: str = Query(
-        ..., description="Dictionary language (fr/en)", regex="^(fr|en)$"
-    ),
+    language: str = Query(..., description="Dictionary language (fr/en)", regex="^(fr|en)$"),
     length: Optional[int] = Query(None, ge=2, le=15, description="Word length"),
-    starts_with: Optional[str] = Query(
-        None, min_length=1, max_length=1, description="First letter"
-    ),
-    ends_with: Optional[str] = Query(
-        None, min_length=1, max_length=1, description="Last letter"
-    ),
+    starts_with: Optional[str] = Query(None, min_length=1, max_length=1, description="First letter"),
+    ends_with: Optional[str] = Query(None, min_length=1, max_length=1, description="Last letter"),
     limit: int = Query(50, ge=1, le=500, description="Maximum number of results"),
 ) -> ReponseRecherche:
     """Searches words according to criteria in the specified language."""
@@ -359,14 +341,8 @@ async def get_statistics() -> ReponseStatistiques:
 
         # Check database availability
         bases_dispo = {
-            "francais": PathLib(
-                global_settings.dictionaries_base_path, "fr.db"
-            ).exists()
-            if global_settings
-            else False,
-            "anglais": PathLib(global_settings.dictionaries_base_path, "en.db").exists()
-            if global_settings
-            else False,
+            "francais": PathLib(global_settings.dictionaries_base_path, "fr.db").exists() if global_settings else False,
+            "anglais": PathLib(global_settings.dictionaries_base_path, "en.db").exists() if global_settings else False,
         }
 
         # Convert float values to int for StatistiquesPerformance
@@ -400,14 +376,8 @@ async def health_check() -> ReponseHealth:
     try:
         # Database verification
         bases = {
-            "francais": PathLib(
-                global_settings.dictionaries_base_path, "fr.db"
-            ).exists()
-            if global_settings
-            else False,
-            "anglais": PathLib(global_settings.dictionaries_base_path, "en.db").exists()
-            if global_settings
-            else False,
+            "francais": PathLib(global_settings.dictionaries_base_path, "fr.db").exists() if global_settings else False,
+            "anglais": PathLib(global_settings.dictionaries_base_path, "en.db").exists() if global_settings else False,
         }
 
         # Global status determination
